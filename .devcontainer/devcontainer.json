@@ -22,7 +22,7 @@
 	"forwardPorts": [ 5173, 5432, 8000, 8080 ],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "cd backend && poetry install",
+	"postCreateCommand": "cd backend && poetry install && pre-commit install -t commit-msg",
 
 	// Configure tool-specific properties.
 	"customizations": {

@@ -1,0 +1,5 @@
+repos:
+- repo: https://github.com/HannanAFC/NetLogAnalyser
+  rev: <RELEASE_TAG>
+  hooks:
+    - id: conventional-commits
