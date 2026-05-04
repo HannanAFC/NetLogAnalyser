@@ -1,5 +1,5 @@
 repos:
-- repo: https://github.com/HannanAFC/NetLogAnalyser
+- repo: https://github.com/qoomon/git-conventional-commits
   rev: <RELEASE_TAG>
   hooks:
     - id: conventional-commits
