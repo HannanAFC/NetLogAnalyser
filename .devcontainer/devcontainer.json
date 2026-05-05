@@ -2,17 +2,9 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/postgres
 {
 	"name": "Python 3, PostgreSQL & Node for NetLogAnalyser",
-	"dockerComposeFile": "docker-compose.yml",
+	"dockerComposeFile": "../docker-compose.yml",
 	"service": "backend",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"nodeGypDependencies": true,
-			"version": "lts",
-			"pnpmVersion": "latest",
-			"nvmVersion": "latest"
-		}
-	},
+	"workspaceFolder": "/workspaces",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -22,7 +14,7 @@
 	"forwardPorts": [ 5173, 5432, 8000, 8080 ],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "cd backend && poetry install && pre-commit install -t commit-msg && pnpm install git-conventional-commits",
+	// "postCreateCommand": "",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -35,7 +27,11 @@
 				"msjsdiag.vscode-react-native"
 			]
 		}
-	}
+	},
+	"mounts": [
+		"source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind"
+	],
+	"postCreateCommand": "git config --global --add safe.directory /workspaces"
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"

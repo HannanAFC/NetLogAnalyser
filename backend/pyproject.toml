@@ -1,6 +1,6 @@
 [project]
 name = "backend"
-version = "0.1.0"
+version = "0.0.0"
 description = "Backend for NetLogAnalyser."
 authors = [
     {name = "HannanAFC",email = "hannanafc18@gmail.com"}
