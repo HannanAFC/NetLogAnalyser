@@ -24,14 +24,21 @@
 				"stivo.tailwind-fold",
 				"ReprEng.csv",
 				"FastAPILabs.fastapi-vscode",
-				"msjsdiag.vscode-react-native"
-			]
+				"msjsdiag.vscode-react-native",
+				"ms-python.python"
+			],
+			"settings": {
+				"editor.indentSize": "tabSize",
+				"editor.tabSize": 4,
+				"chat.disableAIFeatures": true,
+				"python.defaultInterpreterPath": "/workspaces/backend/.venv/bin/python"
+			}
 		}
 	},
 	"mounts": [
 		"source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind"
 	],
-	"postCreateCommand": "git config --global --add safe.directory /workspaces"
+	"postCreateCommand": "git config --global --add safe.directory /workspaces && cd /workspaces/backend && poetry install --no-interaction"
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"

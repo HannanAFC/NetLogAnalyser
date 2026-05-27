@@ -1,6 +1,6 @@
 FROM python:3.14-slim
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update
 RUN pip install poetry
 
 WORKDIR /app

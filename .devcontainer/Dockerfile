@@ -1,18 +1,15 @@
-FROM node:25-alpine
+FROM python:3.14-alpine
+
 
 RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    python3-dev \
     build-base \
     libffi-dev \
     git \
     curl \
     bash
 
-RUN npm install -g pnpm
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-RUN curl -Ls https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 WORKDIR /workspaces
