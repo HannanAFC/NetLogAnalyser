@@ -1,9 +1,9 @@
 FROM python:3.14-slim
 
-WORKDIR /app
-
 RUN apt-get update && apt-get install -y git
 RUN pip install poetry
+
+WORKDIR /app
 
 COPY pyproject.toml poetry.lock ./
 

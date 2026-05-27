@@ -38,7 +38,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./backend:/workspaces/backend
+      - ./backend:/app
     networks:
       - NetLogAnalyser-Network
     restart: unless-stopped
@@ -46,6 +46,8 @@ services:
   db:
     image: postgres:18-alpine
     container_name: NetLogAnalyser-DB
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
