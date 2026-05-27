@@ -3,7 +3,7 @@
 {
 	"name": "Python 3, PostgreSQL & Node for NetLogAnalyser",
 	"dockerComposeFile": "../docker-compose.yml",
-	"service": "backend",
+	"service": "devcontainer",
 	"workspaceFolder": "/workspaces",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -11,7 +11,7 @@
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or the host.
-	"forwardPorts": [ 5173, 5432, 8000, 8080 ],
+	// "forwardPorts": [ 5173, 5432, 8000 ],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "",
