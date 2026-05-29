@@ -1,16 +1,16 @@
 on:
   pull_request:
     branches:
-     - main
-     - staging
-    paths:
-      - "!*.md"
+      - main
+      - staging
+    paths-ignore:
+      - "**/*.md"
   push:
     branches:
       - main
       - staging
-    paths:
-      - "!*.md"
+    paths-ignore:
+      - "**/*.md"
 
 jobs:
   checks:
@@ -24,12 +24,14 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "25"
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Intall Node.js Dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: npm run lint --max-warnings=0
+        run: pnpm run lint --max-warnings=0
   check-branch:
    runs-on: ubuntu-latest
    needs: checks
