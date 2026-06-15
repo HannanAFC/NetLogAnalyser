@@ -1,13 +1,30 @@
-from fastapi import FastAPI
+import time
 
-app = FastAPI()
+from config import Settings, get_settings
+from fastapi import Depends, FastAPI, Request
+from fastapi.templating import Jinja2Templates
 
+startTime = time.time( )
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+app = FastAPI( )
 
+templates = Jinja2Templates( directory="templates" )
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
+@app.get( "/", include_in_schema=False, name="Index" )
+def root( request: Request, settings: Settings = Depends( get_settings ) ):
+    return templates.TemplateResponse(
+        request,
+        "index.html",
+        {
+            "frontend_url": settings.frontend_url
+        }
+    )
+
+@app.get( "/health" )
+def health_check( settings: Settings = Depends( get_settings ) ):
+    return {
+        "database": "ok",
+        "version": settings.app_version,
+        "uptime_seconds": time.time( ) - startTime,
+        "environment": settings.environment
+    }

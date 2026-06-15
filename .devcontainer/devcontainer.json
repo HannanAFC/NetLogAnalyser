@@ -25,7 +25,8 @@
 				"ReprEng.csv",
 				"FastAPILabs.fastapi-vscode",
 				"msjsdiag.vscode-react-native",
-				"ms-python.python"
+				"ms-python.python",
+				"charliermarsh.ruff"
 			],
 			"settings": {
 				"editor.indentSize": "tabSize",

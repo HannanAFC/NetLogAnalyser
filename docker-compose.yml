@@ -13,7 +13,7 @@ services:
     build: ./frontend
     container_name: NetLogAnalyser-Frontend
     ports:
-      - "5173:5173"
+      - "3000:3000"
     environment:
      - BUILD_MODE=${BUILD_MODE}
     depends_on:
