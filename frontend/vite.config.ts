@@ -32,7 +32,7 @@ export default defineConfig( ( { mode } ) =>
                 },
                 '/ws':
                 {
-                    target: env.VITE_WS_BASE_URL || 'ws://localhost:8000ws',
+                    target: env.VITE_WS_BASE_URL || 'ws://localhost:8000/ws',
                     ws: true
                 }
             }
