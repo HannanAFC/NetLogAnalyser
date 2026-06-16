@@ -1,5 +1,4 @@
-**/node_modules/
-docs/
 .env
 .dockerignore
+.venv
 README.md
