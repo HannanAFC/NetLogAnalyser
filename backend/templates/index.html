@@ -815,7 +815,7 @@
             <div class="status-item">
                 <div class="status-dot ok"></div>
                 <span class="status-label">Uptime</span>
-                <span class="status-value" id="uptimeValue">—</span>
+                <span class="status-value" id="uptimeValue">-</span>
             </div>
         </div>
 
@@ -893,14 +893,14 @@
                     </div>
                     <button class="code-copy" onclick="copyCode()" id="copyCodeBtn">copy</button>
                 </div>
-                <pre
-                    id="codeBlock"><span class="c-kw">import</span> requests
+                <pre id="codeBlock">
+<span class="c-kw">import</span> requests
 <span class="c-kw">from</span> datetime <span class="c-kw">import</span> datetime, timezone
 
 url     = <span class="c-str">"http://localhost:8000/ingest"</span>
 headers = {<span class="c-str">"X-API-Key"</span>: <span class="c-str">"nw_live_your_key_here"</span>}
 
-<span class="c-cm"># Send a batch of log entries — always batch, never one at a time.</span>
+<span class="c-cm"># Send a batch of log entries - always batch, never one at a time.</span>
 payload = [
     {
         <span class="c-key">"src_ip"</span>:           <span class="c-str">"192.168.1.1"</span>,
@@ -914,7 +914,8 @@ payload = [
 ]
 
 response = requests.<span class="c-fn">post</span>(url, json=payload, headers=headers)
-<span class="c-fn">print</span>(response.json())  <span class="c-cm"># {"ingested": 1, "anomalies_detected": 0}</span></pre>
+<span class="c-fn">print</span>(response.json())  <span class="c-cm"># {"ingested": 1, "anomalies_detected": 0}</span>
+                </pre>
             </div>
         </div>
 
@@ -935,7 +936,7 @@ response = requests.<span class="c-fn">post</span>(url, json=payload, headers=he
                 <div class="endpoint-row">
                     <span class="method m-post">POST</span>
                     <span class="ep-path">/ingest</span>
-                    <span class="ep-desc">Submit a batch of log entries — requires API key</span>
+                    <span class="ep-desc">Submit a batch of log entries - requires API key</span>
                 </div>
                 <div class="endpoint-row">
                     <span class="method m-get">GET</span>
@@ -990,7 +991,7 @@ response = requests.<span class="c-fn">post</span>(url, json=payload, headers=he
                 <div class="endpoint-row">
                     <span class="method m-ws">WS</span>
                     <span class="ep-path">/ws/live</span>
-                    <span class="ep-desc">Real-time log stream — requires JWT as ?token=</span>
+                    <span class="ep-desc">Real-time log stream - requires JWT as ?token=</span>
                 </div>
             </div>
         </div>
@@ -1087,14 +1088,13 @@ response = requests.<span class="c-fn">post</span>(url, json=payload, headers=he
 
         // ── Code tabs ─────────────────────────────────────────────────────────────
         const snippets = {
-            python: `
-            <span class="c-kw">import</span> requests
+            python: `<span class="c-kw">import</span> requests
 <span class="c-kw">from</span> datetime <span class="c-kw">import</span> datetime, timezone
 
 url     = <span class="c-str">"http://localhost:8000/ingest"</span>
 headers = {<span class="c-str">"X-API-Key"</span>: <span class="c-str">"nw_live_your_key_here"</span>}
 
-<span class="c-cm"># Send a batch of log entries — always batch, never one at a time.</span>
+<span class="c-cm"># Send a batch of log entries - always batch, never one at a time.</span>
 payload = [
     {
         <span class="c-key">"src_ip"</span>:           <span class="c-str">"192.168.1.1"</span>,
@@ -1112,37 +1112,37 @@ response = requests.<span class="c-fn">post</span>(url, json=payload, headers=he
 
             curl: `<span class="c-cm"># Send a single log entry as a JSON batch</span>
 curl -X POST http://localhost:8000/ingest \\
-  -H <span class="c-str">"X-API-Key: nw_live_your_key_here"</span> \\
-  -H <span class="c-str">"Content-Type: application/json"</span> \\
-  -d <span class="c-str">'[
-    {
-      "src_ip":           "192.168.1.1",
-      "dst_ip":           "10.0.0.1",
-      "src_port":         52341,
-      "dst_port":         443,
-      "protocol":         "TCP",
-      "packet_size_bytes": 128,
-      "captured_at":      "2026-06-15T14:32:07Z"
-    }
-  ]'</span>`,
+    -H <span class="c-str">"X-API-Key: nw_live_your_key_here"</span> \\
+    -H <span class="c-str">"Content-Type: application/json"</span> \\
+    -d <span class="c-str">'[
+        {
+            "src_ip":           "192.168.1.1",
+            "dst_ip":           "10.0.0.1",
+            "src_port":         52341,
+            "dst_port":         443,
+            "protocol":         "TCP",
+            "packet_size_bytes": 128,
+            "captured_at":      "2026-06-15T14:32:07Z"
+        }
+    ]'</span>`,
 
             node: `<span class="c-kw">const</span> response = <span class="c-kw">await</span> <span class="c-fn">fetch</span>(<span class="c-str">"http://localhost:8000/ingest"</span>, {
-  method:  <span class="c-str">"POST"</span>,
-  headers: {
-    <span class="c-str">"X-API-Key"</span>:     <span class="c-str">"nw_live_your_key_here"</span>,
-    <span class="c-str">"Content-Type"</span>:  <span class="c-str">"application/json"</span>,
-  },
-  body: JSON.<span class="c-fn">stringify</span>([
-    {
-      src_ip:           <span class="c-str">"192.168.1.1"</span>,
-      dst_ip:           <span class="c-str">"10.0.0.1"</span>,
-      src_port:         <span class="c-num">52341</span>,
-      dst_port:         <span class="c-num">443</span>,
-      protocol:         <span class="c-str">"TCP"</span>,
-      packet_size_bytes: <span class="c-num">128</span>,
-      captured_at:      <span class="c-kw">new</span> <span class="c-fn">Date</span>().toISOString(),
+    method:  <span class="c-str">"POST"</span>,
+    headers: {
+        <span class="c-str">"X-API-Key"</span>:     <span class="c-str">"nw_live_your_key_here"</span>,
+        <span class="c-str">"Content-Type"</span>:  <span class="c-str">"application/json"</span>,
     },
-  ]),
+    body: JSON.<span class="c-fn">stringify</span>([
+        {
+            src_ip:           <span class="c-str">"192.168.1.1"</span>,
+            dst_ip:           <span class="c-str">"10.0.0.1"</span>,
+            src_port:         <span class="c-num">52341</span>,
+            dst_port:         <span class="c-num">443</span>,
+            protocol:         <span class="c-str">"TCP"</span>,
+            packet_size_bytes: <span class="c-num">128</span>,
+            captured_at:      <span class="c-kw">new</span> <span class="c-fn">Date</span>().toISOString(),
+        },
+    ]),
 });
 
 <span class="c-kw">const</span> data = <span class="c-kw">await</span> response.<span class="c-fn">json</span>();

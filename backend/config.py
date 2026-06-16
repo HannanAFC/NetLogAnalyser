@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -14,8 +12,8 @@ class Settings( BaseSettings ):
     app_name:                      str = "NetLogAnalyser"
     app_version:                   str = "0.1.0"
     debug:                         bool = False
-    environment:                          str = "development"
-    frontend_url:                  str = "localhost:3000"
+    environment:                   str = "development"
+    frontend_url:                  str = "http://localhost:3000"
 
     # Database
     database_url:                  str
@@ -46,6 +44,4 @@ class Settings( BaseSettings ):
     cookie_secure:                 bool = True
     cookie_samesite:               str = "lax"
 
-@lru_cache
-def get_settings() -> Settings:
-    return Settings() # type: ignore[call-arg] # loaded from .env file
+settings = Settings( ) # type: ignore[call-arg] # loaded from .env file

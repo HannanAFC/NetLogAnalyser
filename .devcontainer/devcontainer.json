@@ -32,7 +32,17 @@
 				"editor.indentSize": "tabSize",
 				"editor.tabSize": 4,
 				"chat.disableAIFeatures": true,
-				"python.defaultInterpreterPath": "/workspaces/backend/.venv/bin/python"
+				"python.defaultInterpreterPath": "/workspaces/backend/.venv/bin/python",
+				"files.watcherExclude": {
+					"**/routeTree.gen.ts": true
+				},
+				"search.exclude": {
+					"**/routeTree.gen.ts": true
+				},
+				"files.readonlyInclude": {
+					"**/routeTree.gen.ts": true
+				},
+				"python.analysis.typeCheckingMode": "standard"
 			}
 		}
 	},
