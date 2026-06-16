@@ -59,11 +59,14 @@ jobs:
      - name: Checkout Code
        uses: actions/checkout@v6
 
-     - name: Deploy Backend to Render Staging
+     - name: Deploy Backend to Coolify Staging
        if: github.ref == 'refs/heads/staging'
        env:
-         staging_backend_deploy_url: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_STAGING }}
-       run: curl -X POST "$staging_backend_deploy_url"
+         deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_STAGING }}
+         coolify_token: ${{ secrets.COOLIFY_API_TOKEN }}
+       run: |
+         curl -X GET "$deploy_url" \
+           -H "Authorization: Bearer $coolify_token"
 
      - name: Deploy Frontend to Render Staging
        if: github.ref == 'refs/heads/staging'
@@ -72,13 +75,16 @@ jobs:
        run: curl -X POST "$staging_frontend_deploy_url"
 
        
-     - name: Deploy Backend to Render Main
+     - name: Deploy Backend to Coolify Prod
        if: github.ref == 'refs/heads/main'
        env:
-         prod_backend_deploy_url: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_PROD }}
-       run: curl -X POST "$prod_backend_deploy_url"
+         prod_backend_deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_PROD }}
+         coolify_token: ${{ secrets.COOLIFY_API_TOKEN }}
+       run: |
+         curl -X GET "$deploy_url" \
+           -H "Authorization: Bearer $coolify_token"
 
-     - name: Deploy Frontend to Render Main
+     - name: Deploy Frontend to Render Prod
        if: github.ref == 'refs/heads/main'
        env:
          prod_frontend_deploy_url: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_PROD }}
