@@ -1,16 +1,16 @@
 on:
   pull_request:
     branches:
-     - main
-     - staging
-    paths:
-      - "!*.md"
+      - main
+      - staging
+    paths-ignore:
+      - "**/*.md"
   push:
     branches:
       - main
       - staging
-    paths:
-      - "!*.md"
+    paths-ignore:
+      - "**/*.md"
 
 jobs:
   checks:
@@ -20,16 +20,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.6.0
+
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "25"
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Intall Node.js Dependencies
-        run: npm install
+        run: cd frontend && pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: npm run lint --max-warnings=0
+        run: cd frontend && pnpm run lint --max-warnings=0
   check-branch:
    runs-on: ubuntu-latest
    needs: checks
@@ -52,11 +59,14 @@ jobs:
      - name: Checkout Code
        uses: actions/checkout@v6
 
-     - name: Deploy Backend to Render Staging
+     - name: Deploy Backend to Coolify Staging
        if: github.ref == 'refs/heads/staging'
        env:
-         staging_backend_deploy_url: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_STAGING }}
-       run: curl -X POST "$staging_backend_deploy_url"
+         deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_STAGING }}
+         coolify_token: ${{ secrets.COOLIFY_API_TOKEN }}
+       run: |
+         curl -X GET "$deploy_url" \
+           -H "Authorization: Bearer $coolify_token"
 
      - name: Deploy Frontend to Render Staging
        if: github.ref == 'refs/heads/staging'
@@ -65,13 +75,16 @@ jobs:
        run: curl -X POST "$staging_frontend_deploy_url"
 
        
-     - name: Deploy Backend to Render Main
+     - name: Deploy Backend to Coolify Prod
        if: github.ref == 'refs/heads/main'
        env:
-         prod_backend_deploy_url: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_PROD }}
-       run: curl -X POST "$prod_backend_deploy_url"
+         prod_backend_deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_PROD }}
+         coolify_token: ${{ secrets.COOLIFY_API_TOKEN }}
+       run: |
+         curl -X GET "$deploy_url" \
+           -H "Authorization: Bearer $coolify_token"
 
-     - name: Deploy Frontend to Render Main
+     - name: Deploy Frontend to Render Prod
        if: github.ref == 'refs/heads/main'
        env:
          prod_frontend_deploy_url: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_PROD }}
