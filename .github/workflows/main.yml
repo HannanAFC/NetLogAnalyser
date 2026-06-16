@@ -78,7 +78,7 @@ jobs:
      - name: Deploy Backend to Coolify Prod
        if: github.ref == 'refs/heads/main'
        env:
-         prod_backend_deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_PROD }}
+         deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_PROD }}
          coolify_token: ${{ secrets.COOLIFY_API_TOKEN }}
        run: |
          curl -X GET "$deploy_url" \
