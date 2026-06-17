@@ -6,7 +6,7 @@ projects:
   - name: Production
     services:
     - type: web
-      name: NetLogAnalyser
+      name: NetLogAnalyser Production
       runtime: static
       repo: https://github.com/HannanAFC/NetLogAnalyser
       envVars:
@@ -29,7 +29,7 @@ projects:
   - name: Staging
     services:
     - type: web
-      name: NetLogAnalyser
+      name: NetLogAnalyser Staging
       runtime: static
       repo: https://github.com/HannanAFC/NetLogAnalyser
       envVars:
