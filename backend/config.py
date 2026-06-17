@@ -47,7 +47,12 @@ class Settings( BaseSettings ):
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 
-JSON_API_CSP = "default-src 'none'; frame-ancestors 'none'"
+JSON_API_CSP = (
+    "default-src 'none'; "
+    "frame-ancestors 'none'; "
+    "base-uri 'none'; "
+    "object-src 'none'"
+)
 
 LANDING_CSP = (
     "default-src 'self'; "
@@ -63,12 +68,14 @@ LANDING_CSP = (
 
 DOCS_CSP = (
     "default-src 'self'; "
-    "script-src 'self' https://cdn.jsdelivr.net  'unsafe-inline'; "
+    "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
     "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com 'unsafe-inline'; "
-    "img-src 'self' data: https://cdn.jsdelivr.net data: fastapi.tiangolo.com/img/favicon.png data: https://cdn.redoc.ly/redoc/logo-mini.svg; "
+    "img-src 'self' data: https://cdn.jsdelivr.net https://fastapi.tiangolo.com https://cdn.redoc.ly; "
     "font-src 'self' https://fonts.gstatic.com; "
     "connect-src 'self'; "
-    "frame-ancestors 'none'; base-uri 'self'; "
+    "frame-ancestors 'none'; "
+    "base-uri 'self'; "
+    "object-src 'none'"
 )
 
 class SecurityHeadersMiddleware( BaseHTTPMiddleware ):

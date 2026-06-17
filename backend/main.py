@@ -6,8 +6,9 @@ from config import SecurityHeadersMiddleware, settings
 from database import engine, get_db
 from fastapi import Depends, FastAPI, Request, status
 from fastapi.exceptions import HTTPException
-from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,6 +25,14 @@ async def lifespan( _app: FastAPI ):
 startTime = time.time( )
 
 app = FastAPI( lifespan=lifespan )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_allowed_origins,
+    allow_credentials=True,
+    allow_methods=[ "GET", "POST", "PATCH", "DELETE", "OPTIONS" ],
+    allow_headers=[ "*" ],
+)
 
 app.add_middleware( SecurityHeadersMiddleware )
 
