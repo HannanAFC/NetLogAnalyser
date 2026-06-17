@@ -1,5 +1,6 @@
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from starlette.middleware.base import BaseHTTPMiddleware
 
 
 class Settings( BaseSettings ):
@@ -45,3 +46,47 @@ class Settings( BaseSettings ):
     cookie_samesite:               str = "lax"
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
+
+JSON_API_CSP = "default-src 'none'; frame-ancestors 'none'"
+
+LANDING_CSP = (
+    "default-src 'self'; "
+    "script-src 'self'; "
+    "style-src 'self' https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data:; "
+    "connect-src 'self'; "
+    "frame-ancestors 'none'; "
+    "base-uri 'self'; "
+    "object-src 'none'"
+)
+
+DOCS_CSP = (
+    "default-src 'self'; "
+    "script-src 'self' https://cdn.jsdelivr.net  'unsafe-inline'; "
+    "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com 'unsafe-inline'; "
+    "img-src 'self' data: https://cdn.jsdelivr.net data: fastapi.tiangolo.com/img/favicon.png data: https://cdn.redoc.ly/redoc/logo-mini.svg; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "connect-src 'self'; "
+    "frame-ancestors 'none'; base-uri 'self'; "
+)
+
+class SecurityHeadersMiddleware( BaseHTTPMiddleware ):
+    async def dispatch( self, request, call_next ):
+        response = await call_next (request )
+        path = request.url.path
+
+        if path.startswith( "/docs" ) or path.startswith( "/redoc" ):
+            csp = DOCS_CSP
+        elif path == "/":
+            csp = LANDING_CSP
+        else:
+            csp = JSON_API_CSP
+
+        response.headers[ "Content-Security-Policy" ]   = csp
+        response.headers[ "Strict-Transport-Security" ] = "max-age=63072000; includeSubDomains"
+        response.headers[ "X-Content-Type-Options" ]    = "nosniff"
+        response.headers[ "X-Frame-Options" ]           = "DENY"
+        response.headers[ "Referrer-Policy" ]           = "no-referrer"
+        response.headers[ "Permissions-Policy" ]        = "geolocation=(), camera=(), microphone=()"
+        return response
