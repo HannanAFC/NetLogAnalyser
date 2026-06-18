@@ -3,6 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
+from config import settings
+from database import Base
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -15,9 +17,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import ENUM, INET, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from config import settings
-from database import Base
 
 
 class User( Base ):
@@ -45,20 +44,24 @@ class APIKey( Base ):
     label:        Mapped[ str ]             = mapped_column( String( 50 ), nullable=False, default=lambda: f"key_{ datetime.now( timezone.utc ):%Y-%m-%d %H:%M }" )
     is_active:    Mapped[ bool ]            = mapped_column( Boolean, nullable=False, server_default=text( "true" ) )
     last_used_at: Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ), nullable=True )
-    created_at:   Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
+    created_at:   Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False, server_default=func.now( ) )
     revoked_at:   Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ) )
     user:         Mapped[ User ]            = relationship( back_populates="api_keys" )
 
 class RefreshToken( Base ):
     __tablename__ = "refresh_tokens"
 
-    id:         Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
-    user_id:    Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
-    token_hash: Mapped[ str ]             = mapped_column( String( 64 ), unique=True, index=True, nullable=False )
-    expires_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False )
-    created_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False, server_default=func.now( ) )
-    revoked_at: Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ) )
-    user:       Mapped[ User ]            = relationship( back_populates="refresh_tokens" )
+    id:             Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    user_id:        Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    token_hash:     Mapped[ str ]             = mapped_column( String( 64 ), unique=True, index=True, nullable=False )
+    expires_at:     Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False )
+    created_at:     Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False, server_default=func.now( ) )
+    revoked_at:     Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ), nullable=True )
+    family_id:      Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), index=True, nullable=False )
+    replaced_by_id: Mapped[UUID | None]       = mapped_column( UUID( as_uuid=True ), ForeignKey( "refresh_tokens.id" ), nullable=True )
+    ip_address:     Mapped[ str | None ]      = mapped_column( INET, nullable=True )
+    user_agent:     Mapped[ str | None ]      = mapped_column( String( 255 ), nullable=True )
+    user:           Mapped[ User ]            = relationship( back_populates="refresh_tokens" )
 
 class LogEntry( Base ):
     __tablename__ = "log_entries"
@@ -77,7 +80,7 @@ class LogEntry( Base ):
     country_code:      Mapped[ str | None ] = mapped_column( String( 2 ), nullable=True, index=True )
     anomaly_score:     Mapped[ float ]      = mapped_column( default=0.0, index=True )
     raw_payload:       Mapped[ dict ]       = mapped_column( JSONB )
-    captured_at:       Mapped[ datetime ]   = mapped_column( DateTime( timezone=True ), index=True )
+    captured_at:       Mapped[ datetime ]   = mapped_column( DateTime( timezone=True ), nullable=False, index=True )
     inserted_at:       Mapped[ datetime ]   = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
     user:              Mapped[ User ]       = relationship( back_populates="log_entries" )
     

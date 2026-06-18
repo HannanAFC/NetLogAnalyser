@@ -2,6 +2,7 @@ import time
 from contextlib import asynccontextmanager
 from typing import Annotated
 
+from auth import router as auth_router
 from config import SecurityHeadersMiddleware, settings
 from database import engine, get_db
 from fastapi import Depends, FastAPI, Request, status
@@ -9,6 +10,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from schemas import HealthResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,9 +40,11 @@ app.add_middleware( SecurityHeadersMiddleware )
 
 app.mount( "/static", StaticFiles( directory="static" ), name="static" )
 
+app.include_router( auth_router.router, prefix="/auth", tags=[ "auth" ] )
+
 templates = Jinja2Templates( directory="templates" )
 
-@app.get( "/", include_in_schema=False, name="Index" )
+@app.get( "/", include_in_schema=False, name="Index", tags=[ "utilities" ] )
 def root( request: Request ):
     return templates.TemplateResponse(
         request,
@@ -50,7 +54,7 @@ def root( request: Request ):
         }
     )
 
-@app.get( "/health" )
+@app.get( "/health", response_model=HealthResponse )
 async def health_check( db: Annotated[ AsyncSession, Depends( get_db ) ] ):
     try:
         await db.execute( text( "SELECT 1") )
