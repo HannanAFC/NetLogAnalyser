@@ -49,6 +49,7 @@ jobs:
         run: uv run pytest -v
         working-directory: backend
         env:
+          SECRET_KEY: TESTING_KEY
           DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
 
   checks:
