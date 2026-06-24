@@ -32,6 +32,15 @@ class User( Base ):
     refresh_tokens:        Mapped[ list[ "RefreshToken" ] ]       = relationship( back_populates="user" )
     password_reset_tokens: Mapped[ list[ "PasswordResetToken" ] ] = relationship( back_populates="user" )
     log_entries:           Mapped[ list[ "LogEntry" ] ]           = relationship( back_populates="user" )
+
+    def __repr__(self):
+        return f"""
+id: { self.id }
+email: { self.email }
+display_name: { self.display_name }
+created_at: { self.created_at }
+updated_at: { self.updated_at }
+                """
     
 
 class APIKey( Base ):
@@ -48,6 +57,18 @@ class APIKey( Base ):
     revoked_at:   Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ) )
     user:         Mapped[ User ]            = relationship( back_populates="api_keys" )
 
+    def __repr__(self):
+        return f"""
+id: { self.id }
+user_id: { self.user_id }
+key_prefix: { self.key_prefix }
+label: { self.label }
+is_active: { self.is_active }
+last_used_at: { self.last_used_at }
+created_at: { self.created_at }
+revoked_at: { self.revoked_at }
+                """
+
 class RefreshToken( Base ):
     __tablename__ = "refresh_tokens"
 
@@ -62,6 +83,19 @@ class RefreshToken( Base ):
     ip_address:     Mapped[ str | None ]      = mapped_column( INET, nullable=True )
     user_agent:     Mapped[ str | None ]      = mapped_column( String( 255 ), nullable=True )
     user:           Mapped[ User ]            = relationship( back_populates="refresh_tokens" )
+
+    def __repr__(self):
+        return f"""
+id: { self.id }
+user_id: { self.user_id }
+expires_at: { self.expires_at }
+created_at: { self.created_at }
+revoked_at: { self.revoked_at }
+family_id: { self.family_id }
+replaced_by_id: { self.replaced_by_id }
+ip_address: { self.ip_address }
+user_agent: { self.user_agent }
+                """
 
 class LogEntry( Base ):
     __tablename__ = "log_entries"
@@ -83,6 +117,25 @@ class LogEntry( Base ):
     captured_at:       Mapped[ datetime ]   = mapped_column( DateTime( timezone=True ), nullable=False, index=True )
     inserted_at:       Mapped[ datetime ]   = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
     user:              Mapped[ User ]       = relationship( back_populates="log_entries" )
+
+    def __repr__(self):
+        return f"""
+id: { self.id }
+api_key_id: { self.api_key_id }
+user_id: { self.user_id }
+src_ip: { self.src_ip }
+dst_ip: { self.dst_ip }
+src_port: { self.src_port }
+dst_port: { self.dst_port }
+protocol: { self.protocol }
+packet_size_bytes: { self.packet_size_bytes }
+flags: { self.flags }
+country_code: { self.country_code }
+anomaly_score: { self.anomaly_score }
+raw_payload: { self.raw_payload }
+captured_at: { self.captured_at }
+inserted_at: { self.inserted_at }
+                """
     
 class PasswordResetToken( Base ):
     __tablename__ = "password_reset_tokens"

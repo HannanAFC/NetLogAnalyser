@@ -1,6 +1,6 @@
 from datetime import datetime
-from re import search
 from uuid import UUID
+from typing import Annotated
 
 from auth.password_policy import check_password_complexity
 from pydantic import (
@@ -11,7 +11,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-
 
 class PasswordComplexityMixin( BaseModel ):
     password:         str = Field( min_length=8, max_length=120 )

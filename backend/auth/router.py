@@ -111,14 +111,14 @@ async def refresh(
         await db.commit( )
         raise HTTPException( status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token was already used" )
     
-    if token_row.expires_at > datetime.now( timezone.utc ):
+    if token_row.expires_at < datetime.now( timezone.utc ):
         raise HTTPException( status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token has expired" )
     
     token_row.revoked_at = datetime.now( timezone.utc )
 
     user = await db.get( User, token_row.user_id )
 
-    new_token = issue_refresh_token(
+    new_token = await issue_refresh_token(
         db=db,
         user_id=user.id,
         family_id=token_row.family_id,
