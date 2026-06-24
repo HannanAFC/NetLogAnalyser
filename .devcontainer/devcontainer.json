@@ -26,7 +26,8 @@
 				"FastAPILabs.fastapi-vscode",
 				"msjsdiag.vscode-react-native",
 				"ms-python.python",
-				"charliermarsh.ruff"
+				"charliermarsh.ruff",
+				"Vizards.deepseek-v4-for-copilot"
 			],
 			"settings": {
 				"editor.indentSize": "tabSize",
