@@ -94,12 +94,13 @@ jobs:
         run: |
           curl --fail --silent --show-error \
             --request POST \
-            "${{ secrets.DOKPLOY_DEPLOY_API }}"
+            "${{ secrets.DOKPLOY_DEPLOY_API }}" \
+            --header "Content-Type: application/json" \
             --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
             --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
-            --header "x-api-key": ${{ secrets.DOKPLOY_API_KEY }} \
+            --header "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
             --data '{
-              "applicationId": "${{ secrets.DOKPLOY_STAGING_APP_ID }}"
+              "applicationId": "${{ secrets.DOKPLOY_STAGING_APP_ID }}"             
             }'
 
       - name: Deploy Frontend to Render Staging
@@ -123,12 +124,13 @@ jobs:
         run: |
           curl --fail --silent --show-error \
             --request POST \
-            "${{ secrets.DOKPLOY_DEPLOY_API }}"
+            "${{ secrets.DOKPLOY_DEPLOY_API }}" \
+            --header "Content-Type: application/json" \
             --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
             --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
-            --header "x-api-key": ${{ secrets.DOKPLOY_API_KEY }} \
+            --header "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
             --data '{
-              "applicationId": "${{ secrets.DOKPLOY_PROD_APP_ID }}"
+              "applicationId": "${{ secrets.DOKPLOY_PROD_APP_ID }}"             
             }'
 
       - name: Deploy Frontend to Render Prod
