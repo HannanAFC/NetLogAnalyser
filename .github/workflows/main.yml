@@ -90,6 +90,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
 
+      - name: Deploy Backend to Dokploy Staging
+        env:
+          dokploy_api: ${{ secrets.DOKPLOY_DEPLOY_API }}
+          dokploy_key: ${{ secrets.DOKPLOY_API_KEY }}
+          dokploy_app_id: ${{ secrets.DOKPLOY_STAGING_APP_ID }}
+        run: |
+          curl -X 'POST' \
+            '$dokploy_api' \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -H 'x-api-key: $dokploy_key' \
+            -d '{
+            "applicationId": "$dokploy_app_id"
+          }'
+
       - name: Deploy Frontend to Render Staging
         env:
           staging_frontend_deploy_url: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_STAGING }}
@@ -106,6 +121,21 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
+
+      - name: Deploy Backend to Coolify Prod
+        env:
+          dokploy_api: ${{ secrets.DOKPLOY_DEPLOY_API }}
+          dokploy_key: ${{ secrets.DOKPLOY_API_KEY }}
+          dokploy_app_id: ${{ secrets.DOKPLOY_PROD_APP_ID }}
+        run: |
+          curl -X 'POST' \
+            '$dokploy_api' \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -H 'x-api-key: $dokploy_key' \
+            -d '{
+            "applicationId": "$dokploy_app_id"
+          }'
 
       - name: Deploy Frontend to Render Prod
         env:
