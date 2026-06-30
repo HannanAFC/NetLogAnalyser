@@ -90,14 +90,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
 
-      - name: Deploy Backend to Coolify Staging
-        env:
-          deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_STAGING }}
-          coolify_token: ${{ secrets.COOLIFY_API_TOKEN }}
-        run: |
-          curl -X GET "$deploy_url" \
-            -H "Authorization: Bearer $coolify_token"
-
       - name: Deploy Frontend to Render Staging
         env:
           staging_frontend_deploy_url: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_STAGING }}
@@ -114,14 +106,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
-
-      - name: Deploy Backend to Coolify Prod
-        env:
-          deploy_url: ${{ secrets.COOLIFY_BACKEND_DEPLOY_HOOK_PROD }}
-          coolify_token: ${{ secrets.COOLIFY_API_TOKEN }}
-        run: |
-          curl -X GET "$deploy_url" \
-            -H "Authorization: Bearer $coolify_token"
 
       - name: Deploy Frontend to Render Prod
         env:
