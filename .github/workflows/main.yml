@@ -91,19 +91,16 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Deploy Backend to Dokploy Staging
-        env:
-          dokploy_api: ${{ secrets.DOKPLOY_DEPLOY_API }}
-          dokploy_key: ${{ secrets.DOKPLOY_API_KEY }}
-          dokploy_app_id: ${{ secrets.DOKPLOY_STAGING_APP_ID }}
         run: |
-          curl -X 'POST' \
-            '$dokploy_api' \
-            -H 'accept: application/json' \
-            -H 'Content-Type: application/json' \
-            -H 'x-api-key: $dokploy_key' \
-            -d '{
-            "applicationId": "$dokploy_app_id"
-          }'
+          curl --fail --silent --show-error \
+            --request POST \
+            "${{ secrets.DOKPLOY_DEPLOY_API }}"
+            --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
+            --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
+            --header "x-api-key": ${{ secrets.DOKPLOY_API_KEY }} \
+            --data '{
+              "applicationId": "${{ secrets.DOKPLOY_STAGING_APP_ID }}"
+            }'
 
       - name: Deploy Frontend to Render Staging
         env:
@@ -123,19 +120,16 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Deploy Backend to Coolify Prod
-        env:
-          dokploy_api: ${{ secrets.DOKPLOY_DEPLOY_API }}
-          dokploy_key: ${{ secrets.DOKPLOY_API_KEY }}
-          dokploy_app_id: ${{ secrets.DOKPLOY_PROD_APP_ID }}
         run: |
-          curl -X 'POST' \
-            '$dokploy_api' \
-            -H 'accept: application/json' \
-            -H 'Content-Type: application/json' \
-            -H 'x-api-key: $dokploy_key' \
-            -d '{
-            "applicationId": "$dokploy_app_id"
-          }'
+          curl --fail --silent --show-error \
+            --request POST \
+            "${{ secrets.DOKPLOY_DEPLOY_API }}"
+            --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
+            --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
+            --header "x-api-key": ${{ secrets.DOKPLOY_API_KEY }} \
+            --data '{
+              "applicationId": "${{ secrets.DOKPLOY_PROD_APP_ID }}"
+            }'
 
       - name: Deploy Frontend to Render Prod
         env:
