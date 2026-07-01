@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from auth import router as auth_router
+from users import router as users_router
 from config import SecurityHeadersMiddleware, settings
 from database import engine, get_db
 from fastapi import Depends, FastAPI, Request, status
@@ -41,6 +42,7 @@ app.add_middleware( SecurityHeadersMiddleware )
 app.mount( "/static", StaticFiles( directory="static" ), name="static" )
 
 app.include_router( auth_router.router, prefix="/auth", tags=[ "auth" ] )
+app.include_router( users_router.router, prefix="/users", tags=[ "users" ] )
 
 templates = Jinja2Templates( directory="templates" )
 

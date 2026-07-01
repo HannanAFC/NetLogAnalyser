@@ -1,6 +1,5 @@
 from datetime import datetime
 from uuid import UUID
-from typing import Annotated
 
 from auth.password_policy import check_password_complexity
 from pydantic import (
