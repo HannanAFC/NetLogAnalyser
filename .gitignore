@@ -192,5 +192,6 @@ sketch
 .react-router
 /build/
 .pnpm-store
+**.gen.ts
 
 # End of https://www.toptal.com/developers/gitignore/api/python,react
