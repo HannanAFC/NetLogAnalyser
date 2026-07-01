@@ -32,7 +32,7 @@
 			"settings": {
 				"editor.indentSize": "tabSize",
 				"editor.tabSize": 4,
-				"chat.disableAIFeatures": true,
+				"chat.disableAIFeatures": false,
 				"python.defaultInterpreterPath": "/workspaces/backend/.venv/bin/python",
 				"files.watcherExclude": {
 					"**/routeTree.gen.ts": true
