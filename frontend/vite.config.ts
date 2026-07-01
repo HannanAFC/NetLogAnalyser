@@ -21,21 +21,7 @@ export default defineConfig( ( { mode } ) =>
         server:
         {
             host: true,
-            port: 3000,
-            proxy:
-            {
-                '/api':
-                {
-                    target: env.VITE_API_BASE_URL || 'http://localhost:8000',
-                    changeOrigin: true,
-                    rewrite: ( path ) => path.replace( /^\/api/, '' )
-                },
-                '/ws':
-                {
-                    target: env.VITE_WS_BASE_URL || 'ws://localhost:8000/ws',
-                    ws: true
-                }
-            }
+            port: 3000
         }
     };
 } );
