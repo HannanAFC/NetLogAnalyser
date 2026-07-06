@@ -1,18 +1,17 @@
 import { devtools } from '@tanstack/devtools-vite';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 
 import tailwindcss from '@tailwindcss/vite';
 import viteReact from '@vitejs/plugin-react';
 
-export default defineConfig( ( { mode } ) =>
+export default defineConfig( ( { } ) =>
 {
-    const env = loadEnv( mode, process.cwd( ), '' );
-
     return {
 		resolve: { tsconfigPaths: true },
-		plugins: [
+		plugins:
+        [
 			devtools( ),
 			tailwindcss( ),
 			tanstackRouter( { target: 'react', autoCodeSplitting: true } ),
