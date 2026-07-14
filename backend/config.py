@@ -15,6 +15,7 @@ class Settings( BaseSettings ):
     debug:                               bool = False
     environment:                         str = "development"
     frontend_url:                        str = "http://localhost:3000"
+    backend_url:                         str = "http://localhost:8000"
 
     # Database
     database_url:                        str

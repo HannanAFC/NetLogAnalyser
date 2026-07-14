@@ -3,7 +3,7 @@ async function checkHealth( )
 {
     try
     {
-        const res = await fetch( '/health' );
+        const res = await fetch( '/health' )
         const data = await res.json( );
 
         const apiDot    = document.getElementById( 'apiDot' );
@@ -12,39 +12,50 @@ async function checkHealth( )
         const dbStatus  = document.getElementById( 'dbStatus' );
         const tag       = document.getElementById( 'envTag' );
 
-        apiDot.className = 'status-dot ok';
-        apiStatus.textContent = 'operational';
+        if ( !res.ok && res.status == 503 )
+        {
+            apiDot.className = 'status-dot loading';
+            apiStatus.textContent = 'operational';
 
-        if ( data.database === 'ok' )
-        {
-            dbDot.className = 'status-dot ok';
-            dbStatus.textContent = 'connected';
-        }
-        else
-        {
             dbDot.className = 'status-dot err';
             dbStatus.textContent = 'unreachable';
         }
-
-        if ( data.version )
+        else
         {
-            document.getElementById( 'versionValue' ).textContent = `v${ data.version }`;
-        }
+            apiDot.className = 'status-dot ok';
+            apiStatus.textContent = 'operational';
 
-        if ( data.uptime_seconds != null )
-        {
-            document.getElementById( 'uptimeValue' ).textContent = formatUptime( data.uptime_seconds );
-        }
+            if ( data.database === 'ok' )
+            {
+                dbDot.className = 'status-dot ok';
+                dbStatus.textContent = 'connected';
+            }
+            else
+            {
+                dbDot.className = 'status-dot err';
+                dbStatus.textContent = 'unreachable';
+            }
 
-        if ( data.environment === "production" )
-        {
-            tag.textContent = 'production';
-            tag.classList.remove( 'dev' );
-            tag.classList.add( 'prod' );
-            document.getElementById( 'baseUrl' ).textContent = window.location.origin;
+            if ( data.version )
+            {
+                document.getElementById( 'versionValue' ).textContent = `v${ data.version }`;
+            }
+
+            if ( data.uptime_seconds != null )
+            {
+                document.getElementById( 'uptimeValue' ).textContent = formatUptime( data.uptime_seconds );
+            }
+
+            if ( data.environment === "production" )
+            {
+                tag.textContent = 'production';
+                tag.classList.remove( 'dev' );
+                tag.classList.add( 'prod' );
+                document.getElementById( 'baseUrl' ).textContent = window.location.origin;
+            }
         }
     }
-    catch
+    catch ( error )
     {
         document.getElementById( 'apiDot' ).className = 'status-dot err';
         document.getElementById( 'apiStatus' ).textContent = 'unreachable';

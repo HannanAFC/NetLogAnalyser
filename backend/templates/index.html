@@ -18,7 +18,7 @@
                 <span class="wordmark-name">NetLogAnalyser / API</span>
             </a>
             <div class="header-right">
-                <span class="env-tag dev" id="envTag">development</span>
+                <span class="env-tag dev" id="envTag">{{ environment }}</span>
                 <a class="dash-link" href="{{ frontend_url }}">
                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
                         <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
@@ -31,7 +31,7 @@
 
         <!-- Hero -->
         <section class="hero">
-            <p class="hero-eyebrow">REST + WebSocket API &nbsp;·&nbsp; v0.1.0</p>
+            <p class="hero-eyebrow">REST + WebSocket API &nbsp;·&nbsp; v{{ version }}</p>
             <h1>Real-time network log<br><em>ingestion and analysis</em></h1>
             <p class="hero-desc">
                 Send network packet logs from any system using a simple HTTP POST.
@@ -70,12 +70,12 @@
             <div class="status-item">
                 <div class="status-dot ok"></div>
                 <span class="status-label">Version</span>
-                <span class="status-value" id="versionValue">v0.1.0</span>
+                <span class="status-value" id="versionValue">v{{ version }}</span>
             </div>
             <div class="status-item">
                 <div class="status-dot ok"></div>
                 <span class="status-label">Uptime</span>
-                <span class="status-value" id="uptimeValue">-</span>
+                <span class="status-value" id="uptimeValue">{{ uptime_seconds }}</span>
             </div>
         </div>
 
@@ -84,7 +84,7 @@
             <p class="section-title">Base URL</p>
             <div class="url-row">
                 <span class="url-label">endpoint</span>
-                <span class="url-value" id="baseUrl">http://localhost:8000</span>
+                <span class="url-value" id="baseUrl">{{ backend_url }}</span>
                 <button class="copy-btn">copy</button>
             </div>
         </div>
