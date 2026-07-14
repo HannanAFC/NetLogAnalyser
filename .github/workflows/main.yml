@@ -52,7 +52,7 @@ jobs:
           SECRET_KEY: TESTING_KEY
           DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
 
-  checks:
+  frontend-tests:
     runs-on: ubuntu-latest
     needs: backend-tests
 
@@ -75,12 +75,15 @@ jobs:
       - name: Install Node.js Dependencies
         run: cd frontend && pnpm install --frozen-lockfile
 
+      - name: Run vitest
+        run: cd frontend && pnpm run test:all
+
       - name: Run ESLint
         run: cd frontend && pnpm run lint --max-warnings=0
 
   deploy-staging:
     runs-on: ubuntu-latest
-    needs: checks
+    needs: frontend-tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
     environment:
       name: Staging
@@ -105,7 +108,7 @@ jobs:
 
   deploy-production:
     runs-on: ubuntu-latest
-    needs: checks
+    needs: frontend-tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: Production
