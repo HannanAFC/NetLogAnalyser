@@ -20,8 +20,8 @@ export const registerSchema = z
 	.refine ( ( data ) => data.password === data.confirm_password,
 	{
 		message: "Passwords don't match",
-		path: [ 'confirmPassword' ]
+		path: [ 'confirm_password' ]
 	});
 
 export type RegisterPayload = z.infer< typeof registerSchema >;
-export type RegisterRequestBody = Omit< RegisterPayload, 'confirmPassword' >;
+export type RegisterRequestBody = Omit< RegisterPayload, 'confirm_password' >;

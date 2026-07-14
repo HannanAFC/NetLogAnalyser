@@ -1,8 +1,8 @@
-import { createFileRoute, redirect, useNavigate, Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
+import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
-import { sessionQueryOptions } from '../features/auth/queries';
 import { useLogin } from '../features/auth/hooks';
+import { sessionQueryOptions } from '../features/auth/queries';
 import { loginSchema } from '../features/auth/schemas';
 
 const loginSearchSchema = z.object(
@@ -53,7 +53,7 @@ function LoginPage() {
             >
                 <form.Field
                     name="email"
-                    validators={{ onBlur: loginSchema.shape.email }}
+                    validators={{ onChange: loginSchema.shape.email, onBlur: loginSchema.shape.email }}
                 >
                     { ( field ) =>
                     (
@@ -81,7 +81,7 @@ function LoginPage() {
 
                 <form.Field
                     name="password"
-                    validators={{ onBlur: loginSchema.shape.password }}
+                    validators={{ onChange: loginSchema.shape.password, onBlur: loginSchema.shape.password }}
                 >
                 { ( field ) =>
                 (
@@ -111,11 +111,11 @@ function LoginPage() {
                 <p className="text-sm text-critical">Incorrect email or password.</p>
                 )}
 
-                <form.Subscribe selector={ ( state ) => state.canSubmit }>
-                { ( canSubmit ) => (
+                <form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
+                { ( [ canSubmit, isPristine ] ) => (
                     <button
                         type="submit"
-                        disabled={!canSubmit || login.isPending}
+                        disabled={ !canSubmit || isPristine || login.isPending }
                         className="inline-flex w-full items-center justify-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background] duration-150 tracking-[0.01em] px-4 py-[9px] gap-[7px] rounded-md bg-green-500 text-[#0a0f0a] hover:opacity-[0.88] disabled:opacity-50"
                     >
                     { login.isPending ? 'Signing in…' : 'Sign in' }
