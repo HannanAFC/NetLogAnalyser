@@ -1,5 +1,5 @@
-import { type HTMLAttributes, type ReactNode } from 'react';
 import { cn } from '#/lib/utils';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 type BadgeVariant =
     | 'default'

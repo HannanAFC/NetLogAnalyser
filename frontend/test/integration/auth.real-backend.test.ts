@@ -22,7 +22,7 @@ function uniqueTestDisplayName( )
 
 const TEST_PASSWORD = 'Correct-Horse-Battery-Staple-9!';
 
-//TODO: maybe verify response shapes exactly match what is expected?
+// TODO: maybe verify response shapes exactly match what is expected?
 
 describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: auth flow', ( ) =>
 {
