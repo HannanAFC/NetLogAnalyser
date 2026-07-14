@@ -3,6 +3,8 @@ import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-ro
 import { useRegister } from '../features/auth/hooks';
 import { sessionQueryOptions } from '../features/auth/queries';
 import { registerSchema } from '../features/auth/schemas';
+import { apiError } from '../lib/api/errors';
+import { fieldError } from '../lib/utils';
 
 export const Route = createFileRoute( '/register' )(
 {
@@ -24,8 +26,15 @@ function RegisterPage( )
 		defaultValues: { email: '', display_name: '', password: '', confirm_password: '' },
 		onSubmit: async ( { value } ) =>
 		{
-			await register.mutateAsync( registerSchema.parse( value ) );
-			await navigate( { to: '/dashboard', replace: true } );
+			try
+			{
+				await register.mutateAsync( registerSchema.parse( value ) );
+				await navigate( { to: '/dashboard', replace: true } );
+			}
+			catch
+			{
+				// already handled
+			}
 		},
 	});
 
@@ -64,10 +73,10 @@ function RegisterPage( )
 								className={ inputClass }
 							/>
 							{ field.state.meta.errors.length > 0 && (
-                                <p className="mt-1 text-xs text-critical">
-                                    { field.state.meta.errors[ 0 ]?.message }
-                                </p>
-                            )}
+								<p className="mt-1 text-xs text-critical">
+									{ fieldError( field.state.meta.errors ) }
+								</p>
+							)}
 						</div>
 					)}
 				</form.Field>
@@ -93,7 +102,7 @@ function RegisterPage( )
 							/>
 							{ field.state.meta.errors.length > 0 && (
 								<p className="mt-1 text-xs text-critical">
-									{ field.state.meta.errors[ 0 ]?.message }
+									{ fieldError( field.state.meta.errors ) }
 								</p>
 							)}
 						</div>
@@ -120,17 +129,25 @@ function RegisterPage( )
 								className={ inputClass }
 							/>
 							{ field.state.meta.errors.length > 0 && (
-                                <p className="mt-1 text-xs text-critical">
-                                    { field.state.meta.errors[ 0 ]?.message }
-                                </p>
-                            )}
+								<p className="mt-1 text-xs text-critical">
+									{ fieldError( field.state.meta.errors ) }
+								</p>
+							)}
 						</div>
 					)}
 				</form.Field>
 
 				<form.Field
 					name="confirm_password"
-					validators={{ onChange: registerSchema.shape.confirm_password, onBlur: registerSchema.shape.confirm_password }}
+					validators={
+					{
+						onChange: ( { value, fieldApi } ) =>
+						{
+							if ( !value ) return 'Please confirm your password';
+							if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
+							return undefined;
+						}
+					}}
 				>
 					{ ( field ) =>
 					(
@@ -148,16 +165,16 @@ function RegisterPage( )
 								className={ inputClass }
 							/>
 							{ field.state.meta.errors.length > 0 && (
-                                <p className="mt-1 text-xs text-critical">
-                                    { field.state.meta.errors[ 0 ]?.message }
-                                </p>
-                            )}
+								<p className="mt-1 text-xs text-critical">
+									{ fieldError( field.state.meta.errors ) }
+								</p>
+							)}
 						</div>
 					)}
 				</form.Field>
 
 				{ register.isError && (
-					<p className="text-sm text-critical">Couldn't create that account. Try a different email.</p>
+					<p className="text-sm text-critical">{ apiError( register.error ) ?? "Couldn't create that account. Try a different email." }</p>
 				)}
 
 				<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
