@@ -35,7 +35,7 @@ services:
         value: geolocation=(), camera=(), microphone=()
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api.netloganalyser.com wss://api.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api.netloganalyser.com ws://api.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"
 
   - type: web
     name: NetLogAnalyser Staging
@@ -69,4 +69,4 @@ services:
         value: geolocation=(), camera=(), microphone=()
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api-staging.netloganalyser.com wss://api-staging.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api-staging.netloganalyser.com ws://api-staging.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"

@@ -1,8 +1,9 @@
-import { Outlet, createRootRoute, Link } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import { useSession } from '#/features/auth/hooks'
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
+import { env } from '#/lib/env'
 import '../styles.css'
 
 export const Route = createRootRoute(
@@ -59,7 +60,7 @@ function RootComponent( )
 					NetLogAnalyser &nbsp;·&nbsp; v0.1.0
 				</span>
 				<div className="flex gap-5">
-					<a href={ `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}` } className="text-xs text-text-tertiary no-underline hover:text-text-secondary transition-colors duration-150">
+					<a href={ env.apiBaseUrl } className="text-xs text-text-tertiary no-underline hover:text-text-secondary transition-colors duration-150">
 						API docs
 					</a>
 				</div>
