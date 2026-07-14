@@ -7,7 +7,7 @@ from typing import Annotated
 from auth.security import decode_access_token, generate_refresh_token, hash_token
 from config import settings
 from database import get_db
-from fastapi import Depends, HTTPException, status, Response
+from fastapi import Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from models.models import RefreshToken, User
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -100,5 +100,22 @@ def set_refresh_cookie( response: Response, raw_token: str ) -> None:
         max_age=settings.jwt_refresh_token_expire_days * 24 * 60 * 60,
         path="/auth",  # only sent back on auth routes, not every request
     )
+
+def get_client_ip( request: Request ) -> str | None:
+    """
+    Returns the real client IP, accounting for the Cloudflare Tunnel.
+    Parameters:
+        request (Request): FastAPI request object.
+    """
+    cf_ip = request.headers.get( "cf-connecting-ip" )
+    if cf_ip:
+        return cf_ip
+
+    # Fallback for local dev / anything not behind Cloudflare
+    forwarded_for = request.headers.get( "x-forwarded-for" )
+    if forwarded_for:
+        return forwarded_for.split( "," )[ 0 ].strip( )
+
+    return request.client.host if request.client else None
 
 CurrentUser = Annotated[ User, Depends( get_current_user ) ] 

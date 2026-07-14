@@ -4,7 +4,12 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from auth.dependencies import get_current_user, issue_refresh_token, set_refresh_cookie
+from auth.dependencies import (
+    get_client_ip,
+    get_current_user,
+    issue_refresh_token,
+    set_refresh_cookie,
+)
 from auth.schemas import (
     ForgotPasswordRequest,
     ForgotPasswordResponse,
@@ -24,7 +29,7 @@ from auth.security import (
     hash_password,
     hash_token,
 )
-from auth.service import authenticate_user, register_user, find_valid_token
+from auth.service import authenticate_user, find_valid_token, register_user
 from config import settings
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -69,7 +74,7 @@ async def login(
     raw_refresh_token = await issue_refresh_token(
         db,
         user_id=user.id,
-        ip_address=request.client.host if request.client else None,
+        ip_address=get_client_ip( request ),
         user_agent=request.headers.get( "user-agent" )
     )
     await db.commit( )
@@ -122,7 +127,7 @@ async def refresh(
         db=db,
         user_id=user.id,
         family_id=token_row.family_id,
-        ip_address=request.client.host if request.client else None,
+        ip_address=get_client_ip( request ),
         user_agent=request.headers.get( "user-agent" )
     )
 
