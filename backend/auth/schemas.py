@@ -1,6 +1,5 @@
 from datetime import datetime
 from uuid import UUID
-from typing import Annotated
 
 from auth.password_policy import check_password_complexity
 from pydantic import (
@@ -11,6 +10,8 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from pydantic_core import PydanticCustomError
+
 
 class PasswordComplexityMixin( BaseModel ):
     password:         str = Field( min_length=8, max_length=120 )
@@ -21,13 +22,13 @@ class PasswordComplexityMixin( BaseModel ):
     def password_complexity( cls, value: str ) -> str:
         is_valid, error_message = check_password_complexity( value )
         if not is_valid:
-            raise ValueError( error_message )
+            raise PydanticCustomError( 'password_complexity', error_message or 'Password does not meet complexity requirements' )  # pyright: ignore[reportArgumentType]
         return value
     
     @model_validator( mode="after" )
     def passwords_match( self ) -> "PasswordComplexityMixin":
         if self.password != self.confirm_password:
-            raise ValueError( "Passwords don't match" )
+            raise PydanticCustomError( 'password_mismatch', "Passwords don't match" )
         return self
 
 class UserPublic( BaseModel ):

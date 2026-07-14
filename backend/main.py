@@ -1,5 +1,6 @@
 import time
 from contextlib import asynccontextmanager
+from math import floor
 from typing import Annotated
 
 from auth import router as auth_router
@@ -13,6 +14,7 @@ from fastapi.templating import Jinja2Templates
 from schemas import HealthResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+from users import router as users_router
 
 
 @asynccontextmanager
@@ -41,16 +43,30 @@ app.add_middleware( SecurityHeadersMiddleware )
 app.mount( "/static", StaticFiles( directory="static" ), name="static" )
 
 app.include_router( auth_router.router, prefix="/auth", tags=[ "auth" ] )
+app.include_router( users_router.router, prefix="/users", tags=[ "users" ] )
 
 templates = Jinja2Templates( directory="templates" )
 
 @app.get( "/", include_in_schema=False, name="Index", tags=[ "utilities" ] )
 def root( request: Request ):
+    uptime_seconds = "0s"
+    uptime_exact   = time.time( ) - startTime
+    if uptime_exact < 60:
+        uptime_seconds = f"{ floor( uptime_exact ) }s"
+    elif uptime_exact < 3600:
+        uptime_seconds = f"{ floor( uptime_exact / 60 ) }m"
+    else:
+        uptime_seconds = f"{ floor( uptime_exact / 3600 ) }h { floor( ( uptime_exact % 3600 ) / 60 ) }m"
+
     return templates.TemplateResponse(
         request,
         "index.html",
         {
-            "frontend_url": settings.frontend_url
+            "frontend_url": settings.frontend_url,
+            "backend_url": settings.backend_url,
+            "environment": settings.environment,
+            "version": settings.app_version,
+            "uptime_seconds": uptime_seconds
         }
     )
 
