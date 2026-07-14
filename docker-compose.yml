@@ -3,8 +3,11 @@ services:
   devcontainer:
     build: ./.devcontainer
     container_name: NetLogAnalyser-DevContainer
+    env_file:
+      - .env
     volumes:
       - ./:/workspaces
+      - frontend_node_modules:/workspaces/frontend/node_modules
     networks:
       - NetLogAnalyser-Network
     command: sleep infinity  # keeps it alive without doing anything
@@ -23,6 +26,9 @@ services:
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
+    environment:
+      - CI=true
+      - NODE_ENV=development
     command: sh /entrypoint.sh
     restart: unless-stopped
 
@@ -55,6 +61,22 @@ services:
       - NetLogAnalyser-Network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  test-db:
+    image: postgres:18-alpine
+    container_name: NetLogAnalyser-TestDB
+    environment:
+      - POSTGRES_USER=NetlogAnalyserUserTest
+      - POSTGRES_PASSWORD=TestPass
+      - POSTGRES_DB=NetLogAnalyserDBTest
+    ports:
+      - "5433:5432"
+    networks:
+      - NetLogAnalyser-Network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U NetlogAnalyserUserTest -d NetLogAnalyserDBTest"]
       interval: 5s
       timeout: 5s
       retries: 5
