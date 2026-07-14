@@ -56,6 +56,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: backend-tests
 
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: NetlogAnalyserUserTest
+          POSTGRES_PASSWORD: TestPass
+          POSTGRES_DB: NetLogAnalyserDBTest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U NetlogAnalyserUserTest -d NetLogAnalyserDBTest"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -64,6 +79,18 @@ jobs:
         uses: pnpm/action-setup@v6
         with:
           version: 11.6.0
+
+      - name: Install Python
+        run: uv python install 3.14
+
+      - name: Install Backend Dependencies
+        run: cd backend && uv sync --dev --frozen
+
+      - name: Start backend for testing
+        run: uv run alembic upgrade head && uv run fastapi dev main.py --host 0.0.0.0 --port 8000
+        env:
+          SECRET_KEY: TESTING_KEY
+          DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
 
       - name: Install Node.js
         uses: actions/setup-node@v6
