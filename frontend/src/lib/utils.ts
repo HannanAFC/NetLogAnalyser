@@ -1,4 +1,5 @@
-import { clsx, type ClassValue } from 'clsx';
+import type { ClassValue } from 'clsx';
+import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 /** Merge Tailwind classes without style conflicts. */
@@ -19,7 +20,7 @@ export function fieldError( errors: unknown[] ): string | undefined
 	const first = errors[ 0 ];
 	if ( !first ) return undefined;
 	if ( typeof first === 'string' ) return first;
-	if ( typeof first === 'object' && first !== null && 'message' in first )
+	if ( typeof first === 'object' && 'message' in first )
 		return ( first as { message: string } ).message;
 	return String( first );
 }

@@ -6,7 +6,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import tailwindcss from '@tailwindcss/vite';
 import viteReact from '@vitejs/plugin-react';
 
-export default defineConfig( ( { } ) =>
+export default defineConfig( ( ) =>
 {
     return {
 		resolve: { tsconfigPaths: true },

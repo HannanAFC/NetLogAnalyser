@@ -1,9 +1,10 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import { env } from '../env';
-import { tokenStore } from '../auth/token-store';
+import type { AxiosError } from 'axios';
+import axios from 'axios';
 import { sessionQueryKey } from '../auth/session-key';
-import { queryClient } from './query-client';
+import { tokenStore } from '../auth/token-store';
 import type { RefreshResponse } from '../auth/types';
+import { env } from '../env';
+import { queryClient } from './query-client';
 
 declare module 'axios'
 {
@@ -71,7 +72,7 @@ apiClient.interceptors.response.use(
 	( response ) => response,
 	async ( error: AxiosError ) =>
 	{
-		const original = error.config as InternalAxiosRequestConfig | undefined;
+		const original = error.config;
 		const status = error.response?.status;
 
 		const isAuthEndpoint = original?.url?.includes( '/auth/refresh' ) || original?.url?.includes( '/auth/login' );
