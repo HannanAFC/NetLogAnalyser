@@ -90,7 +90,7 @@ jobs:
         run: cd backend && uv sync --dev --frozen
 
       - name: Start backend for testing
-        run: uv run alembic upgrade head && uv run fastapi dev main.py --host 0.0.0.0 --port 8000
+        run: cd backend && uv run alembic upgrade head && uv run fastapi dev main.py --host 0.0.0.0 --port 8000
         env:
           SECRET_KEY: TESTING_KEY
           DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
