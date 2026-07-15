@@ -94,8 +94,8 @@ class TestRateLimitEnforcement:
     """Verify that exceeding the configured limit returns HTTP 429."""
 
     async def test_login_blocked_after_limit( self, client: AsyncClient ):
-        """After 2 successful login attempts the 3rd should be 429."""
-        strict = _build_strict_limiter( 2, 60 )
+        """After 3 requests (register + 2 logins) the 4th should be 429."""
+        strict = _build_strict_limiter( 3, 60 )  # accounts for register call above
 
         async def _strict_auth( request: Request, response: Response ) -> None:
             await strict( request, response )
@@ -118,13 +118,13 @@ class TestRateLimitEnforcement:
             "password": "Str0ng!Pass"
         }
 
-        # First two should succeed
+        # Register + 2 logins = 3 requests (at the limit), 4th should be blocked
         r1 = await client.post( "/auth/login", json=login_payload )
         r2 = await client.post( "/auth/login", json=login_payload )
         assert r1.status_code == 200
         assert r2.status_code == 200
 
-        # Third should be rate-limited
+        # Fourth overall request — must be rate-limited
         r3 = await client.post( "/auth/login", json=login_payload )
         assert r3.status_code == 429
         assert "Too Many Requests" in r3.text
