@@ -12,9 +12,21 @@ on:
     paths-ignore:
       - "**/*.md"
 
+# Cancel in-progress runs on the same branch when a new push arrives.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   backend-tests:
+    # Skip all tests when the PR title or commit message contains "docs"
+    if: |
+      !(
+        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'docs')) ||
+        (github.event_name == 'push' && contains(github.event.head_commit.message, 'docs'))
+      )
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
@@ -30,6 +42,21 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SECRET_KEY: TESTING_KEY
+      DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - name: Checkout Code
@@ -48,13 +75,11 @@ jobs:
       - name: Run Tests
         run: uv run pytest -v
         working-directory: backend
-        env:
-          SECRET_KEY: TESTING_KEY
-          DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
 
   frontend-tests:
     runs-on: ubuntu-latest
     needs: backend-tests
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -70,6 +95,21 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SECRET_KEY: TESTING_KEY
+      DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - name: Checkout Code
@@ -87,24 +127,20 @@ jobs:
         run: uv python install 3.14
 
       - name: Install Backend Dependencies
-        run: cd backend && uv sync --dev --frozen
+        run: uv sync --dev --frozen
+        working-directory: backend
 
-      - name: Run DB migrations
-        run: cd backend && uv run alembic upgrade head
-        env:
-          SECRET_KEY: TESTING_KEY
-          DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
+      - name: Run DB Migrations
+        run: uv run alembic upgrade head
+        working-directory: backend
 
-      - name: Start backend for testing
+      - name: Start Backend
         run: |
-          cd backend
           uv run fastapi dev main.py --host 0.0.0.0 --port 8000 &
           echo $! > $GITHUB_WORKSPACE/backend.pid
-        env:
-          SECRET_KEY: TESTING_KEY
-          DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
+        working-directory: backend
 
-      - name: Wait for backend to be ready
+      - name: Wait for Backend
         run: timeout 60 bash -c 'until curl -sf http://localhost:8000/health; do sleep 1; done'
 
       - name: Install Node.js
@@ -114,17 +150,20 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Install Node.js Dependencies
-        run: cd frontend && pnpm install --frozen-lockfile
+      - name: Install Frontend Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: frontend
 
-      - name: Run vitest
-        run: cd frontend && pnpm run test:all
+      - name: Run Tests
+        run: pnpm run test:all
+        working-directory: frontend
         env:
           VITE_API_BASE_URL: http://localhost:8000
-          VITE_WS_BASE_URL: ws://localhost:8001/ws
+          VITE_WS_BASE_URL: ws://localhost:8000/ws
 
       - name: Run ESLint
-        run: cd frontend && pnpm run lint --max-warnings=0
+        run: pnpm run lint -- --max-warnings=0
+        working-directory: frontend
 
   deploy-staging:
     runs-on: ubuntu-latest
@@ -133,12 +172,13 @@ jobs:
     environment:
       name: Staging
       url: ${{ vars.STAGING_URL }}
+    timeout-minutes: 5
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
 
-      - name: Deploy Backend to Dokploy Staging
+      - name: Deploy Backend (Dokploy)
         run: |
           curl --fail --silent --show-error \
             --request POST \
@@ -147,14 +187,12 @@ jobs:
             --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
             --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
             --header "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
-            --data '{
-              "applicationId": "${{ secrets.DOKPLOY_STAGING_APP_ID }}"             
-            }'
+            --data '{"applicationId": "${{ secrets.DOKPLOY_STAGING_APP_ID }}"}'
 
-      - name: Deploy Frontend to Render Staging
+      - name: Deploy Frontend (Render)
         env:
-          staging_frontend_deploy_url: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_STAGING }}
-        run: curl -X POST "$staging_frontend_deploy_url"
+          RENDER_DEPLOY_URL: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_STAGING }}
+        run: curl -X POST "$RENDER_DEPLOY_URL"
 
   deploy-production:
     runs-on: ubuntu-latest
@@ -163,12 +201,13 @@ jobs:
     environment:
       name: Production
       url: ${{ vars.PRODUCTION_URL }}
+    timeout-minutes: 5
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
 
-      - name: Deploy Backend to Coolify Prod
+      - name: Deploy Backend (Dokploy)
         run: |
           curl --fail --silent --show-error \
             --request POST \
@@ -177,11 +216,9 @@ jobs:
             --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
             --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
             --header "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
-            --data '{
-              "applicationId": "${{ secrets.DOKPLOY_PROD_APP_ID }}"             
-            }'
+            --data '{"applicationId": "${{ secrets.DOKPLOY_PROD_APP_ID }}"}'
 
-      - name: Deploy Frontend to Render Prod
+      - name: Deploy Frontend (Render)
         env:
-          prod_frontend_deploy_url: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_PROD }}
-        run: curl -X POST "$prod_frontend_deploy_url"
+          RENDER_DEPLOY_URL: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_PROD }}
+        run: curl -X POST "$RENDER_DEPLOY_URL"
