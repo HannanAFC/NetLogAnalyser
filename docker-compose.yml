@@ -42,6 +42,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./backend:/app
     networks:
@@ -64,6 +66,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   test-db:
     image: postgres:18-alpine
     container_name: NetLogAnalyser-TestDB
@@ -81,9 +84,25 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: NetLogAnalyser-Redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - NetLogAnalyser-Network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
   frontend_node_modules:
+  redis_data:
 
 networks:
   NetLogAnalyser-Network:

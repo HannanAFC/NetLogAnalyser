@@ -187,7 +187,7 @@ class TestRegister:
         self, client: AsyncClient
     ) -> None:
         """Password shorter than 8 characters must fail the complexity check."""
-        payload = _build_register_payload( password="Ab1!" * 2 )  # 8 chars — valid
+        payload = _build_register_payload( password="Ab1!" * 2 )  # 8 chars - valid
         # actually try 6 chars
         payload = _build_register_payload( password="Ab1!ab", confirm_password="Ab1!ab" )
 
@@ -328,7 +328,7 @@ class TestLogin:
 # ═══════════════════════════════════════════════════════════════════
 
 class TestRefresh:
-    """Tests for POST /auth/refresh — exchanging a refresh-token cookie
+    """Tests for POST /auth/refresh - exchanging a refresh-token cookie
     for a new access token."""
 
     async def _extract_refresh_cookie(
@@ -442,7 +442,7 @@ class TestRefresh:
             headers={ "Authorization": f"Bearer { refresh_token }"},
         )
 
-        # now try to refresh — should fail
+        # now try to refresh - should fail
         response = await client.post( "/auth/refresh" )
         assert response.status_code == 401
 
@@ -560,7 +560,7 @@ class TestLogout:
         resp1 = await client.post( "/auth/logout", headers=headers )
         assert resp1.status_code == 200
 
-        # second logout — the refresh token may already be revoked,
+        # second logout - the refresh token may already be revoked,
         # but the endpoint should still succeed
         resp2 = await client.post( "/auth/logout", headers=headers )
         assert resp2.status_code == 200
@@ -616,7 +616,7 @@ class TestResetPassword:
         """Simulate the forgot-password flow and extract the raw reset token
         from the database so we can use it in reset-password tests.
 
-        The production code prints the token with ``print()`` — here we
+        The production code prints the token with ``print()`` - here we
         query the DB directly for the token_hash and create the raw token
         manually via ``generate_reset_token`` + ``hash_token`` so we
         can construct a valid reset link.
@@ -699,7 +699,7 @@ class TestResetPassword:
         token = await self._get_reset_token( client, db_session )
         new_password = "N3wSecur3!P@ss"
 
-        # first use — succeeds
+        # first use - succeeds
         resp1 = await client.post(
             "/auth/reset-password",
             json={
@@ -710,7 +710,7 @@ class TestResetPassword:
         )
         assert resp1.status_code == 200
 
-        # second use with same token — must fail
+        # second use with same token - must fail
         resp2 = await client.post(
             "/auth/reset-password",
             json={
@@ -1061,5 +1061,5 @@ class TestNoSecretsLeaked:
             resp_wrong_pass.json( )[ "detail" ]
             == resp_unknown_email.json( )[ "detail" ]
         ), (
-            "Error messages differ — user enumeration possible"
+            "Error messages differ - user enumeration possible"
         )

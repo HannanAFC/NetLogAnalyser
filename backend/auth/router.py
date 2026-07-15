@@ -4,7 +4,12 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from auth.dependencies import get_current_user, issue_refresh_token, set_refresh_cookie
+from auth.dependencies import (
+    get_client_ip,
+    get_current_user,
+    issue_refresh_token,
+    set_refresh_cookie,
+)
 from auth.schemas import (
     ForgotPasswordRequest,
     ForgotPasswordResponse,
@@ -24,15 +29,16 @@ from auth.security import (
     hash_password,
     hash_token,
 )
-from auth.service import authenticate_user, register_user, find_valid_token
+from auth.service import authenticate_user, find_valid_token, register_user
 from config import settings
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from models.models import PasswordResetToken, RefreshToken, User
+from rate_limiter import get_auth_rate_limiter, get_forgot_password_rate_limiter
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter( )
+router = APIRouter( dependencies=[ Depends( get_auth_rate_limiter ) ] )
 
 
 @router.post( "/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED )
@@ -69,7 +75,7 @@ async def login(
     raw_refresh_token = await issue_refresh_token(
         db,
         user_id=user.id,
-        ip_address=request.client.host if request.client else None,
+        ip_address=get_client_ip( request ),
         user_agent=request.headers.get( "user-agent" )
     )
     await db.commit( )
@@ -122,7 +128,7 @@ async def refresh(
         db=db,
         user_id=user.id,
         family_id=token_row.family_id,
-        ip_address=request.client.host if request.client else None,
+        ip_address=get_client_ip( request ),
         user_agent=request.headers.get( "user-agent" )
     )
 
@@ -156,7 +162,7 @@ async def logout(
     response.delete_cookie( key="refresh_token", path="/auth" )
     return LogoutResponse( )
 
-@router.post( "/forgot-password", response_model=ForgotPasswordResponse )
+@router.post( "/forgot-password", response_model=ForgotPasswordResponse, dependencies=[ Depends( get_forgot_password_rate_limiter ) ] )
 async def forgot_password(
     payload: ForgotPasswordRequest,
     db: Annotated[ AsyncSession, Depends( get_db ) ]
@@ -181,7 +187,7 @@ async def forgot_password(
         
     return ForgotPasswordResponse( )
 
-@router.post( "/reset-password", response_model=ResetPasswordResponse )
+@router.post( "/reset-password", response_model=ResetPasswordResponse, dependencies=[ Depends( get_forgot_password_rate_limiter ) ] )
 async def reset_password(
     payload: ResetPasswordRequest,
     db: Annotated[ AsyncSession, Depends( get_db ) ],
