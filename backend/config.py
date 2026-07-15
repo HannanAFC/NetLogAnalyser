@@ -36,7 +36,6 @@ class Settings( BaseSettings ):
 
     # Ingestion
     ingest_max_batch_size:               int = 500
-    ingest_rate_limit:                   str = "1000/minute"
 
     # Websocket
     ws_heartbeat_interval:               int = 30
@@ -45,6 +44,21 @@ class Settings( BaseSettings ):
     # Cookies
     cookie_secure:                       bool = True
     cookie_samesite:                     str = "lax"
+
+    # Redis
+    redis_url:                           SecretStr
+
+    # Rate limits
+    ratelimit_auth_times:                int = 10
+    ratelimit_auth_seconds:              int = 60
+    ratelimit_forgot_password_times:     int = 3
+    ratelimit_forgot_password_seconds:   int = 60
+    ratelimit_ingest_times:              int = 1000
+    ratelimit_ingest_seconds:            int = 60
+    ratelimit_ws_times:                  int = 50
+    ratelimit_ws_seconds:                int = 60
+    ratelimit_general_times:             int = 100
+    ratelimit_general_seconds:           int = 60
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 

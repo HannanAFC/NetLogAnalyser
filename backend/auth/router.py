@@ -34,10 +34,11 @@ from config import settings
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from models.models import PasswordResetToken, RefreshToken, User
+from rate_limiter import get_auth_rate_limiter, get_forgot_password_rate_limiter
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter( )
+router = APIRouter( dependencies=[ Depends( get_auth_rate_limiter ) ] )
 
 
 @router.post( "/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED )
@@ -161,7 +162,7 @@ async def logout(
     response.delete_cookie( key="refresh_token", path="/auth" )
     return LogoutResponse( )
 
-@router.post( "/forgot-password", response_model=ForgotPasswordResponse )
+@router.post( "/forgot-password", response_model=ForgotPasswordResponse, dependencies=[ Depends( get_forgot_password_rate_limiter ) ] )
 async def forgot_password(
     payload: ForgotPasswordRequest,
     db: Annotated[ AsyncSession, Depends( get_db ) ]
@@ -186,7 +187,7 @@ async def forgot_password(
         
     return ForgotPasswordResponse( )
 
-@router.post( "/reset-password", response_model=ResetPasswordResponse )
+@router.post( "/reset-password", response_model=ResetPasswordResponse, dependencies=[ Depends( get_forgot_password_rate_limiter ) ] )
 async def reset_password(
     payload: ResetPasswordRequest,
     db: Annotated[ AsyncSession, Depends( get_db ) ],
