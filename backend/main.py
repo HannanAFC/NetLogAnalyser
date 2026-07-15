@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from math import floor
 from typing import Annotated
 
+import rate_limiter as _rl  # access to the module for rebinding globals
 from auth import router as auth_router
 from config import SecurityHeadersMiddleware, settings
 from database import engine, get_db
@@ -11,6 +12,11 @@ from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from rate_limiter import (
+    close_redis,
+    create_rate_limiter,
+    init_redis,
+)
 from schemas import HealthResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,10 +25,35 @@ from users import router as users_router
 
 @asynccontextmanager
 async def lifespan( _app: FastAPI ):
-    # application runtime
+    # startup
+    await init_redis( )
+
+    # Replace default rate limits with ones built from env variables
+    _rl.auth_rate_limiter = await create_rate_limiter(
+        settings.ratelimit_auth_times,
+        settings.ratelimit_auth_seconds,
+        "auth",
+    )
+    _rl.forgot_password_rate_limiter = await create_rate_limiter(
+        settings.ratelimit_forgot_password_times,
+        settings.ratelimit_forgot_password_seconds,
+        "forgot-password",
+    )
+    _rl.ingest_rate_limiter = await create_rate_limiter(
+        settings.ratelimit_ingest_times,
+        settings.ratelimit_ingest_seconds,
+        "ingest",
+    )
+    _rl.general_rate_limiter = await create_rate_limiter(
+        settings.ratelimit_general_times,
+        settings.ratelimit_general_seconds,
+        "general",
+    )
+
     yield
 
     # shutdown
+    await close_redis( )
     await engine.dispose( )
 
 
