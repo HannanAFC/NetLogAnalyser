@@ -162,7 +162,7 @@ jobs:
           VITE_WS_BASE_URL: ws://localhost:8000/ws
 
       - name: Run ESLint
-        run: pnpm run lint -- --max-warnings=0
+        run: pnpm run lint --max-warnings=0
         working-directory: frontend
 
   deploy-staging:
