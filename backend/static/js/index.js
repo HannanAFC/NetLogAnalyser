@@ -85,6 +85,69 @@ function copyUrl( )
     } );
 }
 
+// ── Theme toggle ───────────────────────────────────────────────────────────
+const THEME_KEY = 'netloganalyser-theme';
+
+function getStoredTheme( )
+{
+    try { return localStorage.getItem( THEME_KEY ); }
+    catch { return null; }
+}
+
+function applyTheme( mode )
+{
+    if ( mode === 'auto' ) {
+        document.documentElement.removeAttribute( 'data-theme' );
+    } else {
+        document.documentElement.setAttribute( 'data-theme', mode );
+    }
+    renderToggle( mode );
+    try { localStorage.setItem( THEME_KEY, mode ); } catch { /* ignore */ }
+}
+
+const nextMode = { auto: 'light', light: 'dark', dark: 'auto' };
+const labelFor = { auto: 'Auto', light: 'Light', dark: 'Dark' };
+
+function renderToggle( mode )
+{
+    const btn = document.getElementById( 'themeToggle' );
+    if ( !btn ) return;
+
+    if ( mode === 'auto' ) {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/></svg> Auto';
+    } else if ( mode === 'light' ) {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M12.95 3.05l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Light';
+    } else {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13.5 10.5A6 6 0 0 1 5.5 2.5a6 6 0 1 0 8 8Z" fill="currentColor"/></svg> Dark';
+    }
+    btn.title = 'Theme: ' + labelFor[ mode ];
+}
+
+function cycleTheme( )
+{
+    const current = getStoredTheme( ) || 'auto';
+    applyTheme( nextMode[ current ] );
+}
+
+function initTheme( )
+{
+    const mode = getStoredTheme( ) || 'auto';
+    applyTheme( mode );
+
+    const btn = document.getElementById( 'themeToggle' );
+    if ( btn ) {
+        btn.addEventListener( 'click', cycleTheme );
+    }
+
+    /* Listen for OS preference changes when in auto mode */
+    window.matchMedia( '(prefers-color-scheme: dark)' ).addEventListener( 'change', function( )
+    {
+        if ( ( getStoredTheme( ) || 'auto' ) === 'auto' ) {
+            renderToggle( 'auto' );
+        }
+    } );
+}
+
 // ── Code tabs ─────────────────────────────────────────────────────────────
 const snippets = {
     python: `<span class="c-kw">import</span> requests
@@ -177,6 +240,8 @@ function copyCode( )
 
 function initLandingPage( )
 {
+    initTheme( );
+
     const copyBtn = document.querySelector( ".copy-btn" );
     copyBtn.addEventListener( "click", copyUrl );
 

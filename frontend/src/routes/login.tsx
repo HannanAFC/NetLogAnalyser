@@ -38,98 +38,103 @@ function LoginPage() {
     });
 
     return (
-        <div className="mx-auto mt-24 w-full max-w-sm px-4">
-            <h1 className="heading-1 mb-2">Sign in</h1>
-            <p className="body-sm mb-8">Enter your credentials to access the dashboard.</p>
+        <div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
+            <div>
+                <p className="eyebrow">Secure access</p>
+                <h1 className="heading-1">Sign in</h1>
+                <p className="body-text mt-2">Enter your credentials to access the live operations view.</p>
+            </div>
 
-            <form
-                onSubmit={ ( event ) =>
-                {
-                    event.preventDefault( );
-                    event.stopPropagation( );
-                    form.handleSubmit( );
-                }}
-                className="space-y-4"
-            >
-                <form.Field
-                    name="email"
-                    validators={{ onChange: loginSchema.shape.email, onBlur: loginSchema.shape.email }}
+            <div className="panel p-6">
+                <form
+                    onSubmit={ ( event ) =>
+                    {
+                        event.preventDefault( );
+                        event.stopPropagation( );
+                        form.handleSubmit( );
+                    }}
+                    className="space-y-4"
                 >
+                    <form.Field
+                        name="email"
+                        validators={{ onChange: loginSchema.shape.email, onBlur: loginSchema.shape.email }}
+                    >
+                        { ( field ) =>
+                        (
+                            <div>
+                                <label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+                                    Email
+                                </label>
+                                <input
+                                    id={ field.name }
+                                    type="email"
+                                    autoComplete="email"
+                                    value={ field.state.value }
+                                    onBlur={ field.handleBlur }
+                                    onChange={ ( e ) => field.handleChange( e.target.value ) }
+                                    className="mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150"
+                                />
+                                { field.state.meta.errors.length > 0 && (
+                                    <p className="mt-1 text-[12px] text-critical">
+                                        { field.state.meta.errors[ 0 ]?.message }
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </form.Field>
+
+                    <form.Field
+                        name="password"
+                        validators={{ onChange: loginSchema.shape.password, onBlur: loginSchema.shape.password }}
+                    >
                     { ( field ) =>
                     (
                         <div>
-                            <label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">
-                                Email
+                            <label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+                                Password
                             </label>
                             <input
                                 id={ field.name }
-                                type="email"
-                                autoComplete="email"
+                                type="password"
+                                autoComplete="current-password"
                                 value={ field.state.value }
                                 onBlur={ field.handleBlur }
                                 onChange={ ( e ) => field.handleChange( e.target.value ) }
-                                className="mt-1 w-full rounded-md border bg-surface-card px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-tertiary border-border focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/40 transition-[border-color,box-shadow] duration-150"
+                                className="mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150"
                             />
                             { field.state.meta.errors.length > 0 && (
-                                <p className="mt-1 text-xs text-critical">
+                                <p className="mt-1 text-[12px] text-critical">
                                     { field.state.meta.errors[ 0 ]?.message }
                                 </p>
                             )}
                         </div>
                     )}
-                </form.Field>
+                    </form.Field>
 
-                <form.Field
-                    name="password"
-                    validators={{ onChange: loginSchema.shape.password, onBlur: loginSchema.shape.password }}
-                >
-                { ( field ) =>
-                (
-                    <div>
-                        <label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">
-                            Password
-                        </label>
-                        <input
-                            id={ field.name }
-                            type="password"
-                            autoComplete="current-password"
-                            value={ field.state.value }
-                            onBlur={ field.handleBlur }
-                            onChange={ ( e ) => field.handleChange( e.target.value ) }
-                            className="mt-1 w-full rounded-md border bg-surface-card px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-tertiary border-border focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/40 transition-[border-color,box-shadow] duration-150"
-                        />
-                        { field.state.meta.errors.length > 0 && (
-                            <p className="mt-1 text-xs text-critical">
-                                { field.state.meta.errors[ 0 ]?.message }
-                            </p>
-                        )}
-                    </div>
-                )}
-                </form.Field>
+                    { login.isError && (
+                    <p className="text-[13px] text-critical">Incorrect email or password.</p>
+                    )}
 
-                { login.isError && (
-                <p className="text-sm text-critical">Incorrect email or password.</p>
-                )}
+                    <form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
+                    { ( [ canSubmit, isPristine ] ) => (
+                        <button
+                            type="submit"
+                            disabled={ !canSubmit || isPristine || login.isPending }
+                            className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
+                        >
+                        { login.isPending ? 'Signing in…' : 'Sign in' }
+                        </button>
+                    )}
+                    </form.Subscribe>
+                </form>
 
-                <form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
-                { ( [ canSubmit, isPristine ] ) => (
-                    <button
-                        type="submit"
-                        disabled={ !canSubmit || isPristine || login.isPending }
-                        className="inline-flex w-full items-center justify-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background] duration-150 tracking-[0.01em] px-4 py-[9px] gap-[7px] rounded-md bg-green-500 text-[#0a0f0a] hover:opacity-[0.88] disabled:opacity-50"
-                    >
-                    { login.isPending ? 'Signing in…' : 'Sign in' }
-                    </button>
-                )}
-                </form.Subscribe>
-            </form>
-
-            <p className="mt-4 body-sm">
-                No account?{' '}
-                <Link to="/register" className="font-medium text-green-500 hover:underline">
-                    Register
-                </Link>
-            </p>
+                <p className="mt-5 text-[13px] text-text-secondary">
+                    No account?{' '}
+                    <Link to="/register" className="font-semibold text-[var(--color-accent-strong)] hover:underline">
+                        Register
+                    </Link>
+                </p>
+            </div>
         </div>
     );
 }

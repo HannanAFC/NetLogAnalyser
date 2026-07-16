@@ -1,3 +1,4 @@
+import { ThemeToggle } from '#/components/ui/theme-toggle'
 import { useSession } from '#/features/auth/hooks'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
@@ -8,7 +9,7 @@ import '../styles.css'
 
 export const Route = createRootRoute(
 {
-  	component: RootComponent
+	component: RootComponent
 } )
 
 function RootComponent( )
@@ -16,33 +17,43 @@ function RootComponent( )
 	const { data: session } = useSession( );
 
 	return (
-		<div className="flex min-h-screen flex-col">
-			<header className="flex items-center justify-between px-6 py-7 border-b border-border max-w-215 mx-auto w-full">
+		<div className="flex min-h-screen flex-col bg-[var(--color-paper)] text-text-primary">
+			<header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 				<Link to="/" className="flex items-center gap-2.5 no-underline">
-					<div className="h-2.25 w-2.25 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e,0_0_24px_rgba(34,197,94,0.12)] animate-[breathe_2.8s_ease-in-out_infinite]" />
-					<span className="font-mono text-[15px] font-medium text-text-primary tracking-[-0.01em]">
+					<div className="h-2 w-2 rounded-sm bg-[var(--color-accent)]" />
+					<span className="text-[14px] font-semibold tracking-[-0.02em] text-text-primary">
 						NetLogAnalyser
 					</span>
 				</Link>
-				<nav className="flex items-center gap-5">
+
+				<nav className="flex items-center gap-4">
+					<ThemeToggle />
 					{ session ? (
-						<Link
-							to="/dashboard"
-							className="inline-flex items-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background] duration-150 tracking-[0.01em] px-4 py-2.25 gap-1.75 rounded-md bg-green-500 text-[#0a0f0a] hover:opacity-[0.88]"
-						>
-							Dashboard
-						</Link>
+						<>
+							<Link
+								to="/dashboard"
+								className="text-[13px] font-medium text-text-secondary no-underline transition-colors hover:text-text-primary"
+							>
+								Dashboard
+							</Link>
+							<Link
+								to="/dashboard"
+								className="rounded-md bg-[var(--color-accent)] px-3.5 py-2 text-[12px] font-semibold text-[var(--color-ink)] no-underline transition-opacity hover:opacity-90"
+							>
+								Open
+							</Link>
+						</>
 					) : (
 						<>
 							<Link
 								to="/login"
-								className="font-mono text-[11px] font-medium text-text-tertiary no-underline hover:text-text-secondary transition-colors duration-150 uppercase tracking-wider"
+								className="text-[13px] font-medium text-text-secondary no-underline transition-colors hover:text-text-primary"
 							>
 								Sign in
 							</Link>
 							<Link
 								to="/register"
-								className="inline-flex items-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background] duration-150 tracking-[0.01em] px-4 py-2.25 gap-1.75 rounded-md bg-green-500 text-[#0a0f0a] hover:opacity-[0.88]"
+								className="rounded-md bg-[var(--color-accent)] px-3.5 py-2 text-[12px] font-semibold text-white no-underline transition-opacity hover:opacity-90"
 							>
 								Get started
 							</Link>
@@ -55,15 +66,13 @@ function RootComponent( )
 				<Outlet />
 			</div>
 
-			<footer className="max-w-215 mx-auto w-full mt-16 pt-6 border-t border-border px-6 pb-10 flex items-center justify-between">
-				<span className="font-mono text-[11px] text-text-tertiary">
-					NetLogAnalyser &nbsp;·&nbsp; v0.1.0
+			<footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-border px-4 py-5 sm:px-6 lg:px-8">
+				<span className="text-[12px] text-text-tertiary">
+					NetLogAnalyser · v0.1.0
 				</span>
-				<div className="flex gap-5">
-					<a href={ env.apiBaseUrl } className="text-xs text-text-tertiary no-underline hover:text-text-secondary transition-colors duration-150">
-						API docs
-					</a>
-				</div>
+				<a href={ env.apiBaseUrl } className="text-[12px] font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary">
+					API docs
+				</a>
 			</footer>
 
 			<TanStackDevtools

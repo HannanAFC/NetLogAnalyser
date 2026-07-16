@@ -18,6 +18,9 @@
                 <span class="wordmark-name">NetLogAnalyser / API</span>
             </a>
             <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" type="button" title="Theme: Auto">
+                    <!-- icon injected by JS -->
+                </button>
                 <span class="env-tag dev" id="envTag">{{ environment }}</span>
                 <a class="dash-link" href="{{ frontend_url }}">
                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
@@ -258,7 +261,7 @@ response = requests.<span class="c-fn">post</span>(url, json=payload, headers=he
 
         <!-- Footer -->
         <footer>
-            <span class="footer-left">NetLogAnalyser API &nbsp;·&nbsp; v0.1.0</span>
+            <span class="footer-left">NetLogAnalyser API &nbsp;·&nbsp; v{{ version }}</span>
             <div class="footer-right">
                 <a class="footer-link" href="/docs">Swagger</a>
                 <a class="footer-link" href="/redoc">ReDoc</a>
