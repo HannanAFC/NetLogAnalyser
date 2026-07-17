@@ -6,7 +6,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from auth.security import generate_url_safe_token, hash_token
 from httpx import AsyncClient, Response
-from models.models import PasswordResetToken
+from models.models import EmailVerificationToken, PasswordResetToken, User
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # ═══════════════════════════════════════════════════════════════════
@@ -65,17 +66,50 @@ async def _login_user(
 
 async def _register_and_login(
     client:       AsyncClient,
+    db_session:   AsyncSession,
     email:        str = VALID_EMAIL,
     password:     str = VALID_PASSWORD,
     display_name: str = VALID_DISPLAY_NAME
 ) -> Response:
-    """Convenience: register then login, returning the login response JSON."""
+    """Convenience: register, verify email, then login, returning the login response JSON."""
     await _register_user( client, email=email, password=password, display_name=display_name )
+    await _verify_user_email( db_session, email=email )
     return await _login_user( client, email=email, password=password )
 
-async def _register_and_return_cookie( client: AsyncClient ) -> tuple[ str, Response ]:
-    """Helper to register, login and return refresh token"""
-    response = await _register_and_login( client )
+async def _verify_user_email(
+    db_session: AsyncSession,
+    email: str = VALID_EMAIL
+) -> None:
+    """Mark a user's email as verified directly in the database.
+
+    Also consumes any pending EmailVerificationToken rows so the user
+    can immediately log in without going through the email round-trip.
+    """
+    result = await db_session.execute(
+        select( User ).where( User.email == email.lower( ) )
+    )
+    user = result.scalar_one_or_none( )
+    assert user is not None, f"No user found with email { email }"
+
+    # consume pending verification tokens to match real verify flow
+    await db_session.execute(
+        update( EmailVerificationToken )
+        .where(
+            EmailVerificationToken.user_id == user.id,
+            EmailVerificationToken.used_at.is_( None )
+        )
+        .values( used_at=datetime.now( timezone.utc ) )
+    )
+
+    user.email_verified_at = datetime.now( timezone.utc )
+    await db_session.commit( )
+
+
+async def _register_and_return_cookie(
+    client: AsyncClient, db_session: AsyncSession
+) -> tuple[ str, Response ]:
+    """Helper to register, verify, login and return refresh token"""
+    response = await _register_and_login( client, db_session )
 
     if response.cookies.get( "refresh_token" ) is None:
         raise ValueError( "No refresh token returned." )
@@ -232,11 +266,11 @@ class TestLogin:
 
     @pytest.mark.anyio
     async def test_login_returns_access_token_and_user(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """A valid login must return a JWT access token, user object, and a
         refresh-token cookie."""
-        response = await _register_and_login( client )
+        response = await _register_and_login( client, db_session )
 
         assert response.status_code == 200
         data = response.json( )
@@ -299,10 +333,11 @@ class TestLogin:
 
     @pytest.mark.anyio
     async def test_login_case_insensitive_email(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """Emails should be treated case-insensitively."""
         await _register_user( client, email="CaseTest@Example.COM" )
+        await _verify_user_email( db_session, email="CaseTest@Example.COM" )
 
         response = await client.post(
             "/auth/login",
@@ -357,10 +392,10 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_issues_new_access_token(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """A valid refresh token cookie should return a new access token."""
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
         client.cookies.set( "refresh_token", refresh_token )
 
         response = await client.post( "/auth/refresh" )
@@ -397,13 +432,13 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_reuse_triggers_family_revocation(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """Reusing an already-rotated refresh token must revoke the entire
         token family (token reuse detection)."""
 
         # login and get the raw set-cookie value so we can manually re-send it
-        original_cookie, response = await _register_and_return_cookie( client )
+        original_cookie, response = await _register_and_return_cookie( client, db_session )
         assert original_cookie is not None
 
         # first refresh → rotates token
@@ -431,10 +466,10 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_after_logout_returns_401(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """After a logout, the refresh token should be revoked and unusable."""
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
 
         # call logout with the access token
         await client.post(
@@ -448,10 +483,10 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_returns_new_cookie_each_time(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """Each refresh call should rotate the cookie value."""
-        first_cookie, response = await _register_and_return_cookie( client )
+        first_cookie, response = await _register_and_return_cookie( client, db_session )
         client.cookies.set( "refresh_token", first_cookie )
 
         for _ in range( 3 ):
@@ -475,11 +510,11 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_logout_revokes_refresh_token(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """After logout, the refresh token must be revoked so it cannot be
         used to get new access tokens."""
-        reset_token, response = await _register_and_return_cookie( client )
+        reset_token, response = await _register_and_return_cookie( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -495,11 +530,11 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_logout_clears_refresh_cookie(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """The response should include a Set-Cookie header that clears the
         refresh_token cookie."""
-        reset_token, response = await _register_and_return_cookie( client )
+        reset_token, response = await _register_and_return_cookie( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -532,11 +567,11 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_logout_without_cookie_is_still_successful(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """If the user has a valid access token but no refresh cookie,
         logout should still succeed (no-op on the cookie side)."""
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
 
         # manually remove the cookie
         client.cookies.clear()
@@ -550,11 +585,11 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_double_logout_is_idempotent(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """Calling logout twice with the same access token should not
         error on the second call."""
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
 
         headers = {"Authorization": f"Bearer { response.json( )[ "access_token" ] }"}
         resp1 = await client.post( "/auth/logout", headers=headers )
@@ -666,6 +701,9 @@ class TestResetPassword:
 
         assert response.status_code == 200
         assert "success" in response.json( )[ "detail" ].lower( )
+
+        # the user must have a verified email before they can log in
+        await _verify_user_email( db_session )
 
         # verify the new password actually works for login
         login_resp = await client.post(
@@ -871,10 +909,10 @@ class TestAuthDependency:
 
     @pytest.mark.anyio
     async def test_valid_bearer_token_accepted(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """A valid access token must pass the dependency check."""
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -906,11 +944,11 @@ class TestAuthDependency:
 
     @pytest.mark.anyio
     async def test_tampered_jwt_rejected(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """A JWT whose payload has been modified after signing must be
         rejected (signature verification failure)."""
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
         # Take the valid token and append garbage to invalidate the signature
         tampered = response.json( )[ "access_token" ] + "tampered"
 
@@ -949,10 +987,10 @@ class TestAuthDependency:
 
     @pytest.mark.anyio
     async def test_wrong_auth_scheme_rejected(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """Using 'Basic' instead of 'Bearer' must be rejected."""
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -970,10 +1008,11 @@ class TestConcurrency:
 
     @pytest.mark.anyio
     async def test_rapid_login_logout_sequence(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         """Repeated login → logout cycles should work without errors."""
         await _register_user( client )
+        await _verify_user_email( db_session )
 
         for _ in range( 5 ):
             # fresh client-like cookie state
@@ -1016,9 +1055,10 @@ class TestNoSecretsLeaked:
 
     @pytest.mark.anyio
     async def test_login_response_has_no_password_hash(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
         await _register_user( client )
+        await _verify_user_email( db_session )
         response = await client.post(
             "/auth/login",
             json={ "email": VALID_EMAIL, "password": VALID_PASSWORD }
@@ -1029,9 +1069,9 @@ class TestNoSecretsLeaked:
 
     @pytest.mark.anyio
     async def test_refresh_response_has_no_password_hash(
-        self, client: AsyncClient
+        self, client: AsyncClient, db_session: AsyncSession
     ) -> None:
-        refresh_token, response = await _register_and_return_cookie( client )
+        refresh_token, response = await _register_and_return_cookie( client, db_session )
         client.cookies.set( "refresh_token", refresh_token )
         response = await client.post( "/auth/refresh" )
         body = response.text
