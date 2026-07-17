@@ -124,7 +124,7 @@ class TestRateLimitEnforcement:
         assert r1.status_code == 200
         assert r2.status_code == 200
 
-        # Fourth overall request — must be rate-limited
+        # Fourth overall request - must be rate-limited
         r3 = await client.post( "/auth/login", json=login_payload )
         assert r3.status_code == 429
         assert "Too Many Requests" in r3.text

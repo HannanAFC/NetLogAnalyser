@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from auth.security import generate_reset_token, hash_token
+from auth.security import generate_url_safe_token, hash_token
 from httpx import AsyncClient, Response
 from models.models import PasswordResetToken
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -618,7 +618,7 @@ class TestResetPassword:
 
         The production code prints the token with ``print()`` - here we
         query the DB directly for the token_hash and create the raw token
-        manually via ``generate_reset_token`` + ``hash_token`` so we
+        manually via ``generate_url_safe_token`` + ``hash_token`` so we
         can construct a valid reset link.
         """
         # First, register & request a reset
@@ -641,7 +641,7 @@ class TestResetPassword:
 
         # We can't reverse the hash, so we generate a known raw token
         # and manually patch the row's token_hash so we know the plaintext.
-        raw_token = generate_reset_token( )
+        raw_token = generate_url_safe_token( 32 )
         row.token_hash = hash_token( raw_token) 
         await db_session.commit( )
 

@@ -22,16 +22,18 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class User( Base ):
     __tablename__ = "users"
 
-    id:                    Mapped[ UUID ]                         = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
-    email:                 Mapped[ str ]                          = mapped_column( String( 255 ), unique=True, index=True , nullable=False )
-    password_hash:         Mapped[ str ]                          = mapped_column( String( 255 ), nullable=False )
-    display_name:          Mapped[ str ]                          = mapped_column( String( 50 ), nullable=False )
-    created_at:            Mapped[ datetime ]                     = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
-    updated_at:            Mapped[ datetime ]                     = mapped_column( DateTime( timezone=True ), server_default=func.now( ), onupdate=func.now( ) )
-    api_keys:              Mapped[ list[ "APIKey" ] ]             = relationship( back_populates="user" )
-    refresh_tokens:        Mapped[ list[ "RefreshToken" ] ]       = relationship( back_populates="user" )
-    password_reset_tokens: Mapped[ list[ "PasswordResetToken" ] ] = relationship( back_populates="user" )
-    log_entries:           Mapped[ list[ "LogEntry" ] ]           = relationship( back_populates="user" )
+    id:                        Mapped[ UUID ]                             = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    email:                     Mapped[ str ]                              = mapped_column( String( 255 ), unique=True, index=True , nullable=False )
+    password_hash:             Mapped[ str ]                              = mapped_column( String( 255 ), nullable=False )
+    display_name:              Mapped[ str ]                              = mapped_column( String( 50 ), nullable=False )
+    created_at:                Mapped[ datetime ]                         = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
+    updated_at:                Mapped[ datetime ]                         = mapped_column( DateTime( timezone=True ), server_default=func.now( ), onupdate=func.now( ) )
+    email_verified_at:         Mapped[ datetime | None ]                  = mapped_column( DateTime( timezone=True ), nullable=True )
+    api_keys:                  Mapped[ list[ "APIKey" ] ]                 = relationship( back_populates="user", cascade="all, delete-orphan" )
+    refresh_tokens:            Mapped[ list[ "RefreshToken" ] ]           = relationship( back_populates="user", cascade="all, delete-orphan" )
+    password_reset_tokens:     Mapped[ list[ "PasswordResetToken" ] ]     = relationship( back_populates="user", cascade="all, delete-orphan" )
+    log_entries:               Mapped[ list[ "LogEntry" ] ]               = relationship( back_populates="user", cascade="all, delete-orphan" )
+    email_verification_tokens: Mapped[ list[ "EmailVerificationToken" ] ] = relationship( back_populates="user", cascade="all, delete-orphan" )
 
     def __repr__(self):
         return f"""
@@ -147,3 +149,14 @@ class PasswordResetToken( Base ):
     expires_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False )
     used_at:    Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ), nullable=True )
     user:       Mapped[ User ]            = relationship( back_populates="password_reset_tokens" )
+
+class EmailVerificationToken( Base ):
+    __tablename__ = "email_verification_tokens"
+
+    id:         Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    user_id:    Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), nullable=False )
+    token_hash: Mapped[ str ]             = mapped_column( unique=True, nullable=False )
+    expires_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False )
+    used_at:    Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ), nullable=True )
+    created_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), server_default=func.now( ), nullable=False )
+    user:       Mapped[ "User" ]          = relationship( back_populates="email_verification_tokens" )

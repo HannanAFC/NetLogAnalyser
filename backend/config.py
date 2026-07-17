@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -30,7 +32,7 @@ class Settings( BaseSettings ):
     # CORS
     cors_allowed_origins:                list[ str ] = [ "http://localhost:3000" ]
 
-    # API Keys
+    # API keys
     api_key_prefix_length:               int = 8
     api_key_max_per_user:                int = 10
 
@@ -43,7 +45,7 @@ class Settings( BaseSettings ):
 
     # Cookies
     cookie_secure:                       bool = True
-    cookie_samesite:                     str = "lax"
+    cookie_samesite:                     Literal[ "lax", "strict", "none" ] = "lax"
 
     # Redis
     redis_url:                           SecretStr
@@ -59,6 +61,13 @@ class Settings( BaseSettings ):
     ratelimit_ws_seconds:                int = 60
     ratelimit_general_times:             int = 100
     ratelimit_general_seconds:           int = 60
+
+    # Email service
+    resend_api_key:                          str = ""
+    resend_onboarding_email:                 str = "NetLogAnalyser <onboarding@netloganalyser.com>"
+    resend_verify_email:                     str = "NetLogAnalyser <verify@netloganalyser.com>"
+    resend_recovery_email:                   str = "NetLogAnalyser <recovery@netloganalyser.com>"
+    email_verification_token_expire_minutes: int = 60
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 
