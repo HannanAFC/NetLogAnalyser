@@ -1,37 +1,45 @@
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useRegister } from '../features/auth/hooks';
+import { z } from 'zod';
+import { useResetPassword } from '../features/auth/hooks';
 import { sessionQueryOptions } from '../features/auth/queries';
-import { registerSchema } from '../features/auth/schemas';
+import { resetPasswordSchema } from '../features/auth/schemas';
 import { apiError } from '../lib/api/errors';
 import { fieldError } from '../lib/utils';
 
-export const Route = createFileRoute( '/register' )(
+const resetSearchSchema = z.object(
 {
+	token: z.string( ).optional( ),
+});
+
+export const Route = createFileRoute( '/reset-password' )(
+{
+	validateSearch: resetSearchSchema,
 	beforeLoad: async ( { context } ) =>
 	{
 		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
-	component: RegisterPage
+	component: ResetPasswordPage
 });
 
-function RegisterPage( )
+function ResetPasswordPage( )
 {
-	const register = useRegister( );
-	const [ registeredEmail, setRegisteredEmail ] = useState< string | null >( null );
+	const { token } = Route.useSearch( );
+	const resetPassword = useResetPassword( );
+	const [ done, setDone ] = useState( false );
 
 	const form = useForm(
 	{
-		defaultValues: { email: '', display_name: '', password: '', confirm_password: '' },
+		defaultValues: { token: token ?? '', password: '', confirm_password: '' },
 		onSubmit: async ( { value } ) =>
 		{
 			try
 			{
-				const parsed = registerSchema.parse( value );
-				await register.mutateAsync( parsed );
-				setRegisteredEmail( parsed.email );
+				const parsed = resetPasswordSchema.parse( value );
+				await resetPassword.mutateAsync( parsed );
+				setDone( true );
 			}
 			catch
 			{
@@ -42,52 +50,58 @@ function RegisterPage( )
 
 	const inputClass = "mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150";
 
-	if ( registeredEmail )
+	if ( !token )
+	{
+		return (
+			<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
+				<div className="panel p-8 text-center">
+					<h1 className="heading-1 mb-2">Missing reset token</h1>
+					<p className="body-text">
+						This page requires a reset token from your email. If you need to reset your
+						password, request a new link.
+					</p>
+					<Link
+						to="/forgot-password"
+						className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
+					>
+						Request a reset link
+					</Link>
+				</div>
+			</div>
+		);
+	}
+
+	if ( done )
 	{
 		return (
 			<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 				<div className="panel p-8 text-center">
 					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)]/10">
 						<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-strong)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-							<rect x="2" y="4" width="20" height="16" rx="2" />
-							<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+							<path d="M20 6 9 17l-5-5" />
 						</svg>
 					</div>
-					<h1 className="heading-1 mb-2">Check your email</h1>
+					<h1 className="heading-1 mb-2">Password reset</h1>
 					<p className="body-text">
-						We sent a verification link to{' '}
-						<span className="font-semibold text-text-primary">{ registeredEmail }</span>.
+						Your password has been reset. All existing sessions have been signed out.
 					</p>
-					<p className="body-sm mt-3">
-						Click the link in the email to verify your address. If you don&apos;t see it, check
-						your spam folder or request a new one below.
-					</p>
-
-					<div className="mt-6 space-y-3">
-						<Link
-							to="/login"
-							className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
-						>
-							Continue to sign in
-						</Link>
-						<Link
-							to="/verify-email"
-							className="block text-[13px] font-medium text-[var(--color-accent-strong)] hover:underline"
-						>
-							Resend verification email
-						</Link>
-					</div>
+					<Link
+						to="/login"
+						className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
+					>
+						Sign in with new password
+					</Link>
 				</div>
 			</div>
 		);
 	}
-
+	
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
-				<p className="eyebrow">Create your workspace</p>
-				<h1 className="heading-1">Register</h1>
-				<p className="body-text mt-2">Set up your account to start streaming ingest and live observability.</p>
+				<p className="eyebrow">Account recovery</p>
+				<h1 className="heading-1">Reset password</h1>
+				<p className="body-text mt-2">Choose a new password for your account.</p>
 			</div>
 
 			<div className="panel p-6">
@@ -100,71 +114,20 @@ function RegisterPage( )
 					}}
 					className="space-y-4"
 				>
-					<form.Field
-						name="email"
-						validators={{ onChange: registerSchema.shape.email, onBlur: registerSchema.shape.email }}
-					>
-						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Email
-								</label>
-								<input
-									id={ field.name }
-									type="email"
-									autoComplete="email"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
-					</form.Field>
-
-					<form.Field
-						name="display_name"
-						validators={{ onChange: registerSchema.shape.display_name, onBlur: registerSchema.shape.display_name }}
-					>
-						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Display name
-								</label>
-								<input
-									id={ field.name }
-									type="text"
-									autoComplete="username"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+					{/* Hidden field to carry the token through form state */}
+					<form.Field name="token">
+						{ ( field ) => <input type="hidden" value={ field.state.value } /> }
 					</form.Field>
 
 					<form.Field
 						name="password"
-						validators={{ onChange: registerSchema.shape.password, onBlur: registerSchema.shape.password }}
+						validators={{ onChange: resetPasswordSchema.shape.password, onBlur: resetPasswordSchema.shape.password }}
 					>
 						{ ( field ) =>
 						(
 							<div>
 								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Password
+									New password
 								</label>
 								<input
 									id={ field.name }
@@ -200,13 +163,13 @@ function RegisterPage( )
 						(
 							<div>
 								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Confirm password
+									Confirm new password
 								</label>
 								<input
 									id={ field.name }
 									type="password"
 									autoComplete="new-password"
-									value={ field.state.value}
+									value={ field.state.value }
 									onBlur={ field.handleBlur }
 									onChange={ ( e ) => field.handleChange( e.target.value ) }
 									className={ inputClass }
@@ -220,8 +183,8 @@ function RegisterPage( )
 						)}
 					</form.Field>
 
-					{ register.isError && (
-						<p className="text-[13px] text-critical">{ apiError( register.error ) ?? "Couldn't create that account. Try a different email." }</p>
+					{ resetPassword.isError && (
+						<p className="text-[13px] text-critical">{ apiError( resetPassword.error ) ?? 'Could not reset your password. The link may have expired.' }</p>
 					)}
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
@@ -229,19 +192,18 @@ function RegisterPage( )
 						(
 							<button
 								type="submit"
-								disabled={ !canSubmit || isPristine || register.isPending }
+								disabled={ !canSubmit || isPristine || resetPassword.isPending }
 								className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
 							>
-								{ register.isPending ? 'Creating account…' : 'Create account' }
+								{ resetPassword.isPending ? 'Resetting…' : 'Reset password' }
 							</button>
 						)}
 					</form.Subscribe>
 				</form>
 
 				<p className="mt-5 text-[13px] text-text-secondary">
-					Already have an account?{' '}
 					<Link to="/login" className="font-semibold text-[var(--color-accent-strong)] hover:underline">
-						Sign in
+						Back to sign in
 					</Link>
 				</p>
 			</div>

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { useLogin } from '../features/auth/hooks';
 import { sessionQueryOptions } from '../features/auth/queries';
 import { loginSchema } from '../features/auth/schemas';
+import { apiError } from '../lib/api/errors';
 
 const loginSearchSchema = z.object(
 {
@@ -112,8 +113,16 @@ function LoginPage() {
                     </form.Field>
 
                     { login.isError && (
-                    <p className="text-[13px] text-critical">Incorrect email or password.</p>
+                    <p className="text-[13px] text-critical">
+                        { apiError( login.error ) ?? 'An unexpected error occurred.' }
+                    </p>
                     )}
+
+                    <div className="flex items-center justify-end">
+                        <Link to="/forgot-password" className="text-[13px] font-medium text-[var(--color-accent-strong)] hover:underline">
+                            Forgot password?
+                        </Link>
+                    </div>
 
                     <form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
                     { ( [ canSubmit, isPristine ] ) => (
