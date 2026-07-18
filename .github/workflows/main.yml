@@ -112,6 +112,7 @@ jobs:
       REDIS_URL: redis://localhost:6379
       ENABLE_TEST_ENDPOINTS: true
       TEST_ENDPOINT_KEY: A-TESTING-KEY
+      RUN_INTEGRATION_TESTS: '1'
 
     steps:
       - name: Checkout Code
