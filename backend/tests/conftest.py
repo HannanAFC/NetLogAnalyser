@@ -1,5 +1,6 @@
 import os
 from collections.abc import AsyncGenerator
+from unittest.mock import AsyncMock
 
 os.environ.setdefault(
     "DATABASE_URL",
@@ -99,3 +100,26 @@ async def client(
         yield ac
 
     app.dependency_overrides.clear( )
+
+@pytest.fixture( autouse=True )
+def mock_email_send( monkeypatch ):
+    """
+    Prevent tests from hitting the real Resend API.
+
+    IMPORTANT: patched at `auth.service.*`, not `mailer.service.*` or
+    `mailer.client.*`. auth/service.py does
+    `from mailer.service import send_verification_email`, which creates a
+    *separate* local binding in auth.service's namespace — patching the
+    original mailer.service (or mailer.client) attribute doesn't touch that
+    copy, so the real function would still run. Always patch the name at
+    the point it's called from, not where it's defined.
+    """
+    verification_mock = AsyncMock( )
+    reset_mock        = AsyncMock( )
+    welcome_mock      = AsyncMock( )
+
+    monkeypatch.setattr( "auth.service.send_verification_email", verification_mock )
+    monkeypatch.setattr( "auth.service.send_password_reset_email", reset_mock )
+    monkeypatch.setattr( "auth.service.send_welcome_email", welcome_mock )
+
+    return { "verification": verification_mock, "reset": reset_mock, "welcome": welcome_mock }

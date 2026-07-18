@@ -1,6 +1,6 @@
+import { useSession } from '#/features/auth/hooks';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { sessionQueryOptions } from '../features/auth/queries';
-import { useSession } from '#/features/auth/hooks';
 
 export const Route = createFileRoute( '/' )(
 {
@@ -16,45 +16,62 @@ function IndexPage( )
 	const { data: session } = useSession( );
 
 	return (
-		<div className="mx-auto mt-32 w-full max-w-lg px-4 text-center">
-			<div className="mx-auto mb-6 h-[9px] w-[9px] rounded-full bg-green-500 shadow-[0_0_10px_#22c55e,0_0_24px_rgba(34,197,94,0.12)] animate-[breathe_2.8s_ease-in-out_infinite]" />
+		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-14">
+			<section className="flex flex-col gap-6">
+				<div className="flex flex-col gap-4">
+					<p className="eyebrow">NetLogAnalyser</p>
+					<h1 className="heading-1 max-w-2xl">
+						Every packet,<br />
+						<em>before it turns into noise.</em>
+					</h1>
+					<p className="body-text max-w-xl">
+						Route packet ingestion, anomaly detection, and historical analysis through one product dashboard built for operators who need fast signal, not more clutter.
+					</p>
+					<div className="flex gap-3">
+						{ session ? (
+							<Link
+								to="/dashboard"
+								className="rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[12px] font-semibold text-[var(--color-ink)] no-underline transition-opacity hover:opacity-90"
+							>
+								Open dashboard
+							</Link>
+						) : (
+							<>
+								<Link
+									to="/register"
+									className="rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[12px] font-semibold text-white no-underline transition-opacity hover:opacity-90"
+								>
+									Get started
+								</Link>
+								<Link
+									to="/login"
+									className="rounded-md border border-border px-4 py-2.5 text-[12px] font-semibold text-text-secondary no-underline transition-colors hover:text-text-primary"
+								>
+									Sign in
+								</Link>
+							</>
+						)}
+					</div>
+				</div>
+			</section>
 
-			<p className="eyebrow">NetLogAnalyser &nbsp;·&nbsp; Dashboard</p>
-			<h1 className="heading-1 mb-4">
-				Real-time network log<br />
-				<em>ingestion and analysis</em>
-			</h1>
-			<p className="body-text mx-auto mb-8">
-				Send network packet logs from any system, view live traffic,
-				detect anomalies, and query historical data - all from one dashboard.
-			</p>
-
-			<div className="flex justify-center gap-3">
-				{ session ? (
-					<Link
-						to="/dashboard"
-						className="inline-flex items-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background] duration-150 tracking-[0.01em] px-4 py-[9px] gap-[7px] rounded-md bg-green-500 text-[#0a0f0a] hover:opacity-[0.88]"
-					>
-						Dashboard
-					</Link>
-				) : (
-					<>
-						<Link
-							to="/login"
-							className="inline-flex items-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background] duration-150 tracking-[0.01em] px-4 py-[9px] gap-[7px] rounded-md bg-green-500 text-[#0a0f0a] hover:opacity-[0.88]"
-						>
-							Sign in
-						</Link>
-						<Link
-							to="/register"
-							className="inline-flex items-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background,color,border-color] duration-150 tracking-[0.01em] px-4 py-[9px] gap-[7px] rounded-md bg-transparent text-text-secondary border border-border-hi hover:text-text-primary hover:border-[rgb(var(--color-border-hi-rgb)/0.22)]"
-						>
-							Create account
-						</Link>
-					</>
-				)}
-
-			</div>
+			<section className="grid gap-3 sm:grid-cols-3">
+				<div className="panel p-5">
+					<p className="section-title">Ingest</p>
+					<h3 className="heading-3 mt-2">Single endpoint</h3>
+					<p className="body-sm mt-2">Post packet batches and preserve capture context without extra configuration.</p>
+				</div>
+				<div className="panel p-5">
+					<p className="section-title">Detect</p>
+					<h3 className="heading-3 mt-2">Anomaly signals</h3>
+					<p className="body-sm mt-2">Surface hot traffic, protocol drift, and suspicious spikes the moment they appear.</p>
+				</div>
+				<div className="panel p-5">
+					<p className="section-title">Observe</p>
+					<h3 className="heading-3 mt-2">Live + historical</h3>
+					<p className="body-sm mt-2">Pivot from real-time streams to timeline queries without leaving the dashboard.</p>
+				</div>
+			</section>
 		</div>
 	)
 }

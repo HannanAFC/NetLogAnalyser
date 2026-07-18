@@ -21,7 +21,8 @@ from rate_limiter import (
     get_auth_rate_limiter,
     get_forgot_password_rate_limiter,
 )
-from starlette.requests import Request
+from sqlalchemy.ext.asyncio import AsyncSession
+from tests.test_auth import _register_and_login, _register_user, _verify_user_email
 
 pytestmark = pytest.mark.anyio
 
@@ -93,7 +94,7 @@ class TestCloudflareIdentifier:
 class TestRateLimitEnforcement:
     """Verify that exceeding the configured limit returns HTTP 429."""
 
-    async def test_login_blocked_after_limit( self, client: AsyncClient ):
+    async def test_login_blocked_after_limit( self, client: AsyncClient, db_session: AsyncSession ):
         """After 3 requests (register + 2 logins) the 4th should be 429."""
         strict = _build_strict_limiter( 3, 60 )  # accounts for register call above
 
@@ -103,14 +104,12 @@ class TestRateLimitEnforcement:
         app.dependency_overrides[ get_auth_rate_limiter ] = _strict_auth
 
         # Register a user first so login can succeed
-        await client.post(
-            "/auth/register",
-            json={
-                "email": "ratelimit@example.com",
-                "password": "Str0ng!Pass",
-                "confirm_password": "Str0ng!Pass",
-                "display_name": "RL"
-            }
+        await _register_and_login(
+            client=client,
+            db_session=db_session,
+            email="ratelimit@example.com",
+            password="Str0ng!Pass",
+            display_name="RL"
         )
 
         login_payload = {
@@ -119,12 +118,10 @@ class TestRateLimitEnforcement:
         }
 
         # Register + 2 logins = 3 requests (at the limit), 4th should be blocked
-        r1 = await client.post( "/auth/login", json=login_payload )
         r2 = await client.post( "/auth/login", json=login_payload )
-        assert r1.status_code == 200
         assert r2.status_code == 200
 
-        # Fourth overall request — must be rate-limited
+        # Fourth overall request - must be rate-limited
         r3 = await client.post( "/auth/login", json=login_payload )
         assert r3.status_code == 429
         assert "Too Many Requests" in r3.text
@@ -203,7 +200,7 @@ class TestStricterForgotPasswordLimit:
 class TestBucketIsolation:
     """Hitting the forgot-password limit should NOT block other auth routes."""
 
-    async def test_forgot_password_limit_does_not_block_login( self, client: AsyncClient ):
+    async def test_forgot_password_limit_does_not_block_login( self, client: AsyncClient, db_session: AsyncSession ):
         """Exhaust forgot-password quota; login should still work."""
         strict_forgot = _build_strict_limiter( 1, 60 )
         lenient_auth = _build_strict_limiter( 10, 60 )
@@ -218,14 +215,16 @@ class TestBucketIsolation:
         app.dependency_overrides[ get_auth_rate_limiter ] = _lenient_auth
 
         # Register user for login test  # TestBucketIsolation
-        await client.post(
-            "/auth/register",
-            json={
-                "email": "bucketiso@example.com",
-                "password": "Str0ng!Pass",
-                "confirm_password": "Str0ng!Pass",
-                "display_name": "Bucket"
-            }
+        await _register_user(
+            client=client,
+            email="bucketiso@example.com",
+            password="Str0ng!Pass",
+            display_name="Bucket"
+        )
+        
+        await _verify_user_email(
+            db_session=db_session,
+            email="bucketiso@example.com"
         )
 
         # Exhaust forgot-password quota

@@ -79,3 +79,12 @@ class ResetPasswordRequest( PasswordComplexityMixin ):
 
 class ResetPasswordResponse( BaseModel ):
     detail: str = "Password reset successfully"
+
+class ResendVerificationRequest( BaseModel ):
+    email: EmailStr
+
+class ResendVerificationResponse( BaseModel ):
+    detail: str = "If an account with that email exists and is unverified, a new link will have been sent."
+
+class VerifyEmailResponse( BaseModel ):
+    detail: str = "Email verified successfully"

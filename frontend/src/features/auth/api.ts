@@ -1,6 +1,6 @@
 import { apiClient } from '../../lib/api/client';
-import type { AuthTokenResponse, RefreshResponse, User } from '../../lib/auth/types';
-import type { LoginPayload, RegisterRequestBody } from './schemas';
+import type { AuthTokenResponse, RefreshResponse, RegisterResponse, User } from '../../lib/auth/types';
+import type { ForgotPasswordPayload, LoginPayload, RegisterRequestBody, ResendVerificationPayload, ResetPasswordPayload } from './schemas';
 
 export async function loginRequest( payload: LoginPayload ): Promise< AuthTokenResponse >
 {
@@ -8,9 +8,9 @@ export async function loginRequest( payload: LoginPayload ): Promise< AuthTokenR
 	return data;
 }
 
-export async function registerRequest( payload: RegisterRequestBody ): Promise< AuthTokenResponse >
+export async function registerRequest( payload: RegisterRequestBody ): Promise< RegisterResponse >
 {
-	const { data } = await apiClient.post< AuthTokenResponse >( '/auth/register', payload );
+	const { data } = await apiClient.post< RegisterResponse >( '/auth/register', payload );
 	return data;
 }
 
@@ -29,4 +29,24 @@ export async function getMe( ): Promise< User >
 {
 	const { data } = await apiClient.get< User >( '/users/me' );
 	return data;
+}
+
+export async function verifyEmailRequest( token: string ): Promise< void >
+{
+	await apiClient.get( '/auth/verify-email', { params: { token } } );
+}
+
+export async function resendVerificationRequest( payload: ResendVerificationPayload ): Promise< void >
+{
+	await apiClient.post( '/auth/resend-verification', payload );
+}
+
+export async function forgotPasswordRequest( payload: ForgotPasswordPayload ): Promise< void >
+{
+	await apiClient.post( '/auth/forgot-password', payload );
+}
+
+export async function resetPasswordRequest( payload: ResetPasswordPayload ): Promise< void >
+{
+	await apiClient.post( '/auth/reset-password', payload );
 }

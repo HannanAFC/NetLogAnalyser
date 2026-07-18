@@ -110,6 +110,11 @@ jobs:
       SECRET_KEY: TESTING_KEY
       DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
       REDIS_URL: redis://localhost:6379
+      ENABLE_TEST_ENDPOINTS: true
+      TEST_ENDPOINT_KEY: A-TESTING-KEY
+      RUN_INTEGRATION_TESTS: '1'
+      RATELIMIT_AUTH_TIMES: 10000000
+      RATELIMIT_AUTH_SECONDS: 60
 
     steps:
       - name: Checkout Code

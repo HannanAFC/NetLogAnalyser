@@ -75,6 +75,9 @@ app.mount( "/static", StaticFiles( directory="static" ), name="static" )
 
 app.include_router( auth_router.router, prefix="/auth", tags=[ "auth" ] )
 app.include_router( users_router.router, prefix="/users", tags=[ "users" ] )
+if settings.enable_test_endpoints:
+    from testing.router import router as test_only_router
+    app.include_router( test_only_router )
 
 templates = Jinja2Templates( directory="templates" )
 
