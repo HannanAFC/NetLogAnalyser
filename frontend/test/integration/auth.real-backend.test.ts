@@ -27,14 +27,14 @@ async function getLatestTestToken(
 {
 	const response = await client.get( '/test-only/last-token',
 	{
-		params: { email, token_type: tokenType },
+		params: { email: email, token_type: tokenType },
 		headers: { 'X-Test-Endpoint-Key': process.env.TEST_ENDPOINT_KEY ?? '' },
 	});
 
 	if ( response.status !== 200 )
 	{
 		throw new Error(
-			`Could not fetch test token (status ${ response.status }) — is ENABLE_TEST_ENDPOINTS ` +
+			`Could not fetch test token (status ${ response.status }) - is ENABLE_TEST_ENDPOINTS ` +
 			`and TEST_ENDPOINT_KEY set for the backend this suite is running against?`
 		);
 	}
@@ -46,7 +46,7 @@ const TEST_PASSWORD = 'Correct-Horse-Battery-Staple-9!';
 
 // TODO: maybe verify response shapes exactly match what is expected?
 
-describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: auth flow', ( ) =>
+describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend auth flow', ( ) =>
 {
 	it( 'health check responds ok', async ( ) =>
 	{
@@ -151,7 +151,7 @@ describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: auth
 	});
 });
 
-describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: full password reset loop', ( ) =>
+describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend full password reset loop', ( ) =>
 {
 	it( 'completes forgot-password -> reset -> login with the new password', async ( ) =>
 	{
@@ -165,7 +165,7 @@ describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: full
 		const resetToken = await getLatestTestToken( email, 'reset' );
 
 		const newPassword = 'A-Brand-New-Password-7!';
-		const resetResponse = await client.post( '/auth/reset-password', { token: resetToken, password: newPassword } );
+		const resetResponse = await client.post( '/auth/reset-password', { token: resetToken, password: newPassword, confirm_password: newPassword } );
 		expect( resetResponse.status ).toBe( 200 );
 
 		const oldPasswordLogin = await client.post( '/auth/login', { email, password: TEST_PASSWORD } );
