@@ -135,6 +135,9 @@ async def issue_password_reset_token( db: AsyncSession, user_row: User ) -> None
     db.add( token_row )
     await db.flush( )
 
+    if settings.enable_test_endpoints:
+        record_token( email=user_row.email, token_type="reset", raw_token=raw_token )
+
     await send_password_reset_email(
         to=user_row.email,
         display_name=user_row.display_name,
