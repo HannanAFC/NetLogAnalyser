@@ -46,7 +46,7 @@ const TEST_PASSWORD = 'Correct-Horse-Battery-Staple-9!';
 
 // TODO: maybe verify response shapes exactly match what is expected?
 
-describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: auth flow', ( ) =>
+describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend auth flow', ( ) =>
 {
 	it( 'health check responds ok', async ( ) =>
 	{
@@ -151,7 +151,7 @@ describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: auth
 	});
 });
 
-describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend: full password reset loop', ( ) =>
+describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend full password reset loop', ( ) =>
 {
 	it( 'completes forgot-password -> reset -> login with the new password', async ( ) =>
 	{
