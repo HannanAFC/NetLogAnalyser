@@ -173,20 +173,20 @@ general_rate_limiter: RateLimiter = RateLimiter(
 
 # Returns the current rate limit
 async def get_auth_rate_limiter( request: Request, response: Response ) -> None:
-    """Rate-limit dependency — enforces the auth tier limit per client IP."""
+    """Rate-limit dependency - enforces the auth tier limit per client IP."""
     await auth_rate_limiter( request, response )
 
 
 async def get_forgot_password_rate_limiter( request: Request, response: Response ) -> None:
-    """Rate-limit dependency — strict limit for password‑reset endpoints."""
+    """Rate-limit dependency - strict limit for password‑reset endpoints."""
     await forgot_password_rate_limiter( request, response )
 
 
 async def get_ingest_rate_limiter( request: Request, response: Response ) -> None:
-    """Rate-limit dependency — enforces the ingest tier limit."""
+    """Rate-limit dependency - enforces the ingest tier limit."""
     await ingest_rate_limiter( request, response )
 
 
 async def get_general_rate_limiter( request: Request, response: Response ) -> None:
-    """Rate-limit dependency — enforces the general fallback limit."""
+    """Rate-limit dependency - enforces the general fallback limit."""
     await general_rate_limiter( request, response )

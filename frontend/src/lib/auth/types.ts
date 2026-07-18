@@ -13,6 +13,11 @@ export interface AuthTokenResponse
   user:         User;
 }
 
+export interface RegisterResponse
+{
+  user: User;
+}
+
 export interface RefreshResponse
 {
     access_token: string;

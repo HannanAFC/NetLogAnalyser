@@ -1,8 +1,8 @@
+import { tokenStore } from '#/lib/auth/token-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { tokenStore } from '../../lib/auth/token-store';
-import { loginRequest, logoutRequest, registerRequest } from './api';
+import { forgotPasswordRequest, loginRequest, logoutRequest, registerRequest, resendVerificationRequest, resetPasswordRequest, verifyEmailRequest } from './api';
 import { sessionQueryKey, sessionQueryOptions } from './queries';
-import type { LoginPayload, RegisterRequestBody } from './schemas';
+import type { ForgotPasswordPayload, LoginPayload, RegisterRequestBody, ResendVerificationPayload, ResetPasswordPayload } from './schemas';
 
 /** Read the current session. Cheap after first load - served from cache. */
 export function useSession( )
@@ -26,15 +26,9 @@ export function useLogin( )
 
 export function useRegister( )
 {
-    const queryClient = useQueryClient( );
     return useMutation(
     {
         mutationFn: ( payload: RegisterRequestBody ) => registerRequest( payload ),
-        onSuccess: ( { access_token, user } ) =>
-        {
-            tokenStore.set( access_token );
-            queryClient.setQueryData( sessionQueryKey, user) ;
-        }
     });
 }
 
@@ -51,5 +45,37 @@ export function useLogout( )
                 tokenStore.set( null );
                 queryClient.setQueryData( sessionQueryKey, null );
             }
+    });
+}
+
+export function useForgotPassword( )
+{
+    return useMutation(
+    {
+        mutationFn: ( payload: ForgotPasswordPayload ) => forgotPasswordRequest( payload ),
+    });
+}
+
+export function useResetPassword( )
+{
+    return useMutation(
+    {
+        mutationFn: ( payload: ResetPasswordPayload ) => resetPasswordRequest( payload ),
+    });
+}
+
+export function useVerifyEmail( )
+{
+    return useMutation(
+    {
+        mutationFn: ( token: string ) => verifyEmailRequest( token ),
+    });
+}
+
+export function useResendVerification( )
+{
+    return useMutation(
+    {
+        mutationFn: ( payload: ResendVerificationPayload ) => resendVerificationRequest( payload ),
     });
 }

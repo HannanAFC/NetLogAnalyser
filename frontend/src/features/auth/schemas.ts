@@ -22,6 +22,26 @@ export const registerSchema = z
 		message: "Passwords don't match",
 		path: [ 'confirm_password' ]
 	});
-
 export type RegisterPayload = z.infer< typeof registerSchema >;
 export type RegisterRequestBody = Omit< RegisterPayload, 'confirm_password' >;
+
+export const forgotPasswordSchema = z.object( 
+{
+	email: z.email( 'Enter a valid email address' )
+});
+export type ForgotPasswordPayload = z.infer< typeof forgotPasswordSchema >;
+
+export const resetPasswordSchema = z.object(
+{
+	token:            z.string( ).min( 1 ),
+	password:         z.string( ).min( 8, 'Password must be at least 8 characters' ),
+	confirm_password: z.string( )
+});
+export type ResetPasswordPayload = z.infer< typeof resetPasswordSchema >;
+export type ResetPasswordRequestBody = Omit< ResetPasswordPayload, 'confirm_password' >;
+
+export const resendVerificationSchema = z.object(
+{
+	email: z.email( 'Enter a valid email address' )
+});
+export type ResendVerificationPayload = z.infer< typeof resendVerificationSchema >;

@@ -1,8 +1,8 @@
+import { sessionQueryKey } from '#/lib/auth/session-key';
+import { tokenStore } from '#/lib/auth/token-store';
+import type { User } from '#/lib/auth/types';
 import { queryOptions } from '@tanstack/react-query';
-import { tokenStore } from '../../lib/auth/token-store';
-import { sessionQueryKey } from '../../lib/auth/session-key';
 import { getMe, refreshRequest } from './api';
-import type { User } from '../../lib/auth/types';
 
 export { sessionQueryKey };
 

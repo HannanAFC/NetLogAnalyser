@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from auth.security import decode_access_token, generate_refresh_token, hash_token
+from auth.security import decode_access_token, generate_url_safe_token, hash_token
 from config import settings
 from database import get_db
 from fastapi import Depends, HTTPException, Request, Response, status
@@ -66,7 +66,7 @@ async def issue_refresh_token(
     Returns:
         refresh_token (str): The new refresh token to pass back to the client.
     """
-    raw_token = generate_refresh_token( )
+    raw_token = generate_url_safe_token( 32 )
     now = datetime.now( timezone.utc )
 
     token_row = RefreshToken(

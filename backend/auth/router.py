@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Annotated
 
 from auth.dependencies import (
@@ -19,18 +18,26 @@ from auth.schemas import (
     RefreshResponse,
     RegisterRequest,
     RegisterResponse,
+    ResendVerificationRequest,
+    ResendVerificationResponse,
     ResetPasswordRequest,
     ResetPasswordResponse,
     UserPublic,
+    VerifyEmailResponse,
 )
 from auth.security import (
     create_access_token,
-    generate_reset_token,
     hash_password,
     hash_token,
 )
-from auth.service import authenticate_user, find_valid_token, register_user
-from config import settings
+from auth.service import (
+    authenticate_user,
+    find_valid_token,
+    issue_password_reset_token,
+    register_user,
+    resend_verification_email,
+    verify_email_token,
+)
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from models.models import PasswordResetToken, RefreshToken, User
@@ -46,11 +53,11 @@ async def register(
     payload: RegisterRequest,
     db: Annotated[ AsyncSession, Depends( get_db ) ]
 ) -> RegisterResponse:
-    """
-    Create a new user account. Returns the user object only — no tokens.
-    The client must call /auth/login separately to start a session.
-    """
     user = await register_user( db, payload )
+    
+    await db.commit( )
+    await db.refresh( user )
+
     return RegisterResponse( user=UserPublic.model_validate( user ) )
 
 
@@ -61,13 +68,6 @@ async def login(
     response: Response,
     db: Annotated[ AsyncSession, Depends( get_db ) ]
 ) -> LoginResponse:
-    """
-    Verify email + password. On success, issues a short-lived JWT access
-    token in the response body and sets a long-lived refresh token as an
-    httpOnly cookie. A fresh family_id is started here since this is the
-    beginning of a brand new session (as opposed to a rotation, which
-    would carry the existing family_id forward).
-    """
     user = await authenticate_user( db, payload )
 
     access_token = create_access_token( user_id=str( user.id ) )
@@ -171,19 +171,9 @@ async def forgot_password(
     user = result.scalar_one_or_none( )
 
     if user is not None:
-        reset_token = generate_reset_token( )
+        await issue_password_reset_token( db=db, user_row=user )
 
-        reset_token_row = PasswordResetToken(
-            id=uuid.uuid4( ),
-            user_id=user.id,
-            token_hash=hash_token( reset_token ),
-            expires_at=datetime.now( timezone.utc ) + timedelta( minutes=settings.password_reset_token_expire_minutes ),
-        )
-
-        db.add( reset_token_row )
-        await db.commit( )
-
-        print( f"TEST - { user.email } reset token - { reset_token }" )
+        await db.commit( )       
         
     return ForgotPasswordResponse( )
 
@@ -213,3 +203,19 @@ async def reset_password(
 
     await db.commit( )
     return ResetPasswordResponse( )
+
+@router.get( "/verify-email" )
+async def verify_email( token: str, db: AsyncSession = Depends( get_db ) ):
+    await verify_email_token( db, token )
+    await db.commit( )
+    return VerifyEmailResponse( )
+
+
+@router.post(
+    "/resend-verification",
+    dependencies=[ Depends( get_forgot_password_rate_limiter ) ]
+)
+async def resend_verification( payload: ResendVerificationRequest, db: AsyncSession = Depends( get_db ) ):
+    await resend_verification_email( db, payload.email )
+    await db.commit()
+    return ResendVerificationResponse( )

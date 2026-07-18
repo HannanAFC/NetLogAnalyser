@@ -1,5 +1,6 @@
 import { useForm } from '@tanstack/react-form';
-import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, redirect } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useRegister } from '../features/auth/hooks';
 import { sessionQueryOptions } from '../features/auth/queries';
 import { registerSchema } from '../features/auth/schemas';
@@ -18,8 +19,8 @@ export const Route = createFileRoute( '/register' )(
 
 function RegisterPage( )
 {
-	const navigate = useNavigate( );
 	const register = useRegister( );
+	const [ registeredEmail, setRegisteredEmail ] = useState< string | null >( null );
 
 	const form = useForm(
 	{
@@ -28,8 +29,9 @@ function RegisterPage( )
 		{
 			try
 			{
-				await register.mutateAsync( registerSchema.parse( value ) );
-				await navigate( { to: '/dashboard', replace: true } );
+				const parsed = registerSchema.parse( value );
+				await register.mutateAsync( parsed );
+				setRegisteredEmail( parsed.email );
 			}
 			catch
 			{
@@ -38,165 +40,211 @@ function RegisterPage( )
 		},
 	});
 
-	const inputClass = "mt-1 w-full rounded-md border bg-surface-card px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-tertiary border-border focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/40 transition-[border-color,box-shadow] duration-150";
+	const inputClass = "mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150";
+
+	if ( registeredEmail )
+	{
+		return (
+			<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
+				<div className="panel p-8 text-center">
+					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)]/10">
+						<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-strong)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+							<rect x="2" y="4" width="20" height="16" rx="2" />
+							<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+						</svg>
+					</div>
+					<h1 className="heading-1 mb-2">Check your email</h1>
+					<p className="body-text">
+						We sent a verification link to{' '}
+						<span className="font-semibold text-text-primary">{ registeredEmail }</span>.
+					</p>
+					<p className="body-sm mt-3">
+						Click the link in the email to verify your address. If you don&apos;t see it, check
+						your spam folder or request a new one below.
+					</p>
+
+					<div className="mt-6 space-y-3">
+						<Link
+							to="/login"
+							className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
+						>
+							Continue to sign in
+						</Link>
+						<Link
+							to="/verify-email"
+							className="block text-[13px] font-medium text-[var(--color-accent-strong)] hover:underline"
+						>
+							Resend verification email
+						</Link>
+					</div>
+				</div>
+			</div>
+		);
+	}
 
 	return (
-		<div className="mx-auto mt-24 w-full max-w-sm px-4">
-			<h1 className="heading-1 mb-2">Create an account</h1>
-			<p className="body-sm mb-8">Set up your NetLogAnalyser dashboard account.</p>
-			<form
-				onSubmit={ ( event ) =>
-				{
-					event.preventDefault( );
-					event.stopPropagation( );
-					form.handleSubmit( );
-				}}
-				className="space-y-4"
-			>
-				<form.Field
-					name="email"
-					validators={{ onChange: registerSchema.shape.email, onBlur: registerSchema.shape.email }}
-				>
-					{ ( field ) =>
-					(
-						<div>
-							<label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">
-								Email
-							</label>
-							<input
-								id={ field.name }
-								type="email"
-								autoComplete="email"
-								value={ field.state.value }
-								onBlur={ field.handleBlur }
-								onChange={ ( e ) => field.handleChange( e.target.value ) }
-								className={ inputClass }
-							/>
-							{ field.state.meta.errors.length > 0 && (
-								<p className="mt-1 text-xs text-critical">
-									{ fieldError( field.state.meta.errors ) }
-								</p>
-							)}
-						</div>
-					)}
-				</form.Field>
+		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
+			<div>
+				<p className="eyebrow">Create your workspace</p>
+				<h1 className="heading-1">Register</h1>
+				<p className="body-text mt-2">Set up your account to start streaming ingest and live observability.</p>
+			</div>
 
-				<form.Field
-					name="display_name"
-					validators={{ onChange: registerSchema.shape.display_name, onBlur: registerSchema.shape.display_name }}
-				>
-					{ ( field ) =>
-					(
-						<div>
-							<label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">
-								Display name
-							</label>
-							<input
-								id={ field.name }
-								type="text"
-								autoComplete="username"
-								value={ field.state.value }
-								onBlur={ field.handleBlur }
-								onChange={ ( e ) => field.handleChange( e.target.value ) }
-								className={ inputClass }
-							/>
-							{ field.state.meta.errors.length > 0 && (
-								<p className="mt-1 text-xs text-critical">
-									{ fieldError( field.state.meta.errors ) }
-								</p>
-							)}
-						</div>
-					)}
-				</form.Field>
-
-				<form.Field
-					name="password"
-					validators={{ onChange: registerSchema.shape.password, onBlur: registerSchema.shape.password }}
-				>
-					{ ( field ) =>
-					(
-						<div>
-							<label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">
-								Password
-							</label>
-							<input
-								id={ field.name }
-								type="password"
-								autoComplete="new-password"
-								value={ field.state.value }
-								onBlur={ field.handleBlur }
-								onChange={ ( e ) => field.handleChange( e.target.value ) }
-								className={ inputClass }
-							/>
-							{ field.state.meta.errors.length > 0 && (
-								<p className="mt-1 text-xs text-critical">
-									{ fieldError( field.state.meta.errors ) }
-								</p>
-							)}
-						</div>
-					)}
-				</form.Field>
-
-				<form.Field
-					name="confirm_password"
-					validators={
+			<div className="panel p-6">
+				<form
+					onSubmit={ ( event ) =>
 					{
-						onChange: ( { value, fieldApi } ) =>
-						{
-							if ( !value ) return 'Please confirm your password';
-							if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
-							return undefined;
-						}
+						event.preventDefault( );
+						event.stopPropagation( );
+						form.handleSubmit( );
 					}}
+					className="space-y-4"
 				>
-					{ ( field ) =>
-					(
-						<div>
-							<label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">
-								Confirm password
-							</label>
-							<input
-								id={ field.name }
-								type="password"
-								autoComplete="new-password"
-								value={ field.state.value}
-								onBlur={ field.handleBlur }
-								onChange={ ( e ) => field.handleChange( e.target.value ) }
-								className={ inputClass }
-							/>
-							{ field.state.meta.errors.length > 0 && (
-								<p className="mt-1 text-xs text-critical">
-									{ fieldError( field.state.meta.errors ) }
-								</p>
-							)}
-						</div>
+					<form.Field
+						name="email"
+						validators={{ onChange: registerSchema.shape.email, onBlur: registerSchema.shape.email }}
+					>
+						{ ( field ) =>
+						(
+							<div>
+								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+									Email
+								</label>
+								<input
+									id={ field.name }
+									type="email"
+									autoComplete="email"
+									value={ field.state.value }
+									onBlur={ field.handleBlur }
+									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									className={ inputClass }
+								/>
+								{ field.state.meta.errors.length > 0 && (
+									<p className="mt-1 text-[12px] text-critical">
+										{ fieldError( field.state.meta.errors ) }
+									</p>
+								)}
+							</div>
+						)}
+					</form.Field>
+
+					<form.Field
+						name="display_name"
+						validators={{ onChange: registerSchema.shape.display_name, onBlur: registerSchema.shape.display_name }}
+					>
+						{ ( field ) =>
+						(
+							<div>
+								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+									Display name
+								</label>
+								<input
+									id={ field.name }
+									type="text"
+									autoComplete="username"
+									value={ field.state.value }
+									onBlur={ field.handleBlur }
+									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									className={ inputClass }
+								/>
+								{ field.state.meta.errors.length > 0 && (
+									<p className="mt-1 text-[12px] text-critical">
+										{ fieldError( field.state.meta.errors ) }
+									</p>
+								)}
+							</div>
+						)}
+					</form.Field>
+
+					<form.Field
+						name="password"
+						validators={{ onChange: registerSchema.shape.password, onBlur: registerSchema.shape.password }}
+					>
+						{ ( field ) =>
+						(
+							<div>
+								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+									Password
+								</label>
+								<input
+									id={ field.name }
+									type="password"
+									autoComplete="new-password"
+									value={ field.state.value }
+									onBlur={ field.handleBlur }
+									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									className={ inputClass }
+								/>
+								{ field.state.meta.errors.length > 0 && (
+									<p className="mt-1 text-[12px] text-critical">
+										{ fieldError( field.state.meta.errors ) }
+									</p>
+								)}
+							</div>
+						)}
+					</form.Field>
+
+					<form.Field
+						name="confirm_password"
+						validators={
+						{
+							onChange: ( { value, fieldApi } ) =>
+							{
+								if ( !value ) return 'Please confirm your password';
+								if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
+								return undefined;
+							}
+						}}
+					>
+						{ ( field ) =>
+						(
+							<div>
+								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+									Confirm password
+								</label>
+								<input
+									id={ field.name }
+									type="password"
+									autoComplete="new-password"
+									value={ field.state.value}
+									onBlur={ field.handleBlur }
+									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									className={ inputClass }
+								/>
+								{ field.state.meta.errors.length > 0 && (
+									<p className="mt-1 text-[12px] text-critical">
+										{ fieldError( field.state.meta.errors ) }
+									</p>
+								)}
+							</div>
+						)}
+					</form.Field>
+
+					{ register.isError && (
+						<p className="text-[13px] text-critical">{ apiError( register.error ) ?? "Couldn't create that account. Try a different email." }</p>
 					)}
-				</form.Field>
 
-				{ register.isError && (
-					<p className="text-sm text-critical">{ apiError( register.error ) ?? "Couldn't create that account. Try a different email." }</p>
-				)}
+					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
+						{ ( [ canSubmit, isPristine ] ) =>
+						(
+							<button
+								type="submit"
+								disabled={ !canSubmit || isPristine || register.isPending }
+								className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
+							>
+								{ register.isPending ? 'Creating account…' : 'Create account' }
+							</button>
+						)}
+					</form.Subscribe>
+				</form>
 
-				<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
-					{ ( [ canSubmit, isPristine ] ) =>
-					(
-						<button
-							type="submit"
-							disabled={ !canSubmit || isPristine || register.isPending }
-							className="inline-flex w-full items-center justify-center font-mono text-xs font-medium cursor-pointer border-none no-underline transition-[opacity,background] duration-150 tracking-[0.01em] px-4 py-2.25 gap-1.75 rounded-md bg-green-500 text-[#0a0f0a] hover:opacity-[0.88] disabled:opacity-50"
-						>
-							{ register.isPending ? 'Creating account…' : 'Create account' }
-						</button>
-					)}
-				</form.Subscribe>
-			</form>
-
-			<p className="mt-4 body-sm">
-				Already have an account?{' '}
-				<Link to="/login" className="font-medium text-green-500 hover:underline">
-					Sign in
-				</Link>
-			</p>
+				<p className="mt-5 text-[13px] text-text-secondary">
+					Already have an account?{' '}
+					<Link to="/login" className="font-semibold text-[var(--color-accent-strong)] hover:underline">
+						Sign in
+					</Link>
+				</p>
+			</div>
 		</div>
 	);
 }

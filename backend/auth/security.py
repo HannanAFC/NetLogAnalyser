@@ -50,22 +50,6 @@ def generate_api_key( ) -> str:
     """
     return f"key_{ secrets.token_hex( 32 ) }"
 
-def generate_refresh_token( ) -> str:
-    """
-    Generates a new JWT refresh token.
-    Returns:
-        refresh_token (str): JWT refresh token.
-    """
-    return secrets.token_urlsafe( 32 )
-
-def generate_reset_token( ) -> str:
-    """
-    Generates password reset token.
-    Returns:
-        reset_token (str): Password reset token.
-    """
-    return secrets.token_urlsafe( 32 )
-
 def create_access_token( user_id: str ) -> str:
     """
     Creates a new JWT access token.
@@ -93,3 +77,13 @@ def decode_access_token( token: str ) -> dict:
         payload (dict): Dictionary containing information about the JWT.
     """
     return jwt.decode( token, settings.secret_key.get_secret_value( ), algorithms=[ settings.algorithm ] )
+
+def generate_url_safe_token( bytes: int ) -> str:
+    """
+    Generic URL safe token generator.
+    Parameters:
+        bytes (int): The amount of random bytes.
+    Returns:
+        token (str): URL safe token.
+    """
+    return secrets.token_urlsafe( bytes )
