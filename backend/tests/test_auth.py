@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timedelta, timezone
+from unittest.mock import AsyncMock
 
 import pytest
 from auth.security import generate_url_safe_token, hash_token
@@ -125,7 +126,7 @@ class TestRegister:
 
     @pytest.mark.anyio
     async def test_register_creates_user_and_returns_201(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """A valid payload should create a user and return 201 with the user object."""
         response = await client.post(
@@ -144,9 +145,11 @@ class TestRegister:
         assert "access_token" not in data
         assert "password" not in str( data )
 
+        mock_email_send[ "verification" ].assert_awaited_once( )
+
     @pytest.mark.anyio
     async def test_register_duplicate_email_returns_409(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """Registering the same email twice must return 409 Conflict."""
         await _register_user( client )
@@ -242,7 +245,7 @@ class TestRegister:
 
     @pytest.mark.anyio
     async def test_register_strips_email_whitespace(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """Leading/trailing whitespace on the email should be stripped by EmailStr."""
         payload = _build_register_payload( email=" alice@example.com " )
@@ -250,7 +253,6 @@ class TestRegister:
         response = await client.post( "/auth/register", json=payload )
 
         data = response.json( )
-        print( data )
 
         # EmailStr rejects whitespace
         assert response.status_code == 201
@@ -266,7 +268,7 @@ class TestLogin:
 
     @pytest.mark.anyio
     async def test_login_returns_access_token_and_user(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A valid login must return a JWT access token, user object, and a
         refresh-token cookie."""
@@ -285,7 +287,7 @@ class TestLogin:
 
     @pytest.mark.anyio
     async def test_login_wrong_password_returns_401(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """An incorrect password must return 401."""
         await _register_user( client )
@@ -300,7 +302,7 @@ class TestLogin:
 
     @pytest.mark.anyio
     async def test_login_nonexistent_email_returns_401(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """An email that has never been registered must return 401."""
         response = await client.post(
@@ -313,7 +315,7 @@ class TestLogin:
 
     @pytest.mark.anyio
     async def test_login_missing_email_returns_422(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """Omitting the email field must return 422."""
         response = await client.post(
@@ -333,7 +335,7 @@ class TestLogin:
 
     @pytest.mark.anyio
     async def test_login_case_insensitive_email(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Emails should be treated case-insensitively."""
         await _register_user( client, email="CaseTest@Example.COM" )
@@ -392,7 +394,7 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_issues_new_access_token(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A valid refresh token cookie should return a new access token."""
         refresh_token, response = await _register_and_return_cookie( client, db_session )
@@ -432,7 +434,7 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_reuse_triggers_family_revocation(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Reusing an already-rotated refresh token must revoke the entire
         token family (token reuse detection)."""
@@ -466,7 +468,7 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_after_logout_returns_401(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """After a logout, the refresh token should be revoked and unusable."""
         refresh_token, response = await _register_and_return_cookie( client, db_session )
@@ -483,7 +485,7 @@ class TestRefresh:
 
     @pytest.mark.anyio
     async def test_refresh_returns_new_cookie_each_time(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Each refresh call should rotate the cookie value."""
         first_cookie, response = await _register_and_return_cookie( client, db_session )
@@ -510,7 +512,7 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_logout_revokes_refresh_token(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """After logout, the refresh token must be revoked so it cannot be
         used to get new access tokens."""
@@ -530,7 +532,7 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_logout_clears_refresh_cookie(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """The response should include a Set-Cookie header that clears the
         refresh_token cookie."""
@@ -567,7 +569,7 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_logout_without_cookie_is_still_successful(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """If the user has a valid access token but no refresh cookie,
         logout should still succeed (no-op on the cookie side)."""
@@ -585,7 +587,7 @@ class TestLogout:
 
     @pytest.mark.anyio
     async def test_double_logout_is_idempotent(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Calling logout twice with the same access token should not
         error on the second call."""
@@ -610,7 +612,7 @@ class TestForgotPassword:
 
     @pytest.mark.anyio
     async def test_forgot_password_existing_email_returns_200(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """A known email should return 200 (no user enumeration)."""
         await _register_user( client )
@@ -684,7 +686,7 @@ class TestResetPassword:
 
     @pytest.mark.anyio
     async def test_reset_password_with_valid_token(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A valid reset token + good password must succeed."""
         token = await self._get_reset_token( client, db_session )
@@ -761,7 +763,7 @@ class TestResetPassword:
 
     @pytest.mark.anyio
     async def test_reset_password_expired_token_returns_401(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """An expired reset token must be rejected."""
         token = await self._get_reset_token( client, db_session )
@@ -789,7 +791,7 @@ class TestResetPassword:
 
     @pytest.mark.anyio
     async def test_reset_password_mismatched_passwords_returns_422(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """password != confirm_password must be rejected."""
         token = await self._get_reset_token( client, db_session )
@@ -807,7 +809,7 @@ class TestResetPassword:
 
     @pytest.mark.anyio
     async def test_reset_password_weak_password_returns_422(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A password that fails complexity checks must be rejected."""
         token = await self._get_reset_token( client, db_session )
@@ -909,7 +911,7 @@ class TestAuthDependency:
 
     @pytest.mark.anyio
     async def test_valid_bearer_token_accepted(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A valid access token must pass the dependency check."""
         refresh_token, response = await _register_and_return_cookie( client, db_session )
@@ -922,7 +924,7 @@ class TestAuthDependency:
 
     @pytest.mark.anyio
     async def test_missing_authorization_header_rejected(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """Requests without an Authorization header must be rejected."""
         await _register_user( client)
@@ -944,7 +946,7 @@ class TestAuthDependency:
 
     @pytest.mark.anyio
     async def test_tampered_jwt_rejected(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A JWT whose payload has been modified after signing must be
         rejected (signature verification failure)."""
@@ -987,7 +989,7 @@ class TestAuthDependency:
 
     @pytest.mark.anyio
     async def test_wrong_auth_scheme_rejected(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Using 'Basic' instead of 'Bearer' must be rejected."""
         refresh_token, response = await _register_and_return_cookie( client, db_session )
@@ -1008,7 +1010,7 @@ class TestConcurrency:
 
     @pytest.mark.anyio
     async def test_rapid_login_logout_sequence(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Repeated login → logout cycles should work without errors."""
         await _register_user( client )
@@ -1043,7 +1045,7 @@ class TestNoSecretsLeaked:
 
     @pytest.mark.anyio
     async def test_register_response_has_no_password_hash(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         response = await client.post(
             "/auth/register", json=_build_register_payload( )
@@ -1055,7 +1057,7 @@ class TestNoSecretsLeaked:
 
     @pytest.mark.anyio
     async def test_login_response_has_no_password_hash(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         await _register_user( client )
         await _verify_user_email( db_session )
@@ -1069,7 +1071,7 @@ class TestNoSecretsLeaked:
 
     @pytest.mark.anyio
     async def test_refresh_response_has_no_password_hash(
-        self, client: AsyncClient, db_session: AsyncSession
+        self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         refresh_token, response = await _register_and_return_cookie( client, db_session )
         client.cookies.set( "refresh_token", refresh_token )
@@ -1080,7 +1082,7 @@ class TestNoSecretsLeaked:
 
     @pytest.mark.anyio
     async def test_401_error_does_not_distinguish_email_vs_password(
-        self, client: AsyncClient
+        self, client: AsyncClient, mock_email_send: AsyncMock
     ) -> None:
         """Both wrong-password and unknown-email must return the exact same
         generic message (prevent user enumeration)."""

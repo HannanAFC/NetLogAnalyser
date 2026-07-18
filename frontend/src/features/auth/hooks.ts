@@ -1,5 +1,5 @@
+import { tokenStore } from '#/lib/auth/token-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { tokenStore } from '../../lib/auth/token-store';
 import { forgotPasswordRequest, loginRequest, logoutRequest, registerRequest, resendVerificationRequest, resetPasswordRequest, verifyEmailRequest } from './api';
 import { sessionQueryKey, sessionQueryOptions } from './queries';
 import type { ForgotPasswordPayload, LoginPayload, RegisterRequestBody, ResendVerificationPayload, ResetPasswordPayload } from './schemas';

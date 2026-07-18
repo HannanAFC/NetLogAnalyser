@@ -18,6 +18,7 @@ from models.models import EmailVerificationToken, PasswordResetToken, User
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
+from testing.token_capture import record_token
 
 TokenModel = TypeVar( "TokenModel" )
 
@@ -157,6 +158,9 @@ async def issue_verification_token( db: AsyncSession, user_row: User ) -> None:
     )
     db.add( token_row )
     await db.flush( )
+
+    if settings.enable_test_endpoints:
+        record_token( email=user_row.email, token_type="verification", raw_token=raw_token )
 
     await send_verification_email(
         to=user_row.email,

@@ -69,6 +69,11 @@ class Settings( BaseSettings ):
     resend_recovery_email:                   str = "NetLogAnalyser <recovery@netloganalyser.com>"
     email_verification_token_expire_minutes: int = 60
 
+    # Test config
+    enable_test_endpoints: bool = False
+    test_endpoint_key: str = ""
+    test_email_domain: str = "@example.com"   # matches uniqueTestEmail() in your frontend integration suite
+
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 
 JSON_API_CSP = (
