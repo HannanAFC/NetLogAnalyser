@@ -9,20 +9,20 @@ import { apiError } from '../lib/api/errors';
 import { fieldError } from '../lib/utils';
 
 const resetSearchSchema = z.object(
-{
-	token: z.string( ).optional( ),
-});
+	{
+		token: z.string( ).optional( )
+	} );
 
 export const Route = createFileRoute( '/reset-password' )(
-{
-	validateSearch: resetSearchSchema,
-	beforeLoad: async ( { context } ) =>
 	{
-		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-		if ( session ) throw redirect( { to: '/dashboard' } );
-	},
-	component: ResetPasswordPage
-});
+		validateSearch: resetSearchSchema,
+		beforeLoad: async( { context } ) =>
+		{
+			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+			if ( session ) throw redirect( { to: '/dashboard' } );
+		},
+		component: ResetPasswordPage
+	} );
 
 function ResetPasswordPage( )
 {
@@ -31,24 +31,24 @@ function ResetPasswordPage( )
 	const [ done, setDone ] = useState( false );
 
 	const form = useForm(
-	{
-		defaultValues: { token: token ?? '', password: '', confirm_password: '' },
-		onSubmit: async ( { value } ) =>
 		{
-			try
+			defaultValues: { token: token ?? '', password: '', confirm_password: '' },
+			onSubmit: async( { value } ) =>
 			{
-				const parsed = resetPasswordSchema.parse( value );
-				await resetPassword.mutateAsync( parsed );
-				setDone( true );
-			}
-			catch
-			{
+				try
+				{
+					const parsed = resetPasswordSchema.parse( value );
+					await resetPassword.mutateAsync( parsed );
+					setDone( true );
+				}
+				catch
+				{
 				// already handled
+				}
 			}
-		},
-	});
+		} );
 
-	const inputClass = "mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150";
+	const inputClass = 'mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150';
 
 	if ( !token )
 	{
@@ -95,7 +95,7 @@ function ResetPasswordPage( )
 			</div>
 		);
 	}
-	
+
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
@@ -124,63 +124,63 @@ function ResetPasswordPage( )
 						validators={{ onChange: resetPasswordSchema.shape.password, onBlur: resetPasswordSchema.shape.password }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									New password
-								</label>
-								<input
-									id={ field.name }
-									type="password"
-									autoComplete="new-password"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+										New password
+									</label>
+									<input
+										id={ field.name }
+										type="password"
+										autoComplete="new-password"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										className={ inputClass }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<p className="mt-1 text-[12px] text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</p>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					<form.Field
 						name="confirm_password"
 						validators={
-						{
-							onChange: ( { value, fieldApi } ) =>
 							{
-								if ( !value ) return 'Please confirm your password';
-								if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
-								return undefined;
-							}
-						}}
+								onChange: ( { value, fieldApi } ) =>
+								{
+									if ( !value ) return 'Please confirm your password';
+									if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
+									return undefined;
+								}
+							}}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Confirm new password
-								</label>
-								<input
-									id={ field.name }
-									type="password"
-									autoComplete="new-password"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+										Confirm new password
+									</label>
+									<input
+										id={ field.name }
+										type="password"
+										autoComplete="new-password"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										className={ inputClass }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<p className="mt-1 text-[12px] text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</p>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					{ resetPassword.isError && (
@@ -189,15 +189,15 @@ function ResetPasswordPage( )
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
-						(
-							<button
-								type="submit"
-								disabled={ !canSubmit || isPristine || resetPassword.isPending }
-								className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
-							>
-								{ resetPassword.isPending ? 'Resetting…' : 'Reset password' }
-							</button>
-						)}
+							(
+								<button
+									type="submit"
+									disabled={ !canSubmit || isPristine || resetPassword.isPending }
+									className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
+								>
+									{ resetPassword.isPending ? 'Resetting…' : 'Reset password' }
+								</button>
+							)}
 					</form.Subscribe>
 				</form>
 

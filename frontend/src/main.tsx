@@ -16,7 +16,7 @@ const router = createRouter(
 	// This will ensure that the loader is always called when the route is preloaded or visited
 	defaultPreloadStaleTime: 0,
 	scrollRestoration: true
-});
+} );
 
 // Register things for typesafety
 declare module '@tanstack/react-router'
@@ -27,16 +27,16 @@ declare module '@tanstack/react-router'
 	}
 }
 
-const rootElement = document.getElementById('app')!
+const rootElement = document.getElementById( 'app' )!;
 
 if ( !rootElement.innerHTML )
 {
-	const root = ReactDOM.createRoot( rootElement )
+	const root = ReactDOM.createRoot( rootElement );
 	root.render(
 		<QueryClientProvider client={ queryClient }>
 			<ThemeProvider>
 				<RouterProvider router={ router } />
 			</ThemeProvider>
 		</QueryClientProvider>
-	)
+	);
 }

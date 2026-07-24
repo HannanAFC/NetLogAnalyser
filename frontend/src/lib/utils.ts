@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge';
 /** Merge Tailwind classes without style conflicts. */
 export function cn( ...inputs: ClassValue[ ] )
 {
-    return twMerge( clsx( ...inputs ) );
+	return twMerge( clsx( ...inputs ) );
 }
 
 /**
@@ -15,7 +15,7 @@ export function cn( ...inputs: ClassValue[ ] )
  * - a plain `string` (custom function validators), or
  * - a Zod `ZodIssue` object with a `.message` property.
  */
-export function fieldError( errors: unknown[] ): string | undefined
+export function fieldError( errors: unknown[ ] ): string | undefined
 {
 	const first = errors[ 0 ];
 	if ( !first ) return undefined;

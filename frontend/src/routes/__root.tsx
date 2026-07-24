@@ -1,16 +1,16 @@
-import { ThemeToggle } from '#/components/ui/theme-toggle'
-import { useSession } from '#/features/auth/hooks'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { ThemeToggle } from '#/components/ui/theme-toggle';
+import { useSession } from '#/features/auth/hooks';
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 
-import { env } from '#/lib/env'
-import '../styles.css'
+import { env } from '#/lib/env';
+import '../styles.css';
 
 export const Route = createRootRoute(
-{
-	component: RootComponent
-} )
+	{
+		component: RootComponent
+	} );
 
 function RootComponent( )
 {
@@ -77,17 +77,17 @@ function RootComponent( )
 
 			<TanStackDevtools
 				config={
-				{
-					position: 'bottom-right',
-				}}
-				plugins={
-				[
 					{
-						name: 'TanStack Router',
-						render: <TanStackRouterDevtoolsPanel />
-					}
-				]}
+						position: 'bottom-right'
+					}}
+				plugins={
+					[
+						{
+							name: 'TanStack Router',
+							render: <TanStackRouterDevtoolsPanel />
+						}
+					]}
 			/>
 		</div>
-	)
+	);
 }

@@ -8,19 +8,19 @@ import viteReact from '@vitejs/plugin-react';
 
 export default defineConfig( ( ) =>
 {
-    return {
+	return {
 		resolve: { tsconfigPaths: true },
 		plugins:
         [
-			devtools( ),
-			tailwindcss( ),
-			tanstackRouter( { target: 'react', autoCodeSplitting: true } ),
-			viteReact( ),
-		],
-        server:
+        	devtools( ),
+        	tailwindcss( ),
+        	tanstackRouter( { target: 'react', autoCodeSplitting: true } ),
+        	viteReact( )
+        ],
+		server:
         {
-            host: true,
-            port: 3000
+        	host: true,
+        	port: 3000
         }
-    };
+	};
 } );

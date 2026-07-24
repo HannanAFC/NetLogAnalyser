@@ -3,13 +3,13 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { sessionQueryOptions } from '../features/auth/queries';
 
 export const Route = createFileRoute( '/' )(
-{
-	beforeLoad: async ( { context } ) =>
 	{
-		await context.queryClient.ensureQueryData( sessionQueryOptions );
-	},
-	component: IndexPage
-});
+		beforeLoad: async( { context } ) =>
+		{
+			await context.queryClient.ensureQueryData( sessionQueryOptions );
+		},
+		component: IndexPage
+	} );
 
 function IndexPage( )
 {
@@ -73,5 +73,5 @@ function IndexPage( )
 				</div>
 			</section>
 		</div>
-	)
+	);
 }

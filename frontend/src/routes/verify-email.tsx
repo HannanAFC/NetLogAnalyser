@@ -9,20 +9,20 @@ import { apiError } from '../lib/api/errors';
 import { fieldError } from '../lib/utils';
 
 const verifySearchSchema = z.object(
-{
-	token: z.string( ).optional( ),
-});
+	{
+		token: z.string( ).optional( )
+	} );
 
 export const Route = createFileRoute( '/verify-email' )(
-{
-	validateSearch: verifySearchSchema,
-	beforeLoad: async ( { context } ) =>
 	{
-		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-		if ( session ) throw redirect( { to: '/dashboard' } );
-	},
-	component: VerifyEmailPage
-});
+		validateSearch: verifySearchSchema,
+		beforeLoad: async( { context } ) =>
+		{
+			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+			if ( session ) throw redirect( { to: '/dashboard' } );
+		},
+		component: VerifyEmailPage
+	} );
 
 function VerifyEmailPage( )
 {
@@ -44,23 +44,23 @@ function VerifyEmailPage( )
 	}, [ token ] );
 
 	const form = useForm(
-	{
-		defaultValues: { email: '' },
-		onSubmit: async ( { value } ) =>
 		{
-			try
+			defaultValues: { email: '' },
+			onSubmit: async( { value } ) =>
 			{
-				await resendVerification.mutateAsync( resendVerificationSchema.parse( value ) );
-				setResent( true );
-			}
-			catch
-			{
+				try
+				{
+					await resendVerification.mutateAsync( resendVerificationSchema.parse( value ) );
+					setResent( true );
+				}
+				catch
+				{
 				// already handled
+				}
 			}
-		},
-	});
+		} );
 
-	const inputClass = "mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150";
+	const inputClass = 'mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150';
 
 	if ( token && !verified && !error )
 	{
@@ -183,27 +183,27 @@ function VerifyEmailPage( )
 						validators={{ onChange: resendVerificationSchema.shape.email, onBlur: resendVerificationSchema.shape.email }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Email
-								</label>
-								<input
-									id={ field.name }
-									type="email"
-									autoComplete="email"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+										Email
+									</label>
+									<input
+										id={ field.name }
+										type="email"
+										autoComplete="email"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										className={ inputClass }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<p className="mt-1 text-[12px] text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</p>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					{ resendVerification.isError && (
@@ -212,15 +212,15 @@ function VerifyEmailPage( )
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
-						(
-							<button
-								type="submit"
-								disabled={ !canSubmit || isPristine || resendVerification.isPending }
-								className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
-							>
-								{ resendVerification.isPending ? 'Sending…' : 'Send verification link' }
-							</button>
-						)}
+							(
+								<button
+									type="submit"
+									disabled={ !canSubmit || isPristine || resendVerification.isPending }
+									className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
+								>
+									{ resendVerification.isPending ? 'Sending…' : 'Send verification link' }
+								</button>
+							)}
 					</form.Subscribe>
 				</form>
 

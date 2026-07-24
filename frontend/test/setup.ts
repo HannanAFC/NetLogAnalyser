@@ -9,7 +9,7 @@ import { server } from './mocks/server';
 beforeAll( ( ) =>
 {
 	server.listen( { onUnhandledRequest: 'error' } );
-});
+} );
 
 afterEach( () =>
 {
@@ -17,9 +17,9 @@ afterEach( () =>
 	tokenStore.set( null );
 	resetRefreshCallCount( );
 	setRefreshShouldFail( false );
-});
+} );
 
 afterAll( ( ) =>
 {
 	server.close( );
-});
+} );

@@ -8,14 +8,14 @@ import { apiError } from '../lib/api/errors';
 import { fieldError } from '../lib/utils';
 
 export const Route = createFileRoute( '/register' )(
-{
-	beforeLoad: async ( { context } ) =>
 	{
-		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-		if ( session ) throw redirect( { to: '/dashboard' } );
-	},
-	component: RegisterPage
-});
+		beforeLoad: async( { context } ) =>
+		{
+			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+			if ( session ) throw redirect( { to: '/dashboard' } );
+		},
+		component: RegisterPage
+	} );
 
 function RegisterPage( )
 {
@@ -23,24 +23,24 @@ function RegisterPage( )
 	const [ registeredEmail, setRegisteredEmail ] = useState< string | null >( null );
 
 	const form = useForm(
-	{
-		defaultValues: { email: '', display_name: '', password: '', confirm_password: '' },
-		onSubmit: async ( { value } ) =>
 		{
-			try
+			defaultValues: { email: '', display_name: '', password: '', confirm_password: '' },
+			onSubmit: async( { value } ) =>
 			{
-				const parsed = registerSchema.parse( value );
-				await register.mutateAsync( parsed );
-				setRegisteredEmail( parsed.email );
-			}
-			catch
-			{
+				try
+				{
+					const parsed = registerSchema.parse( value );
+					await register.mutateAsync( parsed );
+					setRegisteredEmail( parsed.email );
+				}
+				catch
+				{
 				// already handled
+				}
 			}
-		},
-	});
+		} );
 
-	const inputClass = "mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150";
+	const inputClass = 'mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150';
 
 	if ( registeredEmail )
 	{
@@ -105,27 +105,27 @@ function RegisterPage( )
 						validators={{ onChange: registerSchema.shape.email, onBlur: registerSchema.shape.email }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Email
-								</label>
-								<input
-									id={ field.name }
-									type="email"
-									autoComplete="email"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+										Email
+									</label>
+									<input
+										id={ field.name }
+										type="email"
+										autoComplete="email"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										className={ inputClass }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<p className="mt-1 text-[12px] text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</p>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					<form.Field
@@ -133,27 +133,27 @@ function RegisterPage( )
 						validators={{ onChange: registerSchema.shape.display_name, onBlur: registerSchema.shape.display_name }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Display name
-								</label>
-								<input
-									id={ field.name }
-									type="text"
-									autoComplete="username"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+										Display name
+									</label>
+									<input
+										id={ field.name }
+										type="text"
+										autoComplete="username"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										className={ inputClass }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<p className="mt-1 text-[12px] text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</p>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					<form.Field
@@ -161,63 +161,63 @@ function RegisterPage( )
 						validators={{ onChange: registerSchema.shape.password, onBlur: registerSchema.shape.password }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Password
-								</label>
-								<input
-									id={ field.name }
-									type="password"
-									autoComplete="new-password"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+										Password
+									</label>
+									<input
+										id={ field.name }
+										type="password"
+										autoComplete="new-password"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										className={ inputClass }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<p className="mt-1 text-[12px] text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</p>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					<form.Field
 						name="confirm_password"
 						validators={
-						{
-							onChange: ( { value, fieldApi } ) =>
 							{
-								if ( !value ) return 'Please confirm your password';
-								if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
-								return undefined;
-							}
-						}}
+								onChange: ( { value, fieldApi } ) =>
+								{
+									if ( !value ) return 'Please confirm your password';
+									if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
+									return undefined;
+								}
+							}}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Confirm password
-								</label>
-								<input
-									id={ field.name }
-									type="password"
-									autoComplete="new-password"
-									value={ field.state.value}
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
+										Confirm password
+									</label>
+									<input
+										id={ field.name }
+										type="password"
+										autoComplete="new-password"
+										value={ field.state.value}
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										className={ inputClass }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<p className="mt-1 text-[12px] text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</p>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					{ register.isError && (
@@ -226,15 +226,15 @@ function RegisterPage( )
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
-						(
-							<button
-								type="submit"
-								disabled={ !canSubmit || isPristine || register.isPending }
-								className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
-							>
-								{ register.isPending ? 'Creating account…' : 'Create account' }
-							</button>
-						)}
+							(
+								<button
+									type="submit"
+									disabled={ !canSubmit || isPristine || register.isPending }
+									className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
+								>
+									{ register.isPending ? 'Creating account…' : 'Create account' }
+								</button>
+							)}
 					</form.Subscribe>
 				</form>
 

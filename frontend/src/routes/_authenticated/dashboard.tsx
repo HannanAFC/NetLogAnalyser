@@ -3,9 +3,9 @@ import { Button } from '../../components/ui/button';
 import { useLogout, useSession } from '../../features/auth/hooks';
 
 export const Route = createFileRoute( '/_authenticated/dashboard' )(
-{
-	component: DashboardPage
-});
+	{
+		component: DashboardPage
+	} );
 
 function DashboardPage( )
 {
