@@ -6,13 +6,13 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class APIKeyCreateRequest( BaseModel ):
+class ApiKeyCreateRequest( BaseModel ):
     model_config = ConfigDict( str_strip_whitespace=True )
     
     label: str = Field( min_length=1, max_length=100 )
 
 
-class APIKeyCreateResponse( BaseModel ):
+class ApiKeyCreateResponse( BaseModel ):
     model_config = ConfigDict( from_attributes=True )
     
     id:         UUID
@@ -22,7 +22,7 @@ class APIKeyCreateResponse( BaseModel ):
     created_at: datetime
 
 
-class APIKeyPublic( BaseModel ):
+class ApiKeyPublic( BaseModel ):
     model_config = ConfigDict( from_attributes=True )
 
     id:           UUID

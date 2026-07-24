@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from api_keys.schemas import APIKeyCreateRequest
+from api_keys.schemas import ApiKeyCreateRequest
 from auth.security import generate_api_key, hash_token
 from config import settings
 from fastapi import HTTPException, status
@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-async def create_api_key( db: AsyncSession, payload: APIKeyCreateRequest, user: User ) -> tuple[ APIKey, str ]:
+async def create_api_key( db: AsyncSession, payload: ApiKeyCreateRequest, user: User ) -> tuple[ APIKey, str ]:
     """
     Creates a new API key for a given user.
     Parameters:
