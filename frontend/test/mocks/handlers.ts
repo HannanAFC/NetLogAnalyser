@@ -12,6 +12,52 @@ const FAKE_USER =
 		email: VALID_EMAIL
 	};
 
+// ── API Keys mock data ──────────────────────────────────────────────
+
+export const FAKE_API_KEY_ID_1 = 'aaaaaaaa-1111-1111-1111-111111111111';
+export const FAKE_API_KEY_ID_2 = 'bbbbbbbb-2222-2222-2222-222222222222';
+
+const FAKE_API_KEYS = [
+	{
+		id: FAKE_API_KEY_ID_1,
+		label: 'My API Key',
+		key_prefix: 'nl_abc123',
+		created_at: '2024-01-01T00:00:00Z',
+		last_used_at: null,
+		revoked_at: null
+	},
+	{
+		id: FAKE_API_KEY_ID_2,
+		label: 'Old Key',
+		key_prefix: 'nl_def456',
+		created_at: '2024-01-02T00:00:00Z',
+		last_used_at: '2024-01-15T00:00:00Z',
+		revoked_at: '2024-02-01T00:00:00Z'
+	}
+];
+
+const FAKE_CREATED_KEY = {
+	id: 'cccccccc-3333-3333-3333-333333333333',
+	label: 'New Key',
+	key_prefix: 'nl_ghi789',
+	api_key: 'nl_ghi789_this_is_a_raw_secret_key',
+	created_at: '2024-03-01T00:00:00Z'
+};
+
+/** Call counts so tests can assert requests were (or were not) made. */
+export let getApiKeysCallCount = 0;
+export let createApiKeyCallCount = 0;
+export let revokeApiKeyCallCount = 0;
+export let lastCreateApiKeyLabel: string | null = null;
+
+export function resetApiKeysCallCounts( )
+{
+	getApiKeysCallCount = 0;
+	createApiKeyCallCount = 0;
+	revokeApiKeyCallCount = 0;
+	lastCreateApiKeyLabel = null;
+}
+
 // Tracks how many times /auth/refresh was actually called, so tests can
 // assert the 401 -> refresh -> retry interceptor deduplicates concurrent
 // refresh calls instead of firing one per failed request.
@@ -158,5 +204,41 @@ export const handlers = [
 		}
 
 		return HttpResponse.json( { detail: 'Password reset successfully' } );
+	} ),
+
+	// ── API Keys ─────────────────────────────────────────────────────
+
+	http.get( '*/api-keys', ( ) =>
+	{
+		getApiKeysCallCount += 1;
+		return HttpResponse.json( FAKE_API_KEYS );
+	} ),
+
+	http.post( '*/api-keys', async( { request } ) =>
+	{
+		createApiKeyCallCount += 1;
+		const body = ( await request.json( ) ) as { label: string };
+		lastCreateApiKeyLabel = body.label;
+
+		return HttpResponse.json( FAKE_CREATED_KEY, { status: 201 } );
+	} ),
+
+	http.delete( '*/api-keys/:id', ( { params } ) =>
+	{
+		revokeApiKeyCallCount += 1;
+		const { id } = params;
+
+		if ( id === FAKE_API_KEY_ID_1 )
+		{
+			return new HttpResponse( null, { status: 204 } );
+		}
+
+		if ( id === FAKE_API_KEY_ID_2 )
+		{
+			// Already revoked
+			return HttpResponse.json( { detail: 'API key has already been revoked.' }, { status: 409 } );
+		}
+
+		return HttpResponse.json( { detail: 'API key was not found.' }, { status: 404 } );
 	} )
 ];
