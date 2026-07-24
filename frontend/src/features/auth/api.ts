@@ -1,5 +1,5 @@
-import { apiClient } from '../../lib/api/client';
-import type { AuthTokenResponse, RefreshResponse, RegisterResponse, User } from '../../lib/auth/types';
+import { apiClient } from '#/lib/api/client';
+import type { AuthTokenResponse, RefreshResponse, RegisterResponse, User } from '#/lib/auth/types';
 import type { ForgotPasswordPayload, LoginPayload, RegisterRequestBody, ResendVerificationPayload, ResetPasswordPayload } from './schemas';
 
 export async function loginRequest( payload: LoginPayload ): Promise< AuthTokenResponse >

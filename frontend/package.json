@@ -14,8 +14,7 @@
     "test:integration": "RUN_INTEGRATION_TESTS=1 vitest run --project integration",
     "test:all": "vitest run",
     "lint": "eslint",
-    "format": "eslint --fix",
-    "check": "eslint"
+    "format": "eslint --fix"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

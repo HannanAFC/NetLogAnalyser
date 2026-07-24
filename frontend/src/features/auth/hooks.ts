@@ -35,17 +35,17 @@ export function useRegister( )
 export function useLogout( )
 {
 	const queryClient = useQueryClient( );
-		return useMutation(
+	return useMutation(
+	{
+		mutationFn: logoutRequest,
+		// Clear local state even if the network call fails - an expired
+		// or already-revoked refresh token shouldn't trap the user logged in.
+		onSettled: ( ) =>
 		{
-			mutationFn: logoutRequest,
-			// Clear local state even if the network call fails - an expired
-			// or already-revoked refresh token shouldn't trap the user logged in.
-			onSettled: ( ) =>
-			{
-				tokenStore.set( null );
-				queryClient.setQueryData( sessionQueryKey, null );
-			}
-		} );
+			tokenStore.set( null );
+			queryClient.setQueryData( sessionQueryKey, null );
+		}
+	} );
 }
 
 export function useForgotPassword( )

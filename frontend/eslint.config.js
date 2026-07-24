@@ -35,8 +35,7 @@ export default [
 			'@stylistic/space-before-blocks': [ 'error', 'always'],			'@stylistic/brace-style': [ 'error', 'allman' ],			'@stylistic/arrow-spacing': [ 'error', { before: true, after: true } ],
 			'@stylistic/no-trailing-spaces': 'error',
 			'@stylistic/type-annotation-spacing': 'error',
-			'@stylistic/comma-spacing': [ 'error', { before: false, after: true } ],
-			'@stylistic/key-spacing': [ 'error', { beforeColon: false, afterColon: true } ]
+			'@stylistic/comma-spacing': [ 'error', { before: false, after: true } ]
 		}
 	}
 ]
