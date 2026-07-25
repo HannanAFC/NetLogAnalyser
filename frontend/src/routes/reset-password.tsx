@@ -25,7 +25,7 @@ export const Route = createFileRoute( '/reset-password' )(
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
 	component: ResetPasswordPage,
-	head: ( ) =>(
+	head: ( ) => (
 	{
 		links:
 		[
@@ -37,7 +37,7 @@ export const Route = createFileRoute( '/reset-password' )(
 		meta:
 		[
 			{
-				title: "Reset Password | NetLogAnalyser"
+				title: 'Reset Password | NetLogAnalyser'
 			},
 			{
 				name: 'description',

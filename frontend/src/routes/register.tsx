@@ -18,7 +18,7 @@ export const Route = createFileRoute( '/register' )(
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
 	component: RegisterPage,
-	head: ( ) =>(
+	head: ( ) => (
 	{
 		links:
 		[
@@ -30,7 +30,7 @@ export const Route = createFileRoute( '/register' )(
 		meta:
 		[
 			{
-				title: "Register | NetLogAnalyser"
+				title: 'Register | NetLogAnalyser'
 			},
 			{
 				name: 'description',

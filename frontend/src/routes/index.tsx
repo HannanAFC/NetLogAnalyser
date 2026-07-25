@@ -11,7 +11,7 @@ export const Route = createFileRoute( '/' )(
 		await context.queryClient.ensureQueryData( sessionQueryOptions );
 	},
 	component: IndexPage,
-	head: ( ) =>(
+	head: ( ) => (
 	{
 		links:
 		[

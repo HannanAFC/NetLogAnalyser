@@ -13,7 +13,7 @@ import { useState } from 'react';
 export const Route = createFileRoute( '/_authenticated/settings' )(
 {
 	component: SettingsPage,
-	head: ( ) =>(
+	head: ( ) => (
 	{
 		links:
 		[
@@ -25,7 +25,7 @@ export const Route = createFileRoute( '/_authenticated/settings' )(
 		meta:
 		[
 			{
-				title: "Settings | NetLogAnalyser"
+				title: 'Settings | NetLogAnalyser'
 			},
 			{
 				name: 'description',

@@ -25,7 +25,7 @@ export const Route = createFileRoute( '/verify-email' )(
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
 	component: VerifyEmailPage,
-	head: ( ) =>(
+	head: ( ) => (
 	{
 		links:
 		[
@@ -37,7 +37,7 @@ export const Route = createFileRoute( '/verify-email' )(
 		meta:
 		[
 			{
-				title: "Verify Email | NetLogAnalyser"
+				title: 'Verify Email | NetLogAnalyser'
 			},
 			{
 				name: 'description',

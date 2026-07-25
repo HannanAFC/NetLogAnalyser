@@ -7,7 +7,7 @@ import { createFileRoute } from '@tanstack/react-router';
 export const Route = createFileRoute( '/_authenticated/dashboard' )(
 {
 	component: DashboardPage,
-	head: ( ) =>(
+	head: ( ) => (
 	{
 		links:
 		[
@@ -19,7 +19,7 @@ export const Route = createFileRoute( '/_authenticated/dashboard' )(
 		meta:
 		[
 			{
-				title: "Dashboard | NetLogAnalyser"
+				title: 'Dashboard | NetLogAnalyser'
 			},
 			{
 				name: 'description',

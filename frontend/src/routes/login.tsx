@@ -24,7 +24,7 @@ export const Route = createFileRoute( '/login' )(
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
 	component: LoginPage,
-	head: ( ) =>(
+	head: ( ) => (
 	{
 		links:
 		[
