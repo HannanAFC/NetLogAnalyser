@@ -1,5 +1,5 @@
+import { createApiKeySchema } from '#/features/api-keys/schemas';
 import { describe, expect, it } from 'vitest';
-import { createApiKeySchema } from './schemas';
 
 describe( 'createApiKeySchema', ( ) =>
 {

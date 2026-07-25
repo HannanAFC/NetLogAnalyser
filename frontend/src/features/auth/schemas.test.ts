@@ -1,5 +1,5 @@
+import { forgotPasswordSchema, loginSchema, registerSchema, resendVerificationSchema, resetPasswordSchema } from '#/features/auth/schemas';
 import { describe, expect, it } from 'vitest';
-import { forgotPasswordSchema, loginSchema, registerSchema, resendVerificationSchema, resetPasswordSchema } from './schemas';
 
 describe( 'loginSchema', ( ) =>
 {

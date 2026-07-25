@@ -1,10 +1,10 @@
+import { queryClient } from '#/lib/api/query-client';
+import { sessionQueryKey } from '#/lib/auth/session-key';
+import { tokenStore } from '#/lib/auth/token-store';
+import type { RefreshResponse } from '#/lib/auth/types';
+import { env } from '#/lib/env';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
-import { sessionQueryKey } from '../auth/session-key';
-import { tokenStore } from '../auth/token-store';
-import type { RefreshResponse } from '../auth/types';
-import { env } from '../env';
-import { queryClient } from './query-client';
 
 declare module 'axios'
 {

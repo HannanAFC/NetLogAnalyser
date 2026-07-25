@@ -1,8 +1,8 @@
+import { forgotPasswordRequest, loginRequest, logoutRequest, registerRequest, resendVerificationRequest, resetPasswordRequest, verifyEmailRequest } from '#/features/auth/api';
+import { sessionQueryKey, sessionQueryOptions } from '#/features/auth/queries';
+import type { ForgotPasswordPayload, LoginPayload, RegisterRequestBody, ResendVerificationPayload, ResetPasswordPayload } from '#/features/auth/schemas';
 import { tokenStore } from '#/lib/auth/token-store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { forgotPasswordRequest, loginRequest, logoutRequest, registerRequest, resendVerificationRequest, resetPasswordRequest, verifyEmailRequest } from './api';
-import { sessionQueryKey, sessionQueryOptions } from './queries';
-import type { ForgotPasswordPayload, LoginPayload, RegisterRequestBody, ResendVerificationPayload, ResetPasswordPayload } from './schemas';
 
 /** Read the current session. Cheap after first load - served from cache. */
 export function useSession( )

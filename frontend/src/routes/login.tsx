@@ -1,10 +1,13 @@
+import { Card } from '#/components/ui/card';
+import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { useLogin } from '#/features/auth/hooks';
+import { sessionQueryOptions } from '#/features/auth/queries';
+import { loginSchema } from '#/features/auth/schemas';
+import { apiError, isEmailNotVerifiedError } from '#/lib/api/errors';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
-import { useLogin } from '../features/auth/hooks';
-import { sessionQueryOptions } from '../features/auth/queries';
-import { loginSchema } from '../features/auth/schemas';
-import { apiError } from '../lib/api/errors';
+import { Input, Label } from '../components/ui/input';
 
 const loginSearchSchema = z.object(
 	{
@@ -42,12 +45,12 @@ function LoginPage()
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
-				<p className="eyebrow">Secure access</p>
-				<h1 className="heading-1">Sign in</h1>
-				<p className="body-text mt-2">Enter your credentials to access the live operations view.</p>
+				<Eyebrow>Secure access</Eyebrow>
+				<Heading level="h1" className="">Sign in</Heading>
+				<BodyText className="mt-2">Enter your credentials to access the live operations view.</BodyText>
 			</div>
 
-			<div className="panel p-6">
+			<Card>
 				<form
 					onSubmit={ ( event ) =>
 					{
@@ -62,27 +65,24 @@ function LoginPage()
 						validators={{ onChange: loginSchema.shape.email, onBlur: loginSchema.shape.email }}
 					>
 						{ ( field ) =>
-							(
-								<div>
-									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-										Email
-									</label>
-									<input
-										id={ field.name }
-										type="email"
-										autoComplete="email"
-										value={ field.state.value }
-										onBlur={ field.handleBlur }
-										onChange={ ( e ) => field.handleChange( e.target.value ) }
-										className="mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150"
-									/>
-									{ field.state.meta.errors.length > 0 && (
-										<p className="mt-1 text-[12px] text-critical">
-											{ field.state.meta.errors[ 0 ]?.message }
-										</p>
-									)}
-								</div>
-							)}
+						(
+							<div>
+								<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Email</Label>
+								<Input
+									id={ field.name }
+									type="email"
+									autoComplete="email"
+									value={ field.state.value }
+									onBlur={ field.handleBlur }
+									onChange={ ( e ) => field.handleChange( e.target.value ) }
+								/>
+								{ field.state.meta.errors.length > 0 && (
+									<BodySm className="text-danger">
+										{ field.state.meta.errors[ 0 ]?.message }
+									</BodySm>
+								) }
+							</div>
+						) }
 					</form.Field>
 
 					<form.Field
@@ -92,35 +92,46 @@ function LoginPage()
 						{ ( field ) =>
 							(
 								<div>
-									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-										Password
-									</label>
-									<input
+									<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Password</Label>
+									<Input
 										id={ field.name }
 										type="password"
 										autoComplete="current-password"
 										value={ field.state.value }
 										onBlur={ field.handleBlur }
 										onChange={ ( e ) => field.handleChange( e.target.value ) }
-										className="mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150"
 									/>
-									{ field.state.meta.errors.length > 0 && (
-										<p className="mt-1 text-[12px] text-critical">
+								{ field.state.meta.errors.length > 0 && (
+									<BodySm className="text-danger">
 											{ field.state.meta.errors[ 0 ]?.message }
-										</p>
+									</BodySm>
 									)}
 								</div>
 							)}
 					</form.Field>
 
-					{ login.isError && (
-						<p className="text-[13px] text-critical">
+					{ login.isError && isEmailNotVerifiedError( login.error ) &&
+					(
+						<div className="rounded-md border border-accent-strong/30 bg-accent/5 px-4 py-3">
+							<BodySm className="text-text-primary">
+								Your email hasn't been verified yet.{' '}
+								<Link to="/verify-email" className="font-semibold text-accent-strong hover:underline">
+									Verify your email
+								</Link>{' '}
+								to sign in.
+							</BodySm>
+						</div>
+					) }
+
+					{ login.isError && !isEmailNotVerifiedError( login.error ) &&
+					(
+						<BodySm className="text-danger">
 							{ apiError( login.error ) ?? 'An unexpected error occurred.' }
-						</p>
-					)}
+						</BodySm>
+					) }
 
 					<div className="flex items-center justify-end">
-						<Link to="/forgot-password" className="text-[13px] font-medium text-[var(--color-accent-strong)] hover:underline">
+						<Link to="/forgot-password" className="text-sm font-medium text-accent-strong hover:underline">
 							Forgot password?
 						</Link>
 					</div>
@@ -130,7 +141,7 @@ function LoginPage()
 							<button
 								type="submit"
 								disabled={ !canSubmit || isPristine || login.isPending }
-								className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
+								className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
 							>
 								{ login.isPending ? 'Signing in…' : 'Sign in' }
 							</button>
@@ -138,13 +149,13 @@ function LoginPage()
 					</form.Subscribe>
 				</form>
 
-				<p className="mt-5 text-[13px] text-text-secondary">
+				<BodySm className="mt-5 text-text-secondary">
 					No account?{' '}
-					<Link to="/register" className="font-semibold text-[var(--color-accent-strong)] hover:underline">
+					<Link to="/register" className="font-semibold text-accent-strong hover:underline">
 						Register
 					</Link>
-				</p>
-			</div>
+				</BodySm>
+			</Card>
 		</div>
 	);
 }

@@ -4,6 +4,50 @@
 @import "./tokens.css";
 @import "tailwindcss";
 
+@theme
+{
+	--color-paper: var( --color-paper );
+    --color-paper-2: var( --color-paper-2 );
+    --color-card: var( --color-card );
+    --color-card-2: var( --color-card-2 );
+    --color-inset: var( --color-inset );
+    --color-text-primary: var( --color-text-primary );
+    --color-text-secondary: var( --color-text-secondary );
+    --color-text-tertiary: var( --color-text-tertiary );
+    --color-border: var( --color-border );
+    --color-border-hi: var( --color-border-hi );
+    --color-accent: var( --color-accent );
+    --color-accent-strong: var( --color-accent-strong );
+    --color-ink: var( --color-ink );
+	--color-danger: var( --color-danger );
+	--color-success: var( --color-success );
+	--color-warning: var( --color-warning );
+	--color-critical: var( --color-critical );
+	--color-high: var( --color-high );
+	--color-medium: var( --color-medium );
+	--color-low: var( --color-low );
+	--color-info: var( --color-info );
+    --shadow-card: var( --shadow-card );
+    --shadow-soft: var( --shadow-soft );
+    --font-display: var( --font-display ) ;
+    --font-body: var( --font-body );
+    --font-mono: var( --font-mono );
+    --radius-sm: var( --radius-sm );
+    --radius-md: var( --radius-md );
+    --radius-lg: var( --radius-lg );
+    --space-1: var( --space-1 );
+    --space-2: var( --space-2 );
+    --space-3: var( --space-3 );
+    --space-4: var( --space-4 );
+    --space-5: var( --space-5 );
+    --space-6: var( --space-6 );
+    --space-8: var( --space-8 );
+    --space-10: var( --space-10 );
+    --space-12: var( --space-12 );
+    --space-16: var( --space-16 );
+    --space-20: var( --space-20 );
+}
+
 :root
 {
 	color-scheme: light;
@@ -143,22 +187,6 @@
 		letter-spacing: -0.04em;
 		color: var( --color-text-primary );
 		font-feature-settings: "tnum";
-	}
-
-	.panel
-	{
-		border: 1px solid var( --color-border );
-		border-radius: var( --radius-lg );
-		background: var( --color-card );
-		box-shadow: var( --shadow-card );
-	}
-
-	.panel-strong
-	{
-		border: 1px solid var( --color-border );
-		border-radius: var( --radius-lg );
-		background: var( --color-card );
-		box-shadow: var( --shadow-soft );
 	}
 }
 

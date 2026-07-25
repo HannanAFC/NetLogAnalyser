@@ -1,18 +1,18 @@
 import {
-    createApiKeyCallCount,
-    FAKE_API_KEY_ID_1,
-    FAKE_API_KEY_ID_2,
-    getApiKeysCallCount,
-    lastCreateApiKeyLabel,
-    revokeApiKeyCallCount
+	createApiKeyCallCount,
+	FAKE_API_KEY_ID_1,
+	FAKE_API_KEY_ID_2,
+	getApiKeysCallCount,
+	lastCreateApiKeyLabel,
+	revokeApiKeyCallCount
 } from '#/../test/mocks/handlers';
 import { createTestQueryClient } from '#/../test/test-utils';
+import { useApiKeys, useCreateApiKey, useGetApiKeys, useRevokeApiKey } from '#/features/api-keys/hooks';
 import { apiKeysQueryKey } from '#/lib/api-keys/query-key';
 import type { ApiKey } from '#/lib/api-keys/types';
 import { wrapperFor } from '#/lib/api/test-utils';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useApiKeys, useCreateApiKey, useGetApiKeys, useRevokeApiKey } from './hooks';
 
 describe( 'useApiKeys', ( ) =>
 {

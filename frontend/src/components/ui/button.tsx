@@ -8,16 +8,15 @@ type ButtonSize = 'sm' | 'md';
 const variantClasses: Record<ButtonVariant, string> =
 	{
 		primary:
-        'bg-green-500 text-[#0a0f0a] hover:opacity-[0.88] ' +
-        'dark:bg-green-500 dark:text-[#0a0f0a]',
+        'bg-accent text-ink hover:opacity-90 ',
 		secondary:
         'bg-transparent text-text-secondary border border-border-hi ' +
-        'hover:text-text-primary hover:border-[rgb(var(--color-border-hi-rgb)/0.22)]',
+        'hover:text-text-primary hover:border-border-hi/50',
 		ghost:
-        'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-card',
+        'bg-transparent text-text-secondary hover:text-text-primary hover:bg-card',
 		danger:
-        'bg-critical/12 text-critical border border-critical/20 ' +
-        'hover:bg-critical/20'
+        'bg-danger text-ink border-border ' +
+        'hover:opacity-80'
 	};
 
 const sizeClasses: Record< ButtonSize, string > =
@@ -44,13 +43,13 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 				ref={ ref }
 				className={ cn(
 					'inline-flex items-center font-mono font-medium',
-					'cursor-pointer border-none no-underline',
+					'cursor-pointer no-underline',
 					'transition-[opacity,background,color,border-color] duration-150',
 					'tracking-[0.01em]',
 					variantClasses[ variant ],
 					sizeClasses[ size ],
 					className
-				)}
+				) }
 				{ ...props }
 			>
 				{ children }

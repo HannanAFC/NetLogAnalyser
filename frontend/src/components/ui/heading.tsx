@@ -5,7 +5,7 @@ type HeadingLevel = 'h1' | 'h2' | 'h3';
 
 export interface HeadingProps extends HTMLAttributes< HTMLHeadingElement >
 {
-	level?: HeadingLevel;
+	level?:   HeadingLevel;
 	children: ReactNode;
 }
 
@@ -96,4 +96,40 @@ export function CodeInline(
 			{ children }
 		</code>
 	);
+}
+
+/* Utility layout components */
+
+export function BodySm(
+{
+	className,
+	children,
+	...props
+}: HTMLAttributes< HTMLParagraphElement > )
+{
+	return (
+		<p className={ cn( 'body-sm', className ) } { ...props }>
+			{ children }
+		</p>
+	);
+}
+
+export function StatNumber(
+{
+	className,
+	children,
+	...props
+}: HTMLAttributes< HTMLSpanElement > )
+{
+	return (
+		<span className={ cn( 'stat-number', className ) } { ...props }>
+			{ children }
+		</span>
+	);
+}
+
+export interface PanelProps extends HTMLAttributes< HTMLDivElement >
+{
+	strong?: boolean;
+	children: ReactNode;
 }

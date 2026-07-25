@@ -1,6 +1,6 @@
+import type { CreateApiKeyPayload } from '#/features/api-keys/schemas';
 import type { CreateApiKeyResponse, GetApiKeysResponse } from '#/lib/api-keys/types';
 import { apiClient } from '#/lib/api/client';
-import type { CreateApiKeyPayload } from './schemas';
 
 export async function getApiKeysRequest( ): Promise< GetApiKeysResponse >
 {

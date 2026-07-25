@@ -1,11 +1,14 @@
+import { Card } from '#/components/ui/card';
+import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { useForgotPassword } from '#/features/auth/hooks';
+import { sessionQueryOptions } from '#/features/auth/queries';
+import { forgotPasswordSchema } from '#/features/auth/schemas';
+import { apiError } from '#/lib/api/errors';
+import { fieldError } from '#/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useForgotPassword } from '../features/auth/hooks';
-import { sessionQueryOptions } from '../features/auth/queries';
-import { forgotPasswordSchema } from '../features/auth/schemas';
-import { apiError } from '../lib/api/errors';
-import { fieldError } from '../lib/utils';
+import { Input, Label } from '../components/ui/input';
 
 export const Route = createFileRoute( '/forgot-password' )(
 	{
@@ -34,38 +37,36 @@ function ForgotPasswordPage( )
 				}
 				catch
 				{
-				// already handled
+					// already handled
 				}
 			}
 		} );
-
-	const inputClass = 'mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150';
 
 	if ( sent )
 	{
 		return (
 			<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
-				<div className="panel p-8 text-center">
-					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)]/10">
+				<Card className="text-center">
+					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
 						<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-strong)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 							<rect x="2" y="4" width="20" height="16" rx="2" />
 							<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
 						</svg>
 					</div>
-					<h1 className="heading-1 mb-2">Check your email</h1>
-					<p className="body-text">
+					<Heading level="h1" className="mb-2">Check your email</Heading>
+					<BodyText>
 						If an account with that email exists, we&apos;ve sent a password reset link.
-					</p>
-					<p className="body-sm mt-3">
+					</BodyText>
+					<BodySm className="mt-3">
 						The link expires in 5 minutes. If you don&apos;t see it, check your spam folder.
-					</p>
+					</BodySm>
 					<Link
 						to="/login"
-						className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
+						className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90"
 					>
 						Back to sign in
 					</Link>
-				</div>
+				</Card>
 			</div>
 		);
 	}
@@ -73,12 +74,12 @@ function ForgotPasswordPage( )
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
-				<p className="eyebrow">Account recovery</p>
-				<h1 className="heading-1">Forgot password</h1>
-				<p className="body-text mt-2">Enter your email and we&apos;ll send you a link to reset your password.</p>
+				<Eyebrow>Account recovery</Eyebrow>
+				<Heading level="h1">Forgot password</Heading>
+				<BodyText className="mt-2">Enter your email and we&apos;ll send you a link to reset your password.</BodyText>
 			</div>
 
-			<div className="panel p-6">
+			<Card>
 				<form
 					onSubmit={ ( event ) =>
 					{
@@ -95,29 +96,26 @@ function ForgotPasswordPage( )
 						{ ( field ) =>
 							(
 								<div>
-									<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-										Email
-									</label>
-									<input
+									<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Email</Label>
+									<Input
 										id={ field.name }
 										type="email"
 										autoComplete="email"
 										value={ field.state.value }
 										onBlur={ field.handleBlur }
 										onChange={ ( e ) => field.handleChange( e.target.value ) }
-										className={ inputClass }
 									/>
 									{ field.state.meta.errors.length > 0 && (
-										<p className="mt-1 text-[12px] text-critical">
+										<BodySm className="text-critical">
 											{ fieldError( field.state.meta.errors ) }
-										</p>
+										</BodySm>
 									)}
 								</div>
 							)}
 					</form.Field>
 
 					{ forgotPassword.isError && (
-						<p className="text-[13px] text-critical">{ apiError( forgotPassword.error ) ?? 'Something went wrong. Try again.' }</p>
+						<BodySm className="text-critical">{ apiError( forgotPassword.error ) ?? 'Something went wrong. Try again.' }</BodySm>
 					)}
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
@@ -126,7 +124,7 @@ function ForgotPasswordPage( )
 								<button
 									type="submit"
 									disabled={ !canSubmit || isPristine || forgotPassword.isPending }
-									className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
+									className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
 								>
 									{ forgotPassword.isPending ? 'Sending…' : 'Send reset link' }
 								</button>
@@ -134,13 +132,13 @@ function ForgotPasswordPage( )
 					</form.Subscribe>
 				</form>
 
-				<p className="mt-5 text-[13px] text-text-secondary">
+				<BodySm className="mt-5 text-text-secondary">
 					Remember your password?{' '}
-					<Link to="/login" className="font-semibold text-[var(--color-accent-strong)] hover:underline">
+					<Link to="/login" className="font-semibold text-accent-strong hover:underline">
 						Sign in
 					</Link>
-				</p>
-			</div>
+				</BodySm>
+			</Card>
 		</div>
 	);
 }

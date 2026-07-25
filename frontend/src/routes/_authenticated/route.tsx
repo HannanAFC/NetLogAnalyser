@@ -1,7 +1,7 @@
-import { createFileRoute, redirect, isRedirect, Outlet, useNavigate } from '@tanstack/react-router';
+import { useSession } from '#/features/auth/hooks';
+import { sessionQueryOptions } from '#/features/auth/queries';
+import { createFileRoute, isRedirect, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { sessionQueryOptions } from '../../features/auth/queries';
-import { useSession } from '../../features/auth/hooks';
 
 export const Route = createFileRoute( '/_authenticated' )(
 	{

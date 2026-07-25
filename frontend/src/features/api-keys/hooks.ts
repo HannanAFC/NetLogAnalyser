@@ -1,9 +1,9 @@
+import { apiKeysQueryOptions } from '#/features/api-keys/queries';
+import type { CreateApiKeyPayload } from '#/features/api-keys/schemas';
 import { apiKeysQueryKey } from '#/lib/api-keys/query-key';
 import type { ApiKey } from '#/lib/api-keys/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createApiKeyRequest, getApiKeysRequest, revokeApiKeyRequest } from './api';
-import { apiKeysQueryOptions } from './queries';
-import type { CreateApiKeyPayload } from './schemas';
 
 export function useApiKeys( )
 {
