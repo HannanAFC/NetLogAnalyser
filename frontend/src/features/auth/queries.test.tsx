@@ -8,7 +8,7 @@ import { createTestQueryClient } from '#/../test/test-utils';
 
 describe( 'route guard (ensureQueryData against sessionQueryOptions)', ( ) =>
 {
-	it( 'resolves to null when there is no access token and no valid refresh cookie', async ( ) =>
+	it( 'resolves to null when there is no access token and no valid refresh cookie', async( ) =>
 	{
 		setRefreshShouldFail( true );
 
@@ -16,14 +16,14 @@ describe( 'route guard (ensureQueryData against sessionQueryOptions)', ( ) =>
 		const session = await queryClient.ensureQueryData( sessionQueryOptions );
 
 		expect( session ).toBeNull( );
-	});
+	} );
 
-	it( 'resolves to the user when a valid refresh cookie is present', async ( ) =>
+	it( 'resolves to the user when a valid refresh cookie is present', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
 		const session = await queryClient.ensureQueryData( sessionQueryOptions );
 
 		expect( session ).toMatchObject( { email: VALID_EMAIL } );
 		expect( tokenStore.get( ) ).toBe( 'refreshed-access-token' );
-	});
-});
+	} );
+} );

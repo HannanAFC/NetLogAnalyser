@@ -1,10 +1,10 @@
+import { queryClient } from '#/lib/api/query-client';
+import { sessionQueryKey } from '#/lib/auth/session-key';
+import { tokenStore } from '#/lib/auth/token-store';
+import type { RefreshResponse } from '#/lib/auth/types';
+import { env } from '#/lib/env';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
-import { sessionQueryKey } from '../auth/session-key';
-import { tokenStore } from '../auth/token-store';
-import type { RefreshResponse } from '../auth/types';
-import { env } from '../env';
-import { queryClient } from './query-client';
 
 declare module 'axios'
 {
@@ -21,9 +21,9 @@ export const apiClient = axios.create(
 	// Sends the httpOnly refresh cookie (path=/auth) on every request.
 	// required for /auth/refresh and /auth/logout.
 	withCredentials: true
-});
+} );
 
-apiClient.interceptors.request.use( ( config ) => 
+apiClient.interceptors.request.use( ( config ) =>
 {
 	const token = tokenStore.get( );
 	if ( token )
@@ -31,7 +31,7 @@ apiClient.interceptors.request.use( ( config ) =>
 		config.headers.Authorization = `Bearer ${ token }`;
 	}
 	return config;
-});
+} );
 
 // Concurrent requests that all 401 at once must share a single refresh
 // call, not each trigger their own - that would race token rotation on
@@ -45,13 +45,13 @@ function refreshAccessToken( ): Promise< string >
 		refreshPromise = axios
 		.post< RefreshResponse >( `${ env.apiBaseUrl }/auth/refresh`, null,
 		{
-			withCredentials: true,
-		})
+			withCredentials: true
+		} )
 		.then( ( { data } ) =>
 		{
 			tokenStore.set( data.access_token );
 			return data.access_token;
-		})
+		} )
 		.catch( ( error ) =>
 		{
 			// Refresh cookie is missing, expired, or its family was revoked
@@ -59,18 +59,18 @@ function refreshAccessToken( ): Promise< string >
 			tokenStore.set( null );
 			queryClient.setQueryData( sessionQueryKey, null );
 			throw error;
-		})
-		.finally( ( ) => 
+		} )
+		.finally( ( ) =>
 		{
 			refreshPromise = null;
-		});
+		} );
 	}
 	return refreshPromise;
 }
 
 apiClient.interceptors.response.use(
 	( response ) => response,
-	async ( error: AxiosError ) =>
+	async( error: AxiosError ) =>
 	{
 		const original = error.config;
 		const status = error.response?.status;
@@ -84,12 +84,13 @@ apiClient.interceptors.response.use(
 
 		original._retry = true;
 
-		try {
+		try
+		{
 			const token = await refreshAccessToken( );
-			original.headers.Authorization = `Bearer ${token}`;
+			original.headers.Authorization = `Bearer ${ token }`;
 			return apiClient( original );
 		}
-		catch ( refreshError )
+		catch( refreshError )
 		{
 			return Promise.reject( refreshError );
 		}

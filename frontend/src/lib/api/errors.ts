@@ -27,3 +27,17 @@ export function apiError( error: unknown ): string | undefined
 	if ( error instanceof Error ) return error.message;
 	return undefined;
 }
+
+/** Returns true if the error is a 403 caused by an unverified email. */
+export function isEmailNotVerifiedError( error: unknown ): boolean
+{
+	if ( error && typeof error === 'object' && 'response' in error )
+	{
+		const axiosErr = error as { response: { status?: number; data?: { detail?: unknown } } };
+		return (
+			axiosErr.response.status === 403 &&
+			axiosErr.response.data?.detail === 'Email has not been verified.'
+		);
+	}
+	return false;
+}

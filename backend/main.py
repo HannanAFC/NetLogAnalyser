@@ -4,6 +4,7 @@ from math import floor
 from typing import Annotated
 
 import rate_limiter as _rl  # access to the module for rebinding globals
+from api_keys import router as api_keys_router
 from auth import router as auth_router
 from config import SecurityHeadersMiddleware, settings
 from database import engine, get_db
@@ -75,6 +76,7 @@ app.mount( "/static", StaticFiles( directory="static" ), name="static" )
 
 app.include_router( auth_router.router, prefix="/auth", tags=[ "auth" ] )
 app.include_router( users_router.router, prefix="/users", tags=[ "users" ] )
+app.include_router( api_keys_router.router, prefix="/api-keys", tags=[ "api-keys" ] )
 if settings.enable_test_endpoints:
     from testing.router import router as test_only_router
     app.include_router( test_only_router )

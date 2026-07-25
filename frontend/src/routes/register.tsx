@@ -1,21 +1,68 @@
+import { Card } from '#/components/ui/card';
+import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { Input, Label } from '#/components/ui/input';
+import { useRegister } from '#/features/auth/hooks';
+import { sessionQueryOptions } from '#/features/auth/queries';
+import { registerSchema } from '#/features/auth/schemas';
+import { apiError } from '#/lib/api/errors';
+import { fieldError } from '#/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useRegister } from '../features/auth/hooks';
-import { sessionQueryOptions } from '../features/auth/queries';
-import { registerSchema } from '../features/auth/schemas';
-import { apiError } from '../lib/api/errors';
-import { fieldError } from '../lib/utils';
 
 export const Route = createFileRoute( '/register' )(
 {
-	beforeLoad: async ( { context } ) =>
+	beforeLoad: async( { context } ) =>
 	{
 		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
-	component: RegisterPage
-});
+	component: RegisterPage,
+	head: ( ) => (
+	{
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/register'
+			}
+		],
+		meta:
+		[
+			{
+				title: 'Register | NetLogAnalyser'
+			},
+			{
+				name: 'description',
+				content: 'Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes.'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Register'
+			},
+			{
+				name: 'og:description',
+				content: 'Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes.'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Register'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/register'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/register'
+			}
+		]
+	} )
+} );
 
 function RegisterPage( )
 {
@@ -23,61 +70,59 @@ function RegisterPage( )
 	const [ registeredEmail, setRegisteredEmail ] = useState< string | null >( null );
 
 	const form = useForm(
-	{
-		defaultValues: { email: '', display_name: '', password: '', confirm_password: '' },
-		onSubmit: async ( { value } ) =>
 		{
-			try
+			defaultValues: { email: '', display_name: '', password: '', confirm_password: '' },
+			onSubmit: async( { value } ) =>
 			{
-				const parsed = registerSchema.parse( value );
-				await register.mutateAsync( parsed );
-				setRegisteredEmail( parsed.email );
-			}
-			catch
-			{
+				try
+				{
+					const parsed = registerSchema.parse( value );
+					await register.mutateAsync( parsed );
+					setRegisteredEmail( parsed.email );
+				}
+				catch
+				{
 				// already handled
+				}
 			}
-		},
-	});
-
-	const inputClass = "mt-1 w-full rounded-md border border-border bg-[var(--color-card)] px-3 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/25 transition-[border-color,box-shadow] duration-150";
+		} );
 
 	if ( registeredEmail )
 	{
 		return (
 			<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
-				<div className="panel p-8 text-center">
-					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)]/10">
+				<Card className="p-8 text-center">
+					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
 						<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-strong)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 							<rect x="2" y="4" width="20" height="16" rx="2" />
 							<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
 						</svg>
 					</div>
-					<h1 className="heading-1 mb-2">Check your email</h1>
-					<p className="body-text">
+					<Heading level="h1" className="mb-2">Check your email</Heading>
+					<BodyText>
 						We sent a verification link to{' '}
 						<span className="font-semibold text-text-primary">{ registeredEmail }</span>.
-					</p>
-					<p className="body-sm mt-3">
+					</BodyText>
+					<BodySm className="mt-3">
 						Click the link in the email to verify your address. If you don&apos;t see it, check
 						your spam folder or request a new one below.
-					</p>
+					</BodySm>
 
 					<div className="mt-6 space-y-3">
 						<Link
 							to="/login"
-							className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90"
+							className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90"
 						>
 							Continue to sign in
 						</Link>
 						<Link
 							to="/verify-email"
-							className="block text-[13px] font-medium text-[var(--color-accent-strong)] hover:underline"
+							className="block text-sm font-medium text-accent-strong hover:underline"
 						>
 							Resend verification email
 						</Link>
 					</div>
-				</div>
+				</Card>
 			</div>
 		);
 	}
@@ -85,12 +130,12 @@ function RegisterPage( )
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
-				<p className="eyebrow">Create your workspace</p>
-				<h1 className="heading-1">Register</h1>
-				<p className="body-text mt-2">Set up your account to start streaming ingest and live observability.</p>
+				<Eyebrow>Create your workspace</Eyebrow>
+				<Heading level="h1">Register</Heading>
+				<BodyText className="mt-2">Set up your account to start streaming ingest and live observability.</BodyText>
 			</div>
 
-			<div className="panel p-6">
+			<Card>
 				<form
 					onSubmit={ ( event ) =>
 					{
@@ -105,27 +150,24 @@ function RegisterPage( )
 						validators={{ onChange: registerSchema.shape.email, onBlur: registerSchema.shape.email }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Email
-								</label>
-								<input
-									id={ field.name }
-									type="email"
-									autoComplete="email"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Email</Label>
+									<Input
+										id={ field.name }
+										type="email"
+										autoComplete="email"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<BodySm className="text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</BodySm>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					<form.Field
@@ -133,27 +175,24 @@ function RegisterPage( )
 						validators={{ onChange: registerSchema.shape.display_name, onBlur: registerSchema.shape.display_name }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Display name
-								</label>
-								<input
-									id={ field.name }
-									type="text"
-									autoComplete="username"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Display name</Label>
+									<Input
+										id={ field.name }
+										type="text"
+										autoComplete="username"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<BodySm className="text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</BodySm>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					<form.Field
@@ -161,90 +200,84 @@ function RegisterPage( )
 						validators={{ onChange: registerSchema.shape.password, onBlur: registerSchema.shape.password }}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Password
-								</label>
-								<input
-									id={ field.name }
-									type="password"
-									autoComplete="new-password"
-									value={ field.state.value }
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Password</Label>
+									<Input
+										id={ field.name }
+										type="password"
+										autoComplete="new-password"
+										value={ field.state.value }
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<BodySm className="text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</BodySm>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					<form.Field
 						name="confirm_password"
 						validators={
-						{
-							onChange: ( { value, fieldApi } ) =>
 							{
-								if ( !value ) return 'Please confirm your password';
-								if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
-								return undefined;
-							}
-						}}
+								onChange: ( { value, fieldApi } ) =>
+								{
+									if ( !value ) return 'Please confirm your password';
+									if ( value !== fieldApi.form.getFieldValue( 'password' ) ) return "Passwords don't match";
+									return undefined;
+								}
+							}}
 					>
 						{ ( field ) =>
-						(
-							<div>
-								<label htmlFor={ field.name } className="block text-[13px] font-medium text-text-primary">
-									Confirm password
-								</label>
-								<input
-									id={ field.name }
-									type="password"
-									autoComplete="new-password"
-									value={ field.state.value}
-									onBlur={ field.handleBlur }
-									onChange={ ( e ) => field.handleChange( e.target.value ) }
-									className={ inputClass }
-								/>
-								{ field.state.meta.errors.length > 0 && (
-									<p className="mt-1 text-[12px] text-critical">
-										{ fieldError( field.state.meta.errors ) }
-									</p>
-								)}
-							</div>
-						)}
+							(
+								<div>
+									<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Confirm password</Label>
+									<Input
+										id={ field.name }
+										type="password"
+										autoComplete="new-password"
+										value={ field.state.value}
+										onBlur={ field.handleBlur }
+										onChange={ ( e ) => field.handleChange( e.target.value ) }
+									/>
+									{ field.state.meta.errors.length > 0 && (
+										<BodySm className="text-critical">
+											{ fieldError( field.state.meta.errors ) }
+										</BodySm>
+									)}
+								</div>
+							)}
 					</form.Field>
 
 					{ register.isError && (
-						<p className="text-[13px] text-critical">{ apiError( register.error ) ?? "Couldn't create that account. Try a different email." }</p>
+						<BodySm className="text-critical">{ apiError( register.error ) ?? "Couldn't create that account. Try a different email." }</BodySm>
 					)}
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
-						(
-							<button
-								type="submit"
-								disabled={ !canSubmit || isPristine || register.isPending }
-								className="inline-flex w-full items-center justify-center rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-[13px] font-semibold text-[var(--color-ink)] transition-opacity hover:opacity-90 disabled:opacity-50"
-							>
-								{ register.isPending ? 'Creating account…' : 'Create account' }
-							</button>
-						)}
+							(
+								<button
+									type="submit"
+									disabled={ !canSubmit || isPristine || register.isPending }
+									className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+								>
+									{ register.isPending ? 'Creating account…' : 'Create account' }
+								</button>
+							)}
 					</form.Subscribe>
 				</form>
 
-				<p className="mt-5 text-[13px] text-text-secondary">
+				<BodySm className="mt-5 text-text-secondary">
 					Already have an account?{' '}
-					<Link to="/login" className="font-semibold text-[var(--color-accent-strong)] hover:underline">
-						Sign in
+					<Link to="/login" className="font-semibold text-accent-strong hover:underline">
+						Login
 					</Link>
-				</p>
-			</div>
+				</BodySm>
+			</Card>
 		</div>
 	);
 }

@@ -4,11 +4,11 @@ import { describe, expect, it } from 'vitest';
 const BASE_URL = 'http://localhost:8000';
 
 const client = axios.create(
-{
-    baseURL: BASE_URL,
-	withCredentials: true,
-	validateStatus: ( ) => true
-});
+	{
+		baseURL: BASE_URL,
+		withCredentials: true,
+		validateStatus: ( ) => true
+	} );
 
 function uniqueTestEmail( )
 {
@@ -17,7 +17,7 @@ function uniqueTestEmail( )
 
 function uniqueTestDisplayName( )
 {
-    return `integration-test-${ Date.now() }-${ Math.random( ).toString( 36 ).slice( 2 ) }`;
+	return `integration-test-${ Date.now() }-${ Math.random( ).toString( 36 ).slice( 2 ) }`;
 }
 
 async function getLatestTestToken(
@@ -26,16 +26,16 @@ async function getLatestTestToken(
 ): Promise<string>
 {
 	const response = await client.get( '/test-only/last-token',
-	{
-		params: { email: email, token_type: tokenType },
-		headers: { 'X-Test-Endpoint-Key': process.env.TEST_ENDPOINT_KEY ?? '' },
-	});
+		{
+			params: { email: email, token_type: tokenType },
+			headers: { 'X-Test-Endpoint-Key': process.env.TEST_ENDPOINT_KEY ?? '' }
+		} );
 
 	if ( response.status !== 200 )
 	{
 		throw new Error(
 			`Could not fetch test token (status ${ response.status }) - is ENABLE_TEST_ENDPOINTS ` +
-			`and TEST_ENDPOINT_KEY set for the backend this suite is running against?`
+			'and TEST_ENDPOINT_KEY set for the backend this suite is running against?'
 		);
 	}
 
@@ -48,40 +48,40 @@ const TEST_PASSWORD = 'Correct-Horse-Battery-Staple-9!';
 
 describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend auth flow', ( ) =>
 {
-	it( 'health check responds ok', async ( ) =>
+	it( 'health check responds ok', async( ) =>
 	{
 		const response = await client.get( '/health' );
 
 		expect( response.status ).toBe( 200 );
 		expect( response.data ).toMatchObject( { database: 'ok' } );
-	});
+	} );
 
-	it( 'registers a new user and returns the expected shape', async ( ) =>
+	it( 'registers a new user and returns the expected shape', async( ) =>
 	{
-		const email       = uniqueTestEmail( );
-        const displayName = uniqueTestDisplayName( );
+		const email = uniqueTestEmail( );
+		const displayName = uniqueTestDisplayName( );
 
 		const response = await client.post( '/auth/register',
-        {
-			email,
-            display_name:     displayName,
-			password:         TEST_PASSWORD,
-            confirm_password: TEST_PASSWORD
-		});
+			{
+				email,
+				display_name: displayName,
+				password: TEST_PASSWORD,
+				confirm_password: TEST_PASSWORD
+			} );
 
 		expect( response.status ).toBe( 201 );
 		expect( response.data ).toMatchObject(
-        {
-			user: { email }
-		});
-		
-		expect( JSON.stringify( response.data ) ).not.toContain( TEST_PASSWORD );
-	});
+			{
+				user: { email }
+			} );
 
-	it( 'logs in with the registered and verified user and receives a real access token', async ( ) =>
+		expect( JSON.stringify( response.data ) ).not.toContain( TEST_PASSWORD );
+	} );
+
+	it( 'logs in with the registered and verified user and receives a real access token', async( ) =>
 	{
-		const email       = uniqueTestEmail( );
-        const displayName = uniqueTestDisplayName( );
+		const email = uniqueTestEmail( );
+		const displayName = uniqueTestDisplayName( );
 		await client.post( '/auth/register', { email, display_name: displayName, password: TEST_PASSWORD, confirm_password: TEST_PASSWORD } );
 
 		const token = await getLatestTestToken( email, 'verification' );
@@ -95,19 +95,19 @@ describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend auth 
 		expect( response.data.access_token ).toBeTypeOf( 'string' );
 		expect( response.data.user ).toMatchObject( { email } );
 
-		
+
 		const setCookie = response.headers[ 'set-cookie' ] ?? [ ];
 		const refreshCookie = setCookie.find( ( c: string ) => c.includes( 'refresh_token' ) );
 
 		expect( refreshCookie ).toBeDefined( );
 		expect( refreshCookie?.toLowerCase() ).toContain( 'httponly' );
 		expect( refreshCookie?.toLowerCase() ).toContain( 'path=/auth' );
-	});
+	} );
 
-	it( 'resends a valid verification link and expires the old one', async ( ) =>
+	it( 'resends a valid verification link and expires the old one', async( ) =>
 	{
-		const email       = uniqueTestEmail( );
-        const displayName = uniqueTestDisplayName( );
+		const email = uniqueTestEmail( );
+		const displayName = uniqueTestDisplayName( );
 		await client.post( '/auth/register', { email, display_name: displayName, password: TEST_PASSWORD, confirm_password: TEST_PASSWORD } );
 		const oldToken = await getLatestTestToken( email, 'verification' );
 
@@ -120,43 +120,43 @@ describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend auth 
 
 		const newResult = await client.get( '/auth/verify-email', { params: { token: newToken } } );
 		expect( newResult.status ).toBe( 200 );
-	});
+	} );
 
-	it( 'rejects login for a nonexistent email with the same response as a wrong password', async ( ) =>
+	it( 'rejects login for a nonexistent email with the same response as a wrong password', async( ) =>
 	{
-		const email       = uniqueTestEmail( );
-        const displayName = uniqueTestDisplayName( );
+		const email = uniqueTestEmail( );
+		const displayName = uniqueTestDisplayName( );
 		await client.post( '/auth/register', { email, display_name: displayName, password: TEST_PASSWORD, confirm_password: TEST_PASSWORD } );
 
 		const wrongPassword = await client.post( '/auth/login',
-        {
-			email,
-			password: 'definitely-wrong',
-		});
+			{
+				email,
+				password: 'definitely-wrong'
+			} );
 		const nonexistentEmail = await client.post( '/auth/login',
-        {
-			email: uniqueTestEmail( ),
-			password: TEST_PASSWORD,
-		});
+			{
+				email: uniqueTestEmail( ),
+				password: TEST_PASSWORD
+			} );
 
 		expect( wrongPassword.status ).toBe( nonexistentEmail.status );
 		expect( wrongPassword.data ).toEqual( nonexistentEmail.data );
-	});
+	} );
 
-	it( 'rejects a request to /users/me without a token', async ( ) =>
+	it( 'rejects a request to /users/me without a token', async( ) =>
 	{
 		const response = await client.get( '/users/me' );
 
 		expect( response.status ).toBe( 401 );
-	});
-});
+	} );
+} );
 
 describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend full password reset loop', ( ) =>
 {
-	it( 'completes forgot-password -> reset -> login with the new password', async ( ) =>
+	it( 'completes forgot-password -> reset -> login with the new password', async( ) =>
 	{
-		const email       = uniqueTestEmail( );
-        const displayName = uniqueTestDisplayName( );
+		const email = uniqueTestEmail( );
+		const displayName = uniqueTestDisplayName( );
 		await client.post( '/auth/register', { email, display_name: displayName, password: TEST_PASSWORD, confirm_password: TEST_PASSWORD } );
 		const verifyToken = await getLatestTestToken( email, 'verification' );
 		await client.get( '/auth/verify-email', { params: { token: verifyToken } } );
@@ -173,5 +173,5 @@ describe.runIf( process.env.RUN_INTEGRATION_TESTS === '1' )( 'real backend full 
 
 		const newPasswordLogin = await client.post( '/auth/login', { email, password: newPassword } );
 		expect( newPasswordLogin.status ).toBe( 200 );
-	});
-});
+	} );
+} );

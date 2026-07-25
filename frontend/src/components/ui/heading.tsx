@@ -5,8 +5,8 @@ type HeadingLevel = 'h1' | 'h2' | 'h3';
 
 export interface HeadingProps extends HTMLAttributes< HTMLHeadingElement >
 {
-    level?:   HeadingLevel;
-    children: ReactNode;
+	level?:   HeadingLevel;
+	children: ReactNode;
 }
 
 /**
@@ -18,82 +18,118 @@ export interface HeadingProps extends HTMLAttributes< HTMLHeadingElement >
  */
 export function Heading(
 {
-    level = 'h1',
-    className,
-    children,
-    ...props
+	level = 'h1',
+	className,
+	children,
+	...props
 }: HeadingProps )
 {
-    const Tag = level;
+	const Tag = level;
 
-    const levelClass: Record< HeadingLevel, string > =
-    {
-        h1: 'heading-1',
-        h2: 'heading-2',
-        h3: 'heading-3'
-    };
+	const levelClass: Record< HeadingLevel, string > =
+		{
+			h1: 'heading-1',
+			h2: 'heading-2',
+			h3: 'heading-3'
+		};
 
-    return (
-        <Tag className={ cn( levelClass[ level ], className ) } { ...props }>
-            { children }
-        </Tag>
-    );
+	return (
+		<Tag className={ cn( levelClass[ level ], className ) } { ...props }>
+			{ children }
+		</Tag>
+	);
 }
 
 /* Utility typography components */
 
 export function Eyebrow(
 {
-    className,
-    children,
-    ...props
+	className,
+	children,
+	...props
 }: HTMLAttributes< HTMLParagraphElement > )
 {
-    return (
-        <p className={ cn('eyebrow', className ) } { ...props }>
-            { children }
-        </p>
-    );
+	return (
+		<p className={ cn( 'eyebrow', className ) } { ...props }>
+			{ children }
+		</p>
+	);
 }
 
 export function SectionTitle(
 {
-    className,
-    children,
-    ...props
+	className,
+	children,
+	...props
 }: HTMLAttributes< HTMLParagraphElement > )
 {
-    return (
-        <p className={ cn( 'section-title', className ) } { ...props }>
-            { children }
-        </p>
-    );
+	return (
+		<p className={ cn( 'section-title', className ) } { ...props }>
+			{ children }
+		</p>
+	);
 }
 
 export function BodyText(
 {
-    className,
-    children,
-    ...props
+	className,
+	children,
+	...props
 }: HTMLAttributes< HTMLParagraphElement > )
 {
-    return (
-        <p className={ cn( 'body-text', className ) } { ...props }>
-            { children }
-        </p>
-    );
+	return (
+		<p className={ cn( 'body-text', className ) } { ...props }>
+			{ children }
+		</p>
+	);
 }
 
 export function CodeInline(
 {
-    className,
-    children,
-    ...props
+	className,
+	children,
+	...props
 }: HTMLAttributes< HTMLElement > )
 {
-    return (
-        <code className={ cn( 'code-inline', className ) } { ...props }>
-            { children }
-        </code>
-    );
+	return (
+		<code className={ cn( 'code-inline', className ) } { ...props }>
+			{ children }
+		</code>
+	);
+}
+
+/* Utility layout components */
+
+export function BodySm(
+{
+	className,
+	children,
+	...props
+}: HTMLAttributes< HTMLParagraphElement > )
+{
+	return (
+		<p className={ cn( 'body-sm', className ) } { ...props }>
+			{ children }
+		</p>
+	);
+}
+
+export function StatNumber(
+{
+	className,
+	children,
+	...props
+}: HTMLAttributes< HTMLSpanElement > )
+{
+	return (
+		<span className={ cn( 'stat-number', className ) } { ...props }>
+			{ children }
+		</span>
+	);
+}
+
+export interface PanelProps extends HTMLAttributes< HTMLDivElement >
+{
+	strong?: boolean;
+	children: ReactNode;
 }

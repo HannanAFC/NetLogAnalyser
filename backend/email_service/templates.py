@@ -240,7 +240,7 @@ def welcome_email( *, display_name: str ) -> tuple[str, str, str]:
             + _body(
                 text=(
                     "To start ingesting network logs, create an API key from "
-                    f"your dashboard and use visit the { _link( text="API documentation", href=settings.backend_url ) }."
+                    f"your dashboard and visit the { _link( text="API documentation", href=settings.backend_url ) }."
                 )
             )
             + _button(label="Go to dashboard", href=f"{settings.frontend_url}/dashboard")

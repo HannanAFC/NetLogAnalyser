@@ -3,13 +3,13 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 
 import { tokenStore } from '#/lib/auth/token-store';
 
-import { resetRefreshCallCount, setRefreshShouldFail } from './mocks/handlers';
+import { resetApiKeysCallCounts, resetRefreshCallCount, setRefreshShouldFail } from './mocks/handlers';
 import { server } from './mocks/server';
 
 beforeAll( ( ) =>
 {
 	server.listen( { onUnhandledRequest: 'error' } );
-});
+} );
 
 afterEach( () =>
 {
@@ -17,9 +17,10 @@ afterEach( () =>
 	tokenStore.set( null );
 	resetRefreshCallCount( );
 	setRefreshShouldFail( false );
-});
+	resetApiKeysCallCounts( );
+} );
 
 afterAll( ( ) =>
 {
 	server.close( );
-});
+} );
