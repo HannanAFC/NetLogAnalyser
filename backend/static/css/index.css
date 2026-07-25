@@ -93,7 +93,7 @@ body {
 
 /* ── Layout ─────────────────────────────────────────────────────────── */
 .page {
-    max-width: 860px;
+    max-width: 72rem;
     margin: 0 auto;
     padding: 0 24px 80px;
 }

@@ -1,29 +1,29 @@
-import { createFileRoute, redirect, isRedirect, Outlet, useNavigate } from '@tanstack/react-router';
+import { useSession } from '#/features/auth/hooks';
+import { sessionQueryOptions } from '#/features/auth/queries';
+import { createFileRoute, isRedirect, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { sessionQueryOptions } from '../../features/auth/queries';
-import { useSession } from '../../features/auth/hooks';
 
 export const Route = createFileRoute( '/_authenticated' )(
-{
-  	beforeLoad: async ( { context, location } ) =>
+	{
+		beforeLoad: async( { context, location } ) =>
 		{
-		try
-		{
-			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-			if ( !session )
+			try
 			{
+				const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+				if ( !session )
+				{
+					throw redirect( { to: '/login', search: { redirect: location.href } } );
+				}
+			}
+			catch( error )
+			{
+				if ( isRedirect( error ) ) throw error;
+				// Network error, etc. - fail closed.
 				throw redirect( { to: '/login', search: { redirect: location.href } } );
 			}
-		}
-		catch ( error )
-		{
-			if ( isRedirect( error ) ) throw error;
-			// Network error, etc. - fail closed.
-			throw redirect( { to: '/login', search: { redirect: location.href } } );
-		}
-	},
-	component: AuthenticatedLayout
-});
+		},
+		component: AuthenticatedLayout
+	} );
 
 function AuthenticatedLayout( )
 {

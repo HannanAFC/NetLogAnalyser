@@ -1,0 +1,1 @@
+export const apiKeysQueryKey = [ 'api-keys' ] as const;

@@ -5,13 +5,13 @@ import type { ReactElement } from 'react';
 export function createTestQueryClient()
 {
 	return new QueryClient(
-	{
-		defaultOptions:
+		{
+			defaultOptions:
 		{
 			queries: { retry: false, staleTime: 0 },
 			mutations: { retry: false }
 		}
-	});
+		} );
 }
 
 export function renderWithProviders( ui: ReactElement, queryClient = createTestQueryClient( ) )
@@ -21,7 +21,7 @@ export function renderWithProviders( ui: ReactElement, queryClient = createTestQ
 		...render(
 			<QueryClientProvider client={ queryClient }>
 				{ ui }
-			</QueryClientProvider>,
+			</QueryClientProvider>
 		)
 	};
 }
