@@ -1,5 +1,6 @@
 import { Card } from '#/components/ui/card';
 import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { Input, Label } from '#/components/ui/input';
 import { useRegister } from '#/features/auth/hooks';
 import { sessionQueryOptions } from '#/features/auth/queries';
 import { registerSchema } from '#/features/auth/schemas';
@@ -8,17 +9,60 @@ import { fieldError } from '#/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
-import { Input, Label } from '../components/ui/input';
 
 export const Route = createFileRoute( '/register' )(
+{
+	beforeLoad: async( { context } ) =>
 	{
-		beforeLoad: async( { context } ) =>
-		{
-			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-			if ( session ) throw redirect( { to: '/dashboard' } );
-		},
-		component: RegisterPage
-	} );
+		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		if ( session ) throw redirect( { to: '/dashboard' } );
+	},
+	component: RegisterPage,
+	head: ( ) =>(
+	{
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/register'
+			}
+		],
+		meta:
+		[
+			{
+				title: "Register | NetLogAnalyser"
+			},
+			{
+				name: 'description',
+				content: 'Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes.'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Register'
+			},
+			{
+				name: 'og:description',
+				content: 'Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes.'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Register'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/register'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/register'
+			}
+		]
+	} )
+} );
 
 function RegisterPage( )
 {
@@ -230,7 +274,7 @@ function RegisterPage( )
 				<BodySm className="mt-5 text-text-secondary">
 					Already have an account?{' '}
 					<Link to="/login" className="font-semibold text-accent-strong hover:underline">
-						Sign in
+						Login
 					</Link>
 				</BodySm>
 			</Card>

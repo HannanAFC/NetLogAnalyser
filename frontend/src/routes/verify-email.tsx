@@ -17,15 +17,59 @@ const verifySearchSchema = z.object(
 	} );
 
 export const Route = createFileRoute( '/verify-email' )(
+{
+	validateSearch: verifySearchSchema,
+	beforeLoad: async( { context } ) =>
 	{
-		validateSearch: verifySearchSchema,
-		beforeLoad: async( { context } ) =>
-		{
-			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-			if ( session ) throw redirect( { to: '/dashboard' } );
-		},
-		component: VerifyEmailPage
-	} );
+		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		if ( session ) throw redirect( { to: '/dashboard' } );
+	},
+	component: VerifyEmailPage,
+	head: ( ) =>(
+	{
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/verify-email'
+			}
+		],
+		meta:
+		[
+			{
+				title: "Verify Email | NetLogAnalyser"
+			},
+			{
+				name: 'description',
+				content: 'Verify you NetLogAnalyser account to start monitoring your network traffic.'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Verify Email'
+			},
+			{
+				name: 'og:description',
+				content: 'Verify you NetLogAnalyser account to start monitoring your network traffic.'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Verify Email'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Verify you NetLogAnalyser account to start monitoring your network traffic.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/verify-email'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/verify-email'
+			}
+		]
+	} )
+} );
 
 function VerifyEmailPage( )
 {
@@ -225,7 +269,7 @@ function VerifyEmailPage( )
 				<BodySm className="mt-5 text-text-secondary">
 					Already verified?{' '}
 					<Link to="/login" className="font-semibold text-accent-strong hover:underline">
-						Sign in
+						Login
 					</Link>
 				</BodySm>
 			</Card>

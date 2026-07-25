@@ -17,15 +17,59 @@ const resetSearchSchema = z.object(
 	} );
 
 export const Route = createFileRoute( '/reset-password' )(
+{
+	validateSearch: resetSearchSchema,
+	beforeLoad: async( { context } ) =>
 	{
-		validateSearch: resetSearchSchema,
-		beforeLoad: async( { context } ) =>
-		{
-			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-			if ( session ) throw redirect( { to: '/dashboard' } );
-		},
-		component: ResetPasswordPage
-	} );
+		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		if ( session ) throw redirect( { to: '/dashboard' } );
+	},
+	component: ResetPasswordPage,
+	head: ( ) =>(
+	{
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/reset-password'
+			}
+		],
+		meta:
+		[
+			{
+				title: "Reset Password | NetLogAnalyser"
+			},
+			{
+				name: 'description',
+				content: 'Reset you NetLogAnalyser account password to start monitoring you network traffic again.'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Reset Password'
+			},
+			{
+				name: 'og:description',
+				content: 'Reset you NetLogAnalyser account password to start monitoring you network traffic again.'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Reset Password'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Reset you NetLogAnalyser account password to start monitoring you network traffic again.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/reset-password'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/reset-password'
+			}
+		]
+	} )
+} );
 
 function ResetPasswordPage( )
 {
@@ -90,7 +134,7 @@ function ResetPasswordPage( )
 						to="/login"
 						className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90"
 					>
-						Sign in with new password
+						Login with new password
 					</Link>
 				</Card>
 			</div>

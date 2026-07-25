@@ -1,7 +1,7 @@
 import { ThemeToggle } from '#/components/ui/theme-toggle';
 import { useSession } from '#/features/auth/hooks';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
+import { createRootRoute, HeadContent, Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 
 import { NotFound } from '#/components/not-found';
@@ -13,10 +13,68 @@ import { Menu } from 'lucide-react';
 import '../styles.css';
 
 export const Route = createRootRoute(
+{
+	component: ( ) =>
+	(
+		<>
+			<HeadContent />
+			<RootComponent />
+		</>
+	),
+	notFoundComponent: NotFound,
+	head: ( ) => (
 	{
-		component: RootComponent,
-		notFoundComponent: NotFound
-	} );
+		links:
+		[
+			{
+				rel: 'icon',
+				href: '/favicon.ico'
+			}
+		],
+		meta:
+		[
+			{
+				title: 'NetLogAnalyser'
+			},
+			{
+				name: 'description',
+				content: 'Monitor, visualise, and analyse your network traffic in real time. Detect anomalies, track source geography, and investigate threats through a live dashboard.'
+			},
+			{
+				name: 'keywords',
+				content: 'network monitoring, log analysis, real-time traffic, anomaly detection, network security, packet analysis, threat detection'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Real-Time Network Log Analysis'
+			},
+			{
+				name: 'og:site_name',
+				content: 'NetLogAnalyser'
+			},
+			{
+				name: 'og:description',
+				content: 'Monitor, visualise, and analyse your network traffic in real time. Detect anomalies, track source geography, and investigate threats through a live dashboard.'
+			},
+			{
+				name: 'og:type',
+				content: 'website'
+			},
+			{
+				name: 'twitter:card',
+				content: 'summary'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Real-Time Network Log Analysis'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Monitor, visualise, and analyse your network traffic in real time. Detect anomalies, track source geography, and investigate threats through a live dashboard.'
+			}
+		]
+	} )
+} );
 
 function AuthenticatedHeader( )
 {
@@ -50,7 +108,7 @@ function RootComponent( )
 
 function RootInner( { session }: { session: unknown } )
 {
-	const { open, close } = useSidebar();
+	const { open, close } = useSidebar( );
 
 	return (
 		<>
@@ -74,7 +132,7 @@ function RootInner( { session }: { session: unknown } )
 									to="/login"
 									className="text-sm font-medium text-text-secondary no-underline transition-colors hover:text-text-primary"
 								>
-									Sign in
+									Login
 								</Link>
 								<Link
 									to="/register"

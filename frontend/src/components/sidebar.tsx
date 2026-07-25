@@ -134,7 +134,7 @@ export function Sidebar( { open, onClose }: SidebarProps )
 				) }
 			>
 				<div className="flex items-center justify-between px-3 py-3">
-					<span className="text-sm font-semibold text-text-primary">Navigation</span>
+					<span className="text-md font-semibold text-text-primary">Navigation</span>
 					<Button
 						type="button"
 						onClick={ onClose }

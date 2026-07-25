@@ -15,16 +15,60 @@ const loginSearchSchema = z.object(
 	} );
 
 export const Route = createFileRoute( '/login' )(
+{
+	validateSearch: loginSearchSchema,
+	beforeLoad: async( { context } ) =>
 	{
-		validateSearch: loginSearchSchema,
-		beforeLoad: async( { context } ) =>
-		{
-			// Don't show form to logged in user
-			const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-			if ( session ) throw redirect( { to: '/dashboard' } );
-		},
-		component: LoginPage
-	} );
+		// Don't show form to logged in user
+		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		if ( session ) throw redirect( { to: '/dashboard' } );
+	},
+	component: LoginPage,
+	head: ( ) =>(
+	{
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/login'
+			}
+		],
+		meta:
+		[
+			{
+				title: 'Login | NetLogAnalyser'
+			},
+			{
+				name: 'description',
+				content: 'Sign in to your NetLogAnalyser account to access your real-time network monitoring dashboard.'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Login'
+			},
+			{
+				name: 'og:description',
+				content: 'Sign in to your NetLogAnalyser account to access your real-time network monitoring dashboard.'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Login'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Sign in to your NetLogAnalyser account to access your real-time network monitoring dashboard.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/register'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/register'
+			}
+		]
+	} )
+} );
 
 function LoginPage()
 {
@@ -46,7 +90,7 @@ function LoginPage()
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
 				<Eyebrow>Secure access</Eyebrow>
-				<Heading level="h1" className="">Sign in</Heading>
+				<Heading level="h1" className="">Login</Heading>
 				<BodyText className="mt-2">Enter your credentials to access the live operations view.</BodyText>
 			</div>
 
@@ -143,7 +187,7 @@ function LoginPage()
 								disabled={ !canSubmit || isPristine || login.isPending }
 								className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
 							>
-								{ login.isPending ? 'Signing in…' : 'Sign in' }
+								{ login.isPending ? 'Logging in…' : 'Login' }
 							</button>
 						)}
 					</form.Subscribe>

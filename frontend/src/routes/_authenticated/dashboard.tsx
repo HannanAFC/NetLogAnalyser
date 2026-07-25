@@ -5,9 +5,53 @@ import { useLogout, useSession } from '#/features/auth/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute( '/_authenticated/dashboard' )(
+{
+	component: DashboardPage,
+	head: ( ) =>(
 	{
-		component: DashboardPage
-	} );
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/dashboard'
+			}
+		],
+		meta:
+		[
+			{
+				title: "Dashboard | NetLogAnalyser"
+			},
+			{
+				name: 'description',
+				content: 'Live overview of your network traffic - packets per second, protocol breakdown, top talkers, and real-time anomaly alerts.'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Dashboard'
+			},
+			{
+				name: 'og:description',
+				content: 'Live overview of your network traffic - packets per second, protocol breakdown, top talkers, and real-time anomaly alerts.'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Dashboard'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Live overview of your network traffic - packets per second, protocol breakdown, top talkers, and real-time anomaly alerts.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/dashboard'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/dashboard'
+			}
+		]
+	} )
+} );
 
 function DashboardPage( )
 {
@@ -33,9 +77,9 @@ function DashboardPage( )
 				<Card>
 					<SectionTitle>Session</SectionTitle>
 					<Heading level="h3" className="mt-2">Controls</Heading>
-					<BodySm className="mt-2 mb-4">Signed in as { session?.email }.</BodySm>
+					<BodySm className="mt-2 mb-4">Logged in as { session?.email }.</BodySm>
 					<Button variant="secondary" onClick={ ( ) => logout.mutate( ) } disabled={ logout.isPending }>
-						{ logout.isPending ? 'Signing out…' : 'Sign out' }
+						{ logout.isPending ? 'Logging out…' : 'Logout' }
 					</Button>
 				</Card>
 			</section>

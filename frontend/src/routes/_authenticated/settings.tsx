@@ -10,9 +10,58 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Ban, Check, Copy, Plus } from 'lucide-react';
 import { useState } from 'react';
 
+export const Route = createFileRoute( '/_authenticated/settings' )(
+{
+	component: SettingsPage,
+	head: ( ) =>(
+	{
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/settings'
+			}
+		],
+		meta:
+		[
+			{
+				title: "Settings | NetLogAnalyser"
+			},
+			{
+				name: 'description',
+				content: 'Manage your NetLogAnalyser account - create, view and revoke API keys and edit account settings.'
+			},
+			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Settings'
+			},
+			{
+				name: 'og:description',
+				content: 'Manage your NetLogAnalyser account - create, view and revoke API keys and edit account settings.'
+			},
+			{
+				name: 'twitter:title',
+				content: 'NetLogAnalyser - Settings'
+			},
+			{
+				name: 'twitter:description',
+				content: 'Manage your NetLogAnalyser account - create, view and revoke API keys and edit account settings.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/settings'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/settings'
+			}
+		]
+	} )
+} );
+
 function formatDate( iso: string | null ): string
 {
-	if ( !iso ) return '—';
+	if ( !iso ) return '-';
 	return new Intl.DateTimeFormat( 'en-US',
 	{
 		month: 'short',
@@ -101,7 +150,7 @@ function CreatedKeyRow( { newKey, setNewKey }: CreateKeyProps )
 		<div className="rounded-md border border-success bg-success/10 px-4 py-3">
 			<Heading level="h3" className="text-success uppercase ">API key created</Heading>
 			<BodySm>
-				Copy this key now — it won't be shown again.
+				Copy this key now - it won't be shown again.
 			</BodySm>
 			<div className="mt-2 flex items-center gap-2">
 				<code className="flex-1 rounded-md border border-border bg-card px-3 py-2 font-mono text-xs text-text-primary break-all">
@@ -286,8 +335,3 @@ function SettingsPage( )
 		</div>
 	);
 }
-
-export const Route = createFileRoute( '/_authenticated/settings' )(
-{
-	component: SettingsPage
-} );
