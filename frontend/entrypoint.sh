@@ -4,7 +4,7 @@ set -e
 if [ "$BUILD_MODE" = "production" ]; then
   echo "Running production environment..."
   pnpm run build
-  pnpm run start
+  pnpm run preview
 else
   echo "Running development environment..."
   # Check if node_modules exists and was created with a different lockfile

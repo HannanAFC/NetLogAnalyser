@@ -193,6 +193,7 @@ sketch
 /build/
 .pnpm-store
 **.gen.ts
+.tanstack
 
 !frontend/**/lib
 # End of https://www.toptal.com/developers/gitignore/api/python,react
