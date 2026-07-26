@@ -9,7 +9,7 @@
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 3000",
     "test": "vitest run --project unit",
     "test:integration": "RUN_INTEGRATION_TESTS=1 vitest run --project integration",
     "test:all": "vitest run",
