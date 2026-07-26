@@ -1,17 +1,5 @@
 services:
 
-  devcontainer:
-    build: ./.devcontainer
-    container_name: NetLogAnalyser-DevContainer
-    env_file:
-      - .env
-    volumes:
-      - ./:/workspaces
-      - frontend_node_modules:/workspaces/frontend/node_modules
-    networks:
-      - NetLogAnalyser-Network
-    command: sleep infinity  # keeps it alive without doing anything
-
   frontend:
     build: ./frontend
     container_name: NetLogAnalyser-Frontend
