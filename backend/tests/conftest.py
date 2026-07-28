@@ -2,19 +2,27 @@ import os
 from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock
 
-os.environ.setdefault(
-    "DATABASE_URL",
-    "postgresql+psycopg://NetlogAnalyserUserTest:TestPass@test-db/NetLogAnalyserDBTest",
+os.environ["DATABASE_URL"] = (
+    "postgresql+psycopg://NetlogAnalyserUserTest:TestPass@test-db/NetLogAnalyserDBTest"
 )
 
+os.environ["REDIS_URL"] = "redis://redis/15"
+
 import pytest
+from cache import get_redis
 from database import Base, get_db
 from fastapi import Request, Response
 from fastapi_limiter.depends import RateLimiter
 from httpx import ASGITransport, AsyncClient
 from main import app
 from pyrate_limiter import Duration, Limiter, Rate
-from rate_limiter import get_auth_rate_limiter, get_forgot_password_rate_limiter
+from rate_limiter import (
+    get_auth_rate_limiter,
+    get_forgot_password_rate_limiter,
+    get_general_rate_limiter,
+    get_ingest_rate_limiter,
+)
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -72,26 +80,43 @@ async def db_session(
             await conn.close( )
 
 @pytest.fixture
+async def redis_client( ) -> AsyncGenerator[ Redis ]:
+    client = Redis.from_url( os.environ[ "REDIS_URL" ], decode_responses=True )
+    await client.flushdb( )
+    try:
+        yield client
+    finally:
+        await client.flushdb( )
+        await client.aclose( )
+
+@pytest.fixture
 async def client(
-    db_session: AsyncSession
+    db_session: AsyncSession,
+    redis_client: Redis
 ) -> AsyncGenerator[ AsyncClient ]:
 
     async def override_get_db( ):
         yield db_session
 
-    app.dependency_overrides[ get_db ] = override_get_db
+    async def override_get_redis( ):
+        yield redis_client
+
+    app.dependency_overrides[ get_db ]    = override_get_db
+    app.dependency_overrides[ get_redis ] = override_get_redis
 
     # Override rate limiter with a permissive in-memory instance so tests
     # never hit real rate limits and don't require a running Redis.
     _test_rate_limiter = RateLimiter(
-        Limiter(Rate(limit=10_000, interval=60 * Duration.SECOND))
+        Limiter(Rate(limit=10000, interval=60 * Duration.SECOND))
     )
 
     async def _permissive_rate_limit( request: Request, response: Response ) -> None:
         await _test_rate_limiter( request, response )
 
-    app.dependency_overrides[ get_auth_rate_limiter ] = _permissive_rate_limit
+    app.dependency_overrides[ get_auth_rate_limiter ]            = _permissive_rate_limit
     app.dependency_overrides[ get_forgot_password_rate_limiter ] = _permissive_rate_limit
+    app.dependency_overrides[ get_general_rate_limiter ]         = _permissive_rate_limit
+    app.dependency_overrides[ get_ingest_rate_limiter ]          = _permissive_rate_limit
 
     async with AsyncClient(
         transport=ASGITransport( app=app ),

@@ -108,7 +108,7 @@ async def _verify_user_email(
 
 async def _register_and_return_cookie(
     client: AsyncClient, db_session: AsyncSession
-) -> tuple[ str, Response ]:
+) -> tuple[ str | None, Response ]:
     """Helper to register, verify, login and return refresh token"""
     response = await _register_and_login( client, db_session )
 

@@ -20,6 +20,7 @@ from rate_limiter import (
     _cloudflare_identifier,
     get_auth_rate_limiter,
     get_forgot_password_rate_limiter,
+    get_ingest_rate_limiter,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from tests.test_auth import _register_and_login, _register_user, _verify_user_email
@@ -199,6 +200,37 @@ class TestStricterForgotPasswordLimit:
 
 class TestBucketIsolation:
     """Hitting the forgot-password limit should NOT block other auth routes."""
+
+    async def test_ingest_limit_can_be_overridden( self, client: AsyncClient ):
+        """The ingest route should respect a dependency override for its rate limiter."""
+        strict = _build_strict_limiter( 1, 60 )
+
+        async def _strict_ingest( request: Request, response: Response ) -> None:
+            await strict( request, response )
+
+        app.dependency_overrides[ get_ingest_rate_limiter ] = _strict_ingest
+
+        payload = {
+            "entries": [
+                {
+                    "src_ip": "192.168.1.10",
+                    "dst_ip": "10.0.0.5",
+                    "src_port": 443,
+                    "dst_port": 51820,
+                    "protocol": "TCP",
+                    "packet_size_bytes": 1500,
+                    "flags": "SYN",
+                    "raw_payload": { "note": "test" },
+                    "captured_at": "2026-07-28T00:00:00Z",
+                }
+            ]
+        }
+
+        first = await client.post( "/ingest", json=payload, headers={ "X-API-Key": "not-a-real-key" } )
+        second = await client.post( "/ingest", json=payload, headers={ "X-API-Key": "not-a-real-key" } )
+
+        assert first.status_code in { 401, 422 }
+        assert second.status_code == 429
 
     async def test_forgot_password_limit_does_not_block_login( self, client: AsyncClient, db_session: AsyncSession ):
         """Exhaust forgot-password quota; login should still work."""
