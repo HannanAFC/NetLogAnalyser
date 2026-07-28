@@ -14,8 +14,8 @@ from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from ingest import router as ingest_router
 from rate_limiter import (
-    close_redis,
     create_rate_limiter,
 )
 from schemas import HealthResponse
@@ -74,9 +74,10 @@ app.add_middleware( SecurityHeadersMiddleware )
 
 app.mount( "/static", StaticFiles( directory="static" ), name="static" )
 
-app.include_router( auth_router.router, prefix="/auth", tags=[ "auth" ] )
-app.include_router( users_router.router, prefix="/users", tags=[ "users" ] )
-app.include_router( api_keys_router.router, prefix="/api-keys", tags=[ "api-keys" ] )
+app.include_router( auth_router.router, prefix="/auth", tags=[ "Auth" ] )
+app.include_router( users_router.router, prefix="/users", tags=[ "Users" ] )
+app.include_router( api_keys_router.router, prefix="/api-keys", tags=[ "API keys" ] )
+app.include_router( ingest_router.router, prefix="/ingest", tags=[ "Ingest" ] )
 if settings.enable_test_endpoints:
     from testing.router import router as test_only_router
     app.include_router( test_only_router )

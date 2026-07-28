@@ -5,15 +5,7 @@ from datetime import datetime, timezone
 
 from config import settings
 from database import Base
-from sqlalchemy import (
-    BigInteger,
-    DateTime,
-    ForeignKey,
-    Index,
-    SmallInteger,
-    String,
-    func,
-)
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, String, func
 from sqlalchemy.dialects.postgresql import ENUM, INET, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -114,8 +106,8 @@ class LogEntry( Base ):
 
     src_ip:            Mapped[ str ]        = mapped_column( INET, index=True )       
     dst_ip:            Mapped[ str ]        = mapped_column( INET, index=True )
-    src_port:          Mapped[ int ]        = mapped_column( SmallInteger )
-    dst_port:          Mapped[ int ]        = mapped_column( SmallInteger )
+    src_port:          Mapped[ int ]        = mapped_column( Integer )
+    dst_port:          Mapped[ int ]        = mapped_column( Integer )
     protocol:          Mapped[ str ]        = mapped_column( ENUM( "TCP", "UDP", "ICMP", "OTHER", name="protocol_enum" ), index=True )
     packet_size_bytes: Mapped[ int ]        = mapped_column( )
     flags:             Mapped[ str | None ] = mapped_column( String( 20 ), nullable=True )

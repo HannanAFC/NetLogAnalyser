@@ -1,11 +1,12 @@
 import uuid
 from datetime import datetime, timezone
 
-from api_keys.schemas import ApiKeyCreateRequest
+from api_keys.schemas import APIKeyCacheEntry, ApiKeyCreateRequest
 from auth.security import generate_api_key, hash_token
 from config import settings
 from fastapi import HTTPException, status
 from models.models import APIKey, User
+from redis.asyncio import Redis
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -70,7 +71,7 @@ async def list_api_keys( db: AsyncSession, user: User ) -> list[ APIKey ]:
 
     return list( api_keys_result.scalars( ).all( ) )
 
-async def revoke_api_key( db: AsyncSession, user: User, key_id: uuid.UUID ) -> None:
+async def revoke_api_key( db: AsyncSession, redis: Redis, user: User, key_id: uuid.UUID ) -> None:
     """
     Revokes and API key. Returns 404 if key is not found or 409 if key is already revoked.
     Parameters:
@@ -98,5 +99,29 @@ async def revoke_api_key( db: AsyncSession, user: User, key_id: uuid.UUID ) -> N
             status_code=status.HTTP_409_CONFLICT
         )
 
+    await redis.delete( f"apikey:{ api_key_row.key_hash }" )
     api_key_row.revoked_at = datetime.now( timezone.utc )
     await db.flush( )
+
+async def verify_api_key( db: AsyncSession, redis: Redis, raw_key: str) -> APIKeyCacheEntry:
+    key_hash = hash_token( raw_key )
+    cached = await redis.get( f"apikey:{ key_hash }" )
+    if cached:
+        api_key = APIKeyCacheEntry.model_validate_json( cached )
+        if api_key.revoked_at is not None:
+            raise HTTPException( status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key" )
+        return api_key
+
+    key_row = await db.execute( select( APIKey ).where( APIKey.key_hash == key_hash ) )
+    api_key = key_row.scalar_one_or_none( )
+    if api_key is None or api_key.revoked_at is not None:
+        raise HTTPException( status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key" )
+
+    entry = APIKeyCacheEntry.model_validate( api_key )
+    await redis.set(
+        f"apikey:{ api_key.key_hash }",
+        entry.model_dump_json( ),
+        ex=300
+    ) 
+
+    return entry
