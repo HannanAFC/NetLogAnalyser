@@ -6,6 +6,7 @@ from typing import Annotated
 import rate_limiter as _rl  # access to the module for rebinding globals
 from api_keys import router as api_keys_router
 from auth import router as auth_router
+from cache import close_redis, init_redis
 from config import SecurityHeadersMiddleware, settings
 from database import engine, get_db
 from fastapi import Depends, FastAPI, Request, status
@@ -16,7 +17,6 @@ from fastapi.templating import Jinja2Templates
 from rate_limiter import (
     close_redis,
     create_rate_limiter,
-    init_redis,
 )
 from schemas import HealthResponse
 from sqlalchemy import text

@@ -14,10 +14,9 @@ instance scoped to the connection's lifespan.
 
 from __future__ import annotations
 
-from typing import Callable, Optional, Union
+from collections.abc import Callable
 
-import redis.asyncio as redis
-from config import settings
+from cache import get_redis
 from fastapi import Request, Response
 from fastapi_limiter.depends import RateLimiter, WebSocketRateLimiter
 from fastapi_limiter.identifier import default_identifier
@@ -25,39 +24,9 @@ from pyrate_limiter import Duration, Limiter, Rate
 from pyrate_limiter.buckets.redis_bucket import RedisBucket
 from starlette.websockets import WebSocket
 
-_redis: Optional[ redis.Redis ] = None
-
-
-async def init_redis( ) -> None:
-    """Open a shared async-Redis connection pool."""
-    global _redis
-    if _redis is not None:
-        return  # already initialised
-    _redis = redis.from_url(
-        settings.redis_url.get_secret_value( ),
-        encoding="utf-8",
-        decode_responses=True
-    )
-    await _redis.ping( )
-
-
-async def close_redis( ) -> None:
-    """Gracefully close the Redis connection pool."""
-    global _redis
-    if _redis is not None:
-        await _redis.close( )
-        _redis = None
-
-
-def _get_redis( ) -> redis.Redis:
-    """Return the shared Redis connection (callable, non-async for Depends)."""
-    if _redis is None:
-        raise RuntimeError( "Redis has not been initialised yet." )
-    return _redis
-
 
 # Mirror of get_client_ip in auth/dependencies.py
-async def _cloudflare_identifier( request_or_ws: Union[ Request, WebSocket ] ) -> str:
+async def _cloudflare_identifier( request_or_ws: Request | WebSocket ) -> str:
     """
     Returns the real client IP, accounting for the Cloudflare Tunnel.
     Falls back to the built-in ``default_identifier`` when used with a
@@ -97,9 +66,10 @@ async def _create_limiter(
         bucket_key (str): A grouping identifier for the rate limit. e.g `auth` for all auth endpoints.
     """
     rate = Rate( limit=times, interval=seconds * Duration.SECOND )
+    redis = await get_redis( )
     bucket = await RedisBucket.init(
         rates=[ rate ],
-        redis=_get_redis( ),
+        redis=redis,
         bucket_key=f"ratelimit:{ bucket_key }"
     )
     return Limiter( bucket )
