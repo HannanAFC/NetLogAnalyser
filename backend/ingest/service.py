@@ -1,6 +1,7 @@
 from ipaddress import IPv4Address, IPv6Address
 
 from api_keys.schemas import APIKeyCacheEntry
+from geoip import resolve_log_country
 from ingest.schemas import (
     IngestBatchRequest,
     IngestBatchResponse,
@@ -14,8 +15,8 @@ from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-def lookup_country( src_ip: IPv4Address | IPv6Address ) -> str | None:
-    return None
+def lookup_country( src_ip: IPv4Address | IPv6Address, dst_ip: IPv4Address | IPv6Address ) -> str | None:
+    return resolve_log_country( str( src_ip ), str( dst_ip ) )
 
 def compute_anomaly_score( log_entry: LogEntryCreate ) -> float:
     return 0
@@ -74,7 +75,7 @@ async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: In
             **entry.model_dump( mode="json" ),
             "api_key_id":    api_key.id,
             "user_id":       api_key.user_id,
-            "country_code":  lookup_country( entry.src_ip ),
+            "country_code":  lookup_country( entry.src_ip, entry.dst_ip ),
             "anomaly_score": compute_anomaly_score( entry )
         })
 

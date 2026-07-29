@@ -21,6 +21,7 @@ class Settings( BaseSettings ):
 
     # Database
     database_url:                        str
+    geoip_db_path:                       str = "geoip/GeoLite2-Country.mmdb"
 
     # Auth
     secret_key:                          SecretStr

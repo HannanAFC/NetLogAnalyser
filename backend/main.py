@@ -14,6 +14,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from geoip import close_geoip, init_geoip
 from ingest import router as ingest_router
 from rate_limiter import (
     create_rate_limiter,
@@ -28,6 +29,7 @@ from users import router as users_router
 async def lifespan( _app: FastAPI ):
     # startup
     await init_redis( )
+    init_geoip( )
 
     # Replace default rate limits with ones built from env variables
     _rl.auth_rate_limiter = await create_rate_limiter(
@@ -55,6 +57,7 @@ async def lifespan( _app: FastAPI ):
 
     # shutdown
     await close_redis( )
+    close_geoip( )
     await engine.dispose( )
 
 
