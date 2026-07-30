@@ -5,7 +5,16 @@ from datetime import datetime, timezone
 
 from config import settings
 from database import Base
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, String, func
+from sqlalchemy import (
+    BigInteger,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import ENUM, INET, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -100,23 +109,25 @@ user_agent: { self.user_agent }
 class LogEntry( Base ):
     __tablename__ = "log_entries"
 
-    id:                Mapped[ int ]        = mapped_column( BigInteger, primary_key=True, autoincrement=True )
-    api_key_id:        Mapped[ UUID ]       = mapped_column( UUID( as_uuid=True ), ForeignKey( "api_keys.id", ondelete="CASCADE" ), index=True, nullable=False )
-    user_id:           Mapped[ UUID ]       = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    id:                Mapped[ int ]          = mapped_column( BigInteger, primary_key=True, autoincrement=True )
+    api_key_id:        Mapped[ UUID ]         = mapped_column( UUID( as_uuid=True ), ForeignKey( "api_keys.id", ondelete="CASCADE" ), index=True, nullable=False )
+    user_id:           Mapped[ UUID ]         = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
 
-    src_ip:            Mapped[ str ]        = mapped_column( INET, index=True )       
-    dst_ip:            Mapped[ str ]        = mapped_column( INET, index=True )
-    src_port:          Mapped[ int ]        = mapped_column( Integer )
-    dst_port:          Mapped[ int ]        = mapped_column( Integer )
-    protocol:          Mapped[ str ]        = mapped_column( ENUM( "TCP", "UDP", "ICMP", "OTHER", name="protocol_enum" ), index=True )
-    packet_size_bytes: Mapped[ int ]        = mapped_column( )
-    flags:             Mapped[ str | None ] = mapped_column( String( 20 ), nullable=True )
-    country_code:      Mapped[ str | None ] = mapped_column( String( 2 ), nullable=True, index=True )
-    anomaly_score:     Mapped[ float ]      = mapped_column( default=0.0, index=True )
-    raw_payload:       Mapped[ dict ]       = mapped_column( JSONB )
-    captured_at:       Mapped[ datetime ]   = mapped_column( DateTime( timezone=True ), nullable=False, index=True )
-    inserted_at:       Mapped[ datetime ]   = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
-    user:              Mapped[ User ]       = relationship( back_populates="log_entries" )
+    src_ip:            Mapped[ str ]          = mapped_column( INET, index=True )       
+    dst_ip:            Mapped[ str ]          = mapped_column( INET, index=True )
+    src_port:          Mapped[ int ]          = mapped_column( Integer )
+    dst_port:          Mapped[ int ]          = mapped_column( Integer )
+    protocol:          Mapped[ str ]          = mapped_column( ENUM( "TCP", "UDP", "ICMP", "OTHER", name="protocol_enum" ), index=True )
+    packet_size_bytes: Mapped[ int ]          = mapped_column( )
+    flags:             Mapped[ str | None ]   = mapped_column( String( 20 ), nullable=True )
+    country_code:      Mapped[ str | None ]   = mapped_column( String( 2 ), nullable=True, index=True )
+    anomaly_score:     Mapped[ float ]        = mapped_column( default=0.0, index=True )
+    raw_payload:       Mapped[ dict ]         = mapped_column( JSONB )
+    captured_at:       Mapped[ datetime ]     = mapped_column( DateTime( timezone=True ), nullable=False, index=True )
+    inserted_at:       Mapped[ datetime ]     = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
+    anomaly_reasons:   Mapped[ list[ dict ] ] = mapped_column( JSONB, nullable=False, server_default=text( "'[]'::jsonb" )
+)
+    user:              Mapped[ User ]         = relationship( back_populates="log_entries" )
 
     __table_args__ = (
         Index( "ix_log_entries_user_id_captured_at", "user_id", "captured_at" ),

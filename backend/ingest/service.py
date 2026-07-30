@@ -1,25 +1,25 @@
+from dataclasses import asdict
 from ipaddress import IPv4Address, IPv6Address
 
 from api_keys.schemas import APIKeyCacheEntry
 from geoip import resolve_log_country
+from ingest.anomaly import _score_batch_heuristics, compute_anomaly_score
 from ingest.schemas import (
     IngestBatchRequest,
     IngestBatchResponse,
     IngestEntryError,
     LogEntryCreate,
+    LogEntryRow,
 )
 from models.models import LogEntry
 from pydantic import ValidationError
 from sqlalchemy import insert
-from sqlalchemy.exc import DataError, IntegrityError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def lookup_country( src_ip: IPv4Address | IPv6Address, dst_ip: IPv4Address | IPv6Address ) -> str | None:
     return resolve_log_country( str( src_ip ), str( dst_ip ) )
-
-def compute_anomaly_score( log_entry: LogEntryCreate ) -> float:
-    return 0
 
 async def insert_log_entries(
     db: AsyncSession,
@@ -33,7 +33,7 @@ async def insert_log_entries(
         await db.execute( insert( LogEntry ), rows )
         await db.flush( )
         return len( rows )
-    except ( IntegrityError, DataError ):
+    except IntegrityError:
         await db.rollback( )
 
     # fallback to row by row inserts
@@ -43,7 +43,7 @@ async def insert_log_entries(
             async with db.begin_nested( ): # SAVEPOINT
                 await db.execute( insert( LogEntry ), [ row ] )
             accepted += 1
-        except ( IntegrityError, DataError ) as exc:
+        except IntegrityError as exc:
             errors.append( IngestEntryError( index=original_index, detail=str( exc.orig ) ) )
 
     await db.flush()
@@ -59,25 +59,44 @@ async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: In
         except ValidationError as error:
             errors.append( IngestEntryError( index=index, detail=error.errors( )[ 0 ][ "msg" ] ) )
             continue
-        except DataError as error:
-            errors.append( IngestEntryError( index=index, detail=error._message( ) ) )
-            continue
         validated.append( ( index, entry ) )
 
     if len( validated ) == 0:
         return IngestBatchResponse( accepted=0, rejected=len( errors ), errors=errors )
 
-    rows = [ ]
-
+    # Building a standard dict here just to fill in the data
+    scoring_inputs: list[ dict ] = [ ]
     for index, entry in validated:
-        rows.append(
+        scoring_inputs.append(
         {
             **entry.model_dump( mode="json" ),
-            "api_key_id":    api_key.id,
-            "user_id":       api_key.user_id,
-            "country_code":  lookup_country( entry.src_ip, entry.dst_ip ),
-            "anomaly_score": compute_anomaly_score( entry )
-        })
+            "country_code": lookup_country( entry.src_ip, entry.dst_ip ),
+        } )
+
+    # Do batch level heuristics first
+    batch_extras = _score_batch_heuristics( scoring_inputs )
+
+    # Phase 3: now that score + reasons are knowable, construct the final,
+    # immutable row in one shot. Forgetting a required field here is a
+    # TypeError raised right now, not a DB-level surprise three lines later.
+    rows: list[ dict ] = [ ]
+    for ( index, entry ), scoring_input, extras in zip( validated, scoring_inputs, batch_extras ):
+        score, results = compute_anomaly_score( scoring_input, extra_results=extras )
+        # Only including non zero scores and returning them as dict
+        reasons = [
+            asdict( r ) for r in sorted(
+                ( r for r in results if r.score > 0 ), key=lambda r: r.score, reverse=True
+            )
+        ]
+
+        row = LogEntryRow(
+            api_key_id      = api_key.id,
+            user_id         = api_key.user_id,
+            anomaly_score   = score,
+            anomaly_reasons = reasons,
+            **scoring_input,   # entry's own fields + country_code
+        )
+        rows.append( asdict( row ) )
 
     accepted = await insert_log_entries( db, rows, validated, errors )
     return IngestBatchResponse( accepted=accepted, rejected=len( errors ), errors=errors )

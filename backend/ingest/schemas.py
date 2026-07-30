@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from ipaddress import IPv4Address, IPv6Address
 from typing import Any, Literal
+from uuid import UUID
 
 from config import settings
 from pydantic import BaseModel, ConfigDict, Field
@@ -38,3 +40,20 @@ class IngestBatchResponse( BaseModel ):
     accepted: int
     rejected: int
     errors:   list[ IngestEntryError ] = Field( default_factory=list )
+
+@dataclass( frozen=True, slots=True )
+class LogEntryRow:
+    api_key_id:        UUID
+    user_id:           UUID
+    src_ip:            str
+    dst_ip:            str
+    src_port:          int
+    dst_port:          int
+    protocol:          str
+    packet_size_bytes: int
+    flags:             str | None
+    raw_payload:       dict
+    captured_at:       datetime
+    country_code:      str | None
+    anomaly_score:     float
+    anomaly_reasons:   list[ dict ]

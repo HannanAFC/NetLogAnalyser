@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -71,9 +71,23 @@ class Settings( BaseSettings ):
     email_verification_token_expire_minutes: int = 60
 
     # Test config
-    enable_test_endpoints: bool = False
-    test_endpoint_key: str = ""
-    test_email_domain: str = "@example.com"   # matches uniqueTestEmail() in your frontend integration suite
+    enable_test_endpoints:               bool = False
+    test_endpoint_key:                   str = ""
+    test_email_domain:                   str = "@example.com"
+
+    # Anomaly detection
+    anomaly_packet_size_mtu:             int = 1500
+    anomaly_packet_size_jumbo_max:       int = 9000
+    anomaly_packet_size_tiny_max:        int = 40
+    anomaly_port_scan_low:               int = 5
+    anomaly_port_scan_high:              int = 25
+    anomaly_host_sweep_low:              int = 5
+    anomaly_host_sweep_high:             int = 20
+    anomaly_weight_packet_size:          float = Field( ge=0.0, le=1.0, default=0.5 )
+    anomaly_weight_tcp_flags:            float = Field( ge=0.0, le=1.0, default=0.9 )
+    anomaly_weight_mismatch_ports:       float = Field( ge=0.0, le=1.0, default=0.6 )
+    anomaly_weight_port_scan_shape:      float = Field( ge=0.0, le=1.0, default=0.7 )
+    anomaly_weight_host_sweep_shape:     float = Field( ge=0.0, le=1.0, default=0.6 )
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 
