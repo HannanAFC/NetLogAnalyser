@@ -205,7 +205,7 @@ async def reset_password(
     return ResetPasswordResponse( )
 
 @router.get( "/verify-email" )
-async def verify_email( token: str, db: AsyncSession = Depends( get_db ) ):
+async def verify_email( token: str, db: Annotated[ AsyncSession, Depends( get_db ) ] ):
     await verify_email_token( db, token )
     await db.commit( )
     return VerifyEmailResponse( )
@@ -215,7 +215,7 @@ async def verify_email( token: str, db: AsyncSession = Depends( get_db ) ):
     "/resend-verification",
     dependencies=[ Depends( get_forgot_password_rate_limiter ) ]
 )
-async def resend_verification( payload: ResendVerificationRequest, db: AsyncSession = Depends( get_db ) ):
+async def resend_verification( payload: ResendVerificationRequest, db: Annotated[ AsyncSession, Depends( get_db ) ] ):
     await resend_verification_email( db, payload.email )
     await db.commit()
     return ResendVerificationResponse( )

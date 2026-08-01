@@ -5,7 +5,7 @@ from redis.asyncio import ConnectionPool, Redis
 
 _pool: ConnectionPool | None = None
 
-async def init_redis( ) -> None:
+def init_redis( ) -> None:
     """Open a shared async-Redis connection pool."""
     global _pool
     if _pool is not None:
@@ -27,7 +27,7 @@ def _get_pool( ) -> ConnectionPool:
         raise RuntimeError( "Redis pool has not been initialised, call init_redis to initialise first." )
     return _pool
 
-async def get_redis( ) -> Redis:
+def get_redis( ) -> Redis:
     """
     FastAPI dependency for redis in request-scoped contexts.
     Returns:
@@ -35,7 +35,7 @@ async def get_redis( ) -> Redis:
     """
     return Redis( connection_pool=_get_pool( ) )
 
-async def new_redis_client( ) -> Redis:
+def new_redis_client( ) -> Redis:
     """
     Separate Redis client for use outside of request-scope, for instance in a websocket.
     Returns:

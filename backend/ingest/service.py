@@ -26,30 +26,30 @@ async def insert_log_entries(
     rows: list[ dict ],
     validated: list[ tuple[ int, LogEntryCreate ] ],
     errors: list[ IngestEntryError ]
-) -> int:
+) -> list[ dict ]:
 
     # attempt to add all the rows at once
     try:
         await db.execute( insert( LogEntry ), rows )
         await db.flush( )
-        return len( rows )
+        return rows
     except IntegrityError:
         await db.rollback( )
 
     # fallback to row by row inserts
-    accepted = 0
-    for ( original_index, log_entry ), row in zip( validated, rows ):
+    accepted_rows: list[ dict ] = [ ]
+    for ( original_index, _ ), row in zip( validated, rows ):
         try:
             async with db.begin_nested( ): # SAVEPOINT
                 await db.execute( insert( LogEntry ), [ row ] )
-            accepted += 1
+            accepted_rows.append( row )
         except IntegrityError as exc:
             errors.append( IngestEntryError( index=original_index, detail=str( exc.orig ) ) )
 
     await db.flush()
-    return accepted
+    return accepted_rows
 
-async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: IngestBatchRequest ) -> IngestBatchResponse:
+async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: IngestBatchRequest ) -> tuple[ IngestBatchResponse, list[ dict ] ]:
     validated:  list[ tuple[ int, LogEntryCreate ] ] = [ ]
     errors:     list[ IngestEntryError ] = [ ]
 
@@ -62,7 +62,7 @@ async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: In
         validated.append( ( index, entry ) )
 
     if len( validated ) == 0:
-        return IngestBatchResponse( accepted=0, rejected=len( errors ), errors=errors )
+        return IngestBatchResponse( accepted=0, rejected=len( errors ), errors=errors ), [ ]
 
     # Building a standard dict here just to fill in the data
     scoring_inputs: list[ dict ] = [ ]
@@ -98,5 +98,6 @@ async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: In
         )
         rows.append( asdict( row ) )
 
-    accepted = await insert_log_entries( db, rows, validated, errors )
-    return IngestBatchResponse( accepted=accepted, rejected=len( errors ), errors=errors )
+    accepted_rows = await insert_log_entries( db, rows, validated, errors )
+    response = IngestBatchResponse( accepted=len( accepted_rows ), rejected=len( errors ), errors=errors )
+    return response, accepted_rows

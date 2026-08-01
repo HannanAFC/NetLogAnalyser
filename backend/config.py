@@ -43,6 +43,8 @@ class Settings( BaseSettings ):
     # Websocket
     ws_heartbeat_interval:               int = 30
     ws_max_connections_per_user:         int = 5
+    ws_ticket_ttl_seconds:               int = 30
+    ws_stale_connection_seconds:         int = 90
 
     # Cookies
     cookie_secure:                       bool = True

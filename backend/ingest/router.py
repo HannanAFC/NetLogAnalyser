@@ -12,6 +12,7 @@ from ingest.service import ingest_batch
 from rate_limiter import get_ingest_rate_limiter
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
+from websocket.pubsub import publish_log_entries
 
 router = APIRouter( dependencies=[ Depends( get_ingest_rate_limiter ) ] )
 api_key_header = APIKeyHeader( name="X-API-Key" )
@@ -43,9 +44,13 @@ async def ingest(
     \n\t}
     """
     api_key = await verify_api_key( db, redis, raw_key )
-    ingest_response = await ingest_batch( db, api_key, payload )
+    ingest_response, accepted_rows = await ingest_batch( db, api_key, payload )
     await db.commit( )
 
     if ingest_response.accepted == 0:
         response.status_code = status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    if accepted_rows:
+        await publish_log_entries( redis, str( api_key.user_id ), accepted_rows )
+
     return ingest_response
