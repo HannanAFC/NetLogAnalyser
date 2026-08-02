@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from geoip import close_geoip, init_geoip
 from ingest import router as ingest_router
+from logs import router as logs_router
 from rate_limiter import (
     create_rate_limiter,
 )
@@ -86,6 +87,7 @@ app.include_router( users_router.router, prefix="/users", tags=[ "Users" ] )
 app.include_router( api_keys_router.router, prefix="/api-keys", tags=[ "API keys" ] )
 app.include_router( ingest_router.router, prefix="/ingest", tags=[ "Ingest" ] )
 app.include_router( websocket_router.router, prefix="/ws", tags=[ "Websocket" ] )
+app.include_router( logs_router.router, prefix="/logs", tags=[ "Logs" ] )
 if settings.enable_test_endpoints:
     from testing.router import router as test_only_router
     app.include_router( test_only_router )
