@@ -175,7 +175,6 @@ pyrightconfig.json
 
 ### react ###
 .DS_*
-logs
 **/*.backup.*
 **/*.back.*
 
@@ -197,3 +196,5 @@ sketch
 
 !frontend/**/lib
 # End of https://www.toptal.com/developers/gitignore/api/python,react
+
+**.mmdb
