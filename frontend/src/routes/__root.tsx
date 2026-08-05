@@ -3,7 +3,8 @@ import { useSession } from '#/features/auth/hooks';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { createRootRoute, HeadContent, Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-
+import { FormDevtoolsPanel } from '@tanstack/react-form-devtools';
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { NotFound } from '#/components/not-found';
 import { Sidebar, SidebarProvider, useSidebar } from '#/components/sidebar';
 import { Button } from '#/components/ui/button';
@@ -192,6 +193,14 @@ function RootInner( { session }: { session: unknown } )
 						{
 							name:   'TanStack Router',
 							render: <TanStackRouterDevtoolsPanel />
+						},
+						{
+							name: 'TanStack Query',
+							render: <ReactQueryDevtoolsPanel />
+						},
+						{
+							name: 'TanStack Form',
+							render: <FormDevtoolsPanel />
 						}
 					] }
 				/>

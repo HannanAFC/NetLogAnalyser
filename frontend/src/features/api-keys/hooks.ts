@@ -43,7 +43,7 @@ export function useRevokeApiKey( )
     return useMutation(
     {
         mutationFn: ( id: string ) => revokeApiKeyRequest( id ),
-        onSuccess: ( data, keyId ) =>
+        onSuccess: ( _data, keyId ) =>
         {
             queryClient.setQueryData(
                 apiKeysQueryKey,

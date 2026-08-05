@@ -24,3 +24,16 @@ export function fieldError( errors: unknown[ ] ): string | undefined
 		return ( first as { message: string } ).message;
 	return String( first );
 }
+
+export function formatApiKeyDate( iso: string | null ): string
+{
+	if ( !iso ) return '-';
+	return new Intl.DateTimeFormat( 'en-US',
+	{
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+		hour: 'numeric',
+		minute: '2-digit'
+	} ).format( new Date( iso ) );
+}
