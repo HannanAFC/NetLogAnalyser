@@ -9,9 +9,9 @@ from real capture tools that use different column names, e.g.:
 from __future__ import annotations
 
 import csv
+import datetime
 import json
 from collections.abc import Iterator
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -68,7 +68,13 @@ def _coerce_row( raw: dict[ str, Any ], field_map: dict[ str, str ] | None ) -> 
         raise ValueError( f"Row missing required field: { exc }" ) from exc
 
     captured_at = raw.get( "captured_at" )
-    entry[ "captured_at" ] = captured_at if captured_at not in ( None, "" ) else datetime.now( timezone.utc ).isoformat()
+    if captured_at is not None:
+        try:
+            datetime.date.fromisoformat( captured_at )
+        except ValueError:
+            captured_at = None
+    
+    entry[ "captured_at" ] = captured_at if captured_at not in ( None, "" ) else datetime.datetime.now( datetime.timezone.utc ).isoformat( )
 
     flags = raw.get( "flags" )
     if flags not in ( None, "" ):
