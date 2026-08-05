@@ -272,6 +272,18 @@ export const handlers = [
 		return HttpResponse.json( { detail: 'API key was not found.' }, { status: 404 } );
 	} ),
 
+	// ── WebSocket ticket ─────────────────────────────────────────────
+
+	http.post( '*/ws/ticket', ( ) =>
+	{
+		return HttpResponse.json(
+			{
+				ticket:     'fake-ws-ticket',
+				expires_in: 30
+			}
+		);
+	} ),
+
 	// ── Logs ─────────────────────────────────────────────────────────
 
 	http.get( '*/logs', ( { request } ) =>
