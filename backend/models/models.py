@@ -15,14 +15,15 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import ENUM, INET, JSONB, UUID
+from sqlalchemy.dialects.postgresql import ENUM, INET, JSONB
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class User( Base ):
     __tablename__ = "users"
 
-    id:                        Mapped[ UUID ]                             = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    id:                        Mapped[ uuid.UUID ]                        = mapped_column( PGUUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
     email:                     Mapped[ str ]                              = mapped_column( String( 255 ), unique=True, index=True , nullable=False )
     password_hash:             Mapped[ str ]                              = mapped_column( String( 255 ), nullable=False )
     display_name:              Mapped[ str ]                              = mapped_column( String( 50 ), nullable=False )
@@ -48,8 +49,8 @@ updated_at: { self.updated_at }
 class APIKey( Base ):
     __tablename__ = "api_keys"
 
-    id:           Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
-    user_id:      Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    id:           Mapped[ uuid.UUID ]       = mapped_column( PGUUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    user_id:      Mapped[ uuid.UUID ]       = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
     key_hash:     Mapped[ str ]             = mapped_column( String( 64 ), nullable=False )
     key_prefix:   Mapped[ str ]             = mapped_column( String( settings.api_key_prefix_length ) )
     label:        Mapped[ str ]             = mapped_column( String( 50 ), nullable=False, default=lambda: f"key_{ datetime.now( timezone.utc ):%Y-%m-%d %H:%M }" )
@@ -77,17 +78,17 @@ revoked_at: { self.revoked_at }
 class RefreshToken( Base ):
     __tablename__ = "refresh_tokens"
 
-    id:             Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
-    user_id:        Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
-    token_hash:     Mapped[ str ]             = mapped_column( String( 64 ), unique=True, index=True, nullable=False )
-    expires_at:     Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False )
-    created_at:     Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False, server_default=func.now( ) )
-    revoked_at:     Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ), nullable=True )
-    family_id:      Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), index=True, nullable=False )
-    replaced_by_id: Mapped[UUID | None]       = mapped_column( UUID( as_uuid=True ), ForeignKey( "refresh_tokens.id" ), nullable=True )
-    ip_address:     Mapped[ str | None ]      = mapped_column( INET, nullable=True )
-    user_agent:     Mapped[ str | None ]      = mapped_column( String( 255 ), nullable=True )
-    user:           Mapped[ User ]            = relationship( back_populates="refresh_tokens" )
+    id:             Mapped[ uuid.UUID ]        = mapped_column( PGUUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    user_id:        Mapped[ uuid.UUID ]        = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    token_hash:     Mapped[ str ]              = mapped_column( String( 64 ), unique=True, index=True, nullable=False )
+    expires_at:     Mapped[ datetime ]         = mapped_column( DateTime( timezone=True ), nullable=False )
+    created_at:     Mapped[ datetime ]         = mapped_column( DateTime( timezone=True ), nullable=False, server_default=func.now( ) )
+    revoked_at:     Mapped[ datetime | None ]  = mapped_column( DateTime( timezone=True ), nullable=True )
+    family_id:      Mapped[ uuid.UUID ]        = mapped_column( PGUUID( as_uuid=True ), index=True, nullable=False )
+    replaced_by_id: Mapped[ uuid.UUID | None ] = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "refresh_tokens.id" ), nullable=True )
+    ip_address:     Mapped[ str | None ]       = mapped_column( INET, nullable=True )
+    user_agent:     Mapped[ str | None ]       = mapped_column( String( 255 ), nullable=True )
+    user:           Mapped[ User ]             = relationship( back_populates="refresh_tokens" )
 
     __table_args__ = (
         Index( "ix_refresh_tokens_user_id_revoked_at", "user_id", "revoked_at" ),
@@ -110,8 +111,8 @@ class LogEntry( Base ):
     __tablename__ = "log_entries"
 
     id:                Mapped[ int ]          = mapped_column( BigInteger, primary_key=True, autoincrement=True )
-    api_key_id:        Mapped[ UUID ]         = mapped_column( UUID( as_uuid=True ), ForeignKey( "api_keys.id", ondelete="CASCADE" ), index=True, nullable=False )
-    user_id:           Mapped[ UUID ]         = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    api_key_id:        Mapped[ uuid.UUID ]    = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "api_keys.id", ondelete="CASCADE" ), index=True, nullable=False )
+    user_id:           Mapped[ uuid.UUID ]    = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
 
     src_ip:            Mapped[ str ]          = mapped_column( INET, index=True )       
     dst_ip:            Mapped[ str ]          = mapped_column( INET, index=True )
@@ -155,8 +156,8 @@ inserted_at: { self.inserted_at }
 class PasswordResetToken( Base ):
     __tablename__ = "password_reset_tokens"
 
-    id:         Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
-    user_id:    Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    id:         Mapped[ uuid.UUID ]       = mapped_column( PGUUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    user_id:    Mapped[ uuid.UUID ]       = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
     token_hash: Mapped[ str ]             = mapped_column( String( 64 ), unique=True, index=True, nullable=False )
     created_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), server_default=func.now( ) )
     expires_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False )
@@ -166,8 +167,8 @@ class PasswordResetToken( Base ):
 class EmailVerificationToken( Base ):
     __tablename__ = "email_verification_tokens"
 
-    id:         Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
-    user_id:    Mapped[ UUID ]            = mapped_column( UUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    id:         Mapped[ uuid.UUID ]       = mapped_column( PGUUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    user_id:    Mapped[ uuid.UUID ]       = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
     token_hash: Mapped[ str ]             = mapped_column( unique=True, nullable=False )
     expires_at: Mapped[ datetime ]        = mapped_column( DateTime( timezone=True ), nullable=False )
     used_at:    Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ), nullable=True )
