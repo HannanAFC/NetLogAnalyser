@@ -45,6 +45,13 @@
     --space-12: var( --space-12 );
     --space-16: var( --space-16 );
     --space-20: var( --space-20 );
+    --animate-breathe: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe
+{
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.35; }
 }
 
 :root
@@ -75,8 +82,8 @@
 		min-height: 100%;
 		background: var( --color-paper );
 		color: var( --color-text-primary );
-		font-family: var( --font-display );
-		font-size: 15px;
+		font-family: var( --font-body );
+		font-size: 0.9375rem;
 		line-height: 1.55;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
