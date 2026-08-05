@@ -128,4 +128,6 @@ def _origin_allowed( websocket: WebSocket ) -> bool:
         allowed (bool): Whether the origin is allowed.
     """
     origin = websocket.headers.get( "origin" )
+    if "*" in settings.cors_allowed_origins:
+        return True
     return origin in settings.cors_allowed_origins
