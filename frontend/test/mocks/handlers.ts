@@ -94,6 +94,36 @@ export function resetEmailVerificationCounters( )
 	lastForgotPasswordEmail = null;
 }
 
+// ── Logs mock data ──────────────────────────────────────────────────
+
+/** 50 mock log entries sorted newest-first (id 50 → 1). */
+const MOCK_LOG_ENTRIES = Array.from( { length: 50 }, ( _, i ) =>
+{
+	const id = 50 - i;
+	const padded = String( id ).padStart( 2, '0' );
+	return {
+		id,
+		src_ip:            `192.168.1.${ id }`,
+		dst_ip:            `10.0.0.${ id }`,
+		src_port:          443,
+		dst_port:          5000 + id,
+		protocol:          id % 3 === 0 ? 'UDP' : 'TCP',
+		packet_size_bytes: 1500,
+		flags:             id % 2 === 0 ? 'SYN,ACK' : null,
+		country_code:      id % 5 === 0 ? 'US' : null,
+		anomaly_score:     id % 7 === 0 ? 0.85 : 0,
+		anomaly_reasons:   id % 7 === 0 ? [ { name: 'test_anomaly', score: 0.85, detail: 'Test anomaly detail' } ] : [],
+		captured_at:       `2024-01-01T00:00:${ padded }Z`
+	};
+} );
+
+export let getLogsCallCount = 0;
+
+export function resetGetLogsCallCount( )
+{
+	getLogsCallCount = 0;
+}
+
 export const handlers = [
 	http.post( '*/auth/login', async( { request } ) =>
 	{
@@ -240,5 +270,47 @@ export const handlers = [
 		}
 
 		return HttpResponse.json( { detail: 'API key was not found.' }, { status: 404 } );
+	} ),
+
+	// ── Logs ─────────────────────────────────────────────────────────
+
+	http.get( '*/logs', ( { request } ) =>
+	{
+		getLogsCallCount += 1;
+		const url = new URL( request.url );
+		const rawLimit = url.searchParams.get( 'limit' ) || '20';
+		const limit = Math.min( Math.max( parseInt( rawLimit, 10 ) || 20, 1 ), 50 );
+		const cursor = url.searchParams.get( 'cursor' );
+
+		let startIndex = 0;
+		if ( cursor )
+		{
+			try
+			{
+				const decoded = JSON.parse( atob( cursor ) ) as { id: number; captured_at: string };
+				const idx = MOCK_LOG_ENTRIES.findIndex(
+					( e ) => e.id === decoded.id && e.captured_at === decoded.captured_at
+				);
+				if ( idx === -1 )
+				{
+					return HttpResponse.json( { detail: 'Invalid cursor' }, { status: 400 } );
+				}
+				startIndex = idx + 1;
+			}
+			catch
+			{
+				return HttpResponse.json( { detail: 'Invalid cursor' }, { status: 400 } );
+			}
+		}
+
+		const slice = MOCK_LOG_ENTRIES.slice( startIndex, startIndex + limit + 1 );
+		const hasMore = slice.length > limit;
+		const entries = hasMore ? slice.slice( 0, limit ) : slice;
+
+		const nextCursor = hasMore && entries.length > 0
+			? btoa( JSON.stringify( { id: entries[ entries.length - 1 ].id, captured_at: entries[ entries.length - 1 ].captured_at } ) )
+			: null;
+
+		return HttpResponse.json( { entries, next_cursor: nextCursor, has_more: hasMore } );
 	} )
 ];
