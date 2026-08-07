@@ -8,6 +8,7 @@ from typing import Any
 from uuid import UUID
 
 from config import settings
+from geoip import GeoStatus
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -60,6 +61,9 @@ class LogEntryRow:
     flags:             str | None
     raw_payload:       dict
     captured_at:       datetime
-    country_code:      str | None
+    src_country_code:  str | None
+    dst_country_code:  str | None
+    src_geo_status:    GeoStatus
+    dst_geo_status:    GeoStatus
     anomaly_score:     float
     anomaly_reasons:   list[ dict ]

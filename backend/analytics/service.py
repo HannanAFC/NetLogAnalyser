@@ -6,6 +6,7 @@ from uuid import UUID
 from analytics.schemas import (
     AnomaliesRequestParams,
     AnomaliesResponse,
+    DirectionEnum,
     GeoRequestParams,
     GeoResponse,
     GeoRow,
@@ -17,7 +18,6 @@ from analytics.schemas import (
     TimeSeriesPoint,
     TimeSeriesRequestParams,
     TimeSeriesResponse,
-    TopTalkersDirectionEnum,
     TopTalkersMetricEnum,
     TopTalkersRequestParams,
     TopTalkersResponse,
@@ -194,7 +194,7 @@ async def get_top_talkers(
     Returns:
         response (TopTalkersResponse): A response containing the top-talkers.
     """
-    ip_column = LogEntry.src_ip if params.direction == TopTalkersDirectionEnum.src else LogEntry.dst_ip
+    ip_column = LogEntry.src_ip if params.direction == DirectionEnum.src else LogEntry.dst_ip
     count_expr = func.count().label( "log_count" )
     bytes_expr = func.coalesce( func.sum( LogEntry.packet_size_bytes ), 0 ).label( "total_bytes" )
     order_expr = count_expr if params.metric == TopTalkersMetricEnum.packets else bytes_expr
@@ -312,7 +312,7 @@ async def get_protocols(
 async def get_geo(
     db:      AsyncSession,
     user_id: UUID,
-    params:  GeoRequestParams   
+    params:  GeoRequestParams
 ) -> GeoResponse:
     """
     Get the user geo metrics over a given period.
@@ -323,20 +323,24 @@ async def get_geo(
     Returns:
         response (GeoResponse): A response containing the geo metrics.
     """
+    country_column = getattr( LogEntry, f"{ params.direction.value }_country_code" )
+    status_column  = getattr( LogEntry, f"{ params.direction.value }_geo_status" )
+
     total_expr = func.sum( func.count( ) ).over( ).label( "total" )
 
     stmt = (
         select(
-            LogEntry.country_code,
+            country_column.label( "country_code" ),
+            status_column.label( "geo_status" ),
             func.count( ).label( "log_count" ),
             total_expr
-        )
+            )
         .where(
             LogEntry.user_id == user_id,
             LogEntry.captured_at >= params.start,
             LogEntry.captured_at < params.end
         )
-        .group_by( LogEntry.country_code )
+        .group_by( country_column, status_column )
         .order_by( func.count( ).desc( ) )
         .limit( params.limit )
     )
@@ -349,6 +353,7 @@ async def get_geo(
     rows = [
         GeoRow(
             country_code=row.country_code,
+            geo_status=row.geo_status,
             count=row.log_count,
             packet_percentage=round( ( row.log_count / total ) * 100, 1 ) if total else 0.0
         )
@@ -356,6 +361,7 @@ async def get_geo(
     ]
 
     return GeoResponse(
+        direction=params.direction,
         rows=rows
     )
 

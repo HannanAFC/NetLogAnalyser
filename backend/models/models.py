@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from config import settings
 from database import Base
+from geoip import GeoStatus
 from sqlalchemy import (
     BigInteger,
     DateTime,
@@ -121,7 +122,10 @@ class LogEntry( Base ):
     protocol:          Mapped[ str ]          = mapped_column( ENUM( "TCP", "UDP", "ICMP", "OTHER", name="protocol_enum" ), index=True )
     packet_size_bytes: Mapped[ int ]          = mapped_column( )
     flags:             Mapped[ str | None ]   = mapped_column( String( 20 ), nullable=True )
-    country_code:      Mapped[ str | None ]   = mapped_column( String( 2 ), nullable=True, index=True )
+    src_country_code:  Mapped[ str | None ]   = mapped_column( String( 2 ), nullable=True )
+    dst_country_code:  Mapped[ str | None ]   = mapped_column( String( 2 ), nullable=True )
+    src_geo_status:    Mapped[ GeoStatus ]    = mapped_column( ENUM( GeoStatus, name="geo_status" ), nullable=False, index=True )
+    dst_geo_status:    Mapped[ GeoStatus ]    = mapped_column( ENUM( GeoStatus, name="geo_status" ), nullable=False, index=True )
     anomaly_score:     Mapped[ float ]        = mapped_column( default=0.0, index=True )
     raw_payload:       Mapped[ dict ]         = mapped_column( JSONB )
     captured_at:       Mapped[ datetime ]     = mapped_column( DateTime( timezone=True ), nullable=False, index=True )
@@ -146,7 +150,10 @@ dst_port: { self.dst_port }
 protocol: { self.protocol }
 packet_size_bytes: { self.packet_size_bytes }
 flags: { self.flags }
-country_code: { self.country_code }
+src_country_code: { self.src_country_code }
+dst_country_code: { self.dst_country_code }
+src_geo_status: { self.src_geo_status }
+dst_geo_status: { self.dst_geo_status }
 anomaly_score: { self.anomaly_score }
 raw_payload: { self.raw_payload }
 captured_at: { self.captured_at }

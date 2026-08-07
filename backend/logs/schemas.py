@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from ipaddress import IPv4Address, IPv6Address
 
+from geoip import GeoStatus
 from pydantic import BaseModel, ConfigDict
 
 
@@ -18,7 +19,10 @@ class LogEntryPublic( BaseModel ):
     protocol:          str
     packet_size_bytes: int
     flags:             str | None
-    country_code:      str | None
+    src_country_code:  str | None
+    dst_country_code:  str | None
+    src_geo_status:    GeoStatus
+    dst_geo_status:    GeoStatus
     anomaly_score:     float
     anomaly_reasons:   list[ dict ]
     captured_at:       datetime

@@ -5,11 +5,11 @@ from datetime import datetime, timedelta, timezone
 
 from analytics.schemas import (
     AnomaliesRequestParams,
+    DirectionEnum,
     GeoRequestParams,
     TimeBucketEnum,
     TimeRangeRequestParams,
     TimeSeriesRequestParams,
-    TopTalkersDirectionEnum,
     TopTalkersMetricEnum,
     TopTalkersRequestParams,
 )
@@ -93,10 +93,10 @@ async def get_timeseries_params(
     )
 
 async def get_toptalkers_params(
-    time_range: TimeRangeRequestParams  = Depends( get_time_range ),
-    direction:  TopTalkersDirectionEnum = Query( default=TopTalkersDirectionEnum.src ),
-    metric:     TopTalkersMetricEnum    = Query( default=TopTalkersMetricEnum.bytes ),
-    limit:      int                     = Query( default=10 )
+    time_range: TimeRangeRequestParams = Depends( get_time_range ),
+    direction:  DirectionEnum          = Query( default=DirectionEnum.src ),
+    metric:     TopTalkersMetricEnum   = Query( default=TopTalkersMetricEnum.bytes ),
+    limit:      int                    = Query( default=10 )
 ) -> TopTalkersRequestParams:
     return TopTalkersRequestParams(
         start=time_range.start,
@@ -107,13 +107,15 @@ async def get_toptalkers_params(
     )
 
 async def get_geo_params(
-    time_range: TimeRangeRequestParams  = Depends( get_time_range ),
-    limit:      int                     = Query( default=25 )
+    time_range: TimeRangeRequestParams = Depends( get_time_range ),
+    limit:      int                    = Query( default=25 ),
+    direction:  DirectionEnum          = Query( default=DirectionEnum.src )
 ) -> GeoRequestParams:
     return GeoRequestParams(
         start=time_range.start,
         end=time_range.end,
-        limit=limit
+        limit=limit,
+        direction=direction
     )
 
 async def get_anomalies_params(

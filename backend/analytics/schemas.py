@@ -4,6 +4,7 @@ from datetime import datetime
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 
+from geoip import GeoStatus
 from ingest.schemas import ProtocolEnum
 from logs.schemas import LogEntryPublic
 from pydantic import BaseModel, ConfigDict, Field
@@ -14,7 +15,7 @@ class TimeBucketEnum( str, Enum ):
     hour    = "hour"
     day     = "day"
 
-class TopTalkersDirectionEnum( str, Enum ):
+class DirectionEnum( str, Enum ):
     src     = "src"
     dst     = "dst"
 
@@ -70,14 +71,14 @@ class TopTalkersRow( BaseModel ):
 class TopTalkersRequestParams( TimeRangeRequestParams ):
     model_config       = ConfigDict( frozen=True )
 
-    direction:          TopTalkersDirectionEnum
+    direction:          DirectionEnum
     metric:             TopTalkersMetricEnum
     limit:              int = Field( ge=1, le=100, default=10 )
 
 class TopTalkersResponse( BaseModel ):
     model_config        = ConfigDict( from_attributes=True )
 
-    direction:          TopTalkersDirectionEnum
+    direction:          DirectionEnum
     metric:             TopTalkersMetricEnum
     rows:               list[ TopTalkersRow ]
 
@@ -104,17 +105,20 @@ class GeoRequestParams( TimeRangeRequestParams ):
     model_config       = ConfigDict( frozen=True )
     
     limit:              int = Field( ge=1, le=50, default=25 )
+    direction:          DirectionEnum
 
 class GeoRow( BaseModel ):
     model_config        = ConfigDict( from_attributes=True )
     
     country_code:       str | None
+    geo_status:         GeoStatus
     count:              int   = Field( ge=0 )
     packet_percentage:  float = Field( ge=0.0, le=100.0 )
 
 class GeoResponse( BaseModel ):
     model_config        = ConfigDict( from_attributes=True )
     rows:               list[ GeoRow ]
+    direction:          DirectionEnum
 
 class AnomaliesRequestParams( TimeRangeRequestParams ):
     model_config       = ConfigDict( frozen=True )

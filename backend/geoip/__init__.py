@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ipaddress
 import logging
+from enum import Enum
 
 import geoip2.database
 import geoip2.errors
@@ -34,7 +35,7 @@ def close_geoip( ) -> None:
         _reader = None
 
 
-def lookup_country( ip: str ) -> str | None:
+def lookup_country( ip: str ) -> tuple[ str | None, GeoStatus ]:
     """
     Return the ISO 3166-1 alpha-2 country code for an IP, or None.
     Parameters:
@@ -43,29 +44,25 @@ def lookup_country( ip: str ) -> str | None:
         country (str | None): Returns None for - an unloaded database, an unparseable IP, private/loopback/link-local/reserved addresses and addresses GeoLite2 has no record for.
     """
     if _reader is None:
-        return None
+        return None, GeoStatus.UNAVAILABLE
 
     try:
         address = ipaddress.ip_address( ip )
     except ValueError:
-        return None
+        return None, GeoStatus.UNAVAILABLE
 
     if address.is_private or address.is_loopback or address.is_link_local or address.is_reserved:
-        return None
+        return None, GeoStatus.PRIVATE
 
     try:
         response = _reader.country( ip )
     except geoip2.errors.AddressNotFoundError:
-        return None
+        return None, GeoStatus.UNRESOLVED
 
-    return response.country.iso_code
+    return response.country.iso_code, GeoStatus.RESOLVED
 
-
-def resolve_log_country( src_ip: str, dst_ip: str ) -> str | None:
-    """
-    Pick the most useful country code for a log entry. The destination IP is preferred but the source IP can be used as a fallback.
-    Parameters:
-        src_ip (str): The source IP.
-        dst_ip (str): The destination IP.
-    """
-    return lookup_country( dst_ip ) or lookup_country( src_ip )
+class GeoStatus( str, Enum ):
+    RESOLVED    = "resolved"
+    PRIVATE     = "private"
+    UNRESOLVED  = "unresolved"
+    UNAVAILABLE = "unavailable"

@@ -529,13 +529,13 @@ class TestGeo:
 		user:         User,
 		api_key:      APIKey
 	):
-		await make_log_entry( db_session, user_id=user.id, api_key_id=api_key.id, country_code="US", captured_at=NOW - timedelta( minutes=5 ) )
-		await make_log_entry( db_session, user_id=user.id, api_key_id=api_key.id, country_code=None, captured_at=NOW - timedelta( minutes=5 ) )
+		await make_log_entry( db_session, user_id=user.id, api_key_id=api_key.id, dst_country_code="US", captured_at=NOW - timedelta( minutes=5 ) )
+		await make_log_entry( db_session, user_id=user.id, api_key_id=api_key.id, dst_country_code=None, captured_at=NOW - timedelta( minutes=5 ) )
 		await db_session.commit( )
 
 		response = await client.get(
 			"/analytics/geo",
-			params  = { "start": ( NOW - timedelta( hours=1 ) ).isoformat( ), "end": NOW.isoformat( ) },
+			params  = { "start": ( NOW - timedelta( hours=1 ) ).isoformat( ), "end": NOW.isoformat( ), "direction": "dst" },
 			headers = auth_headers
 		)
 		rows = response.json( )[ "rows" ]

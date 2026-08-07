@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import UUID
 
+from geoip import GeoStatus
 from models.models import LogEntry
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,7 +24,10 @@ async def make_log_entry(
     protocol:          str        = "TCP",
     packet_size_bytes: int        = 512,
     anomaly_score:     float      = 0.1,
-    country_code:      str | None = "US",
+    dst_country_code:  str | None = "US",
+    src_country_code:  str | None = None,
+    src_geo_status:    GeoStatus  = GeoStatus.PRIVATE,
+    dst_geo_status:    GeoStatus  = GeoStatus.RESOLVED,
     captured_at:       datetime   = _DEFAULT_CAPTURED_AT,
     flags:             str | None = None,
 ) -> LogEntry:
@@ -37,13 +41,16 @@ async def make_log_entry(
         protocol          = protocol,
         packet_size_bytes = packet_size_bytes,
         anomaly_score     = anomaly_score,
-        country_code      = country_code,
+        src_country_code  = src_country_code,
+        dst_country_code  = dst_country_code,
+        src_geo_status    = src_geo_status,
+        dst_geo_status    = dst_geo_status,
         captured_at       = captured_at,
         raw_payload       = {},
         flags             = flags,
     )
     db.add( entry )
-    await db.flush()
+    await db.flush( )
     return entry
 
 
@@ -62,12 +69,15 @@ async def make_log_entries( db: AsyncSession, *, count: int, **overrides ) -> li
             protocol          = overrides.get( "protocol", "TCP" ),
             packet_size_bytes = overrides.get( "packet_size_bytes", 512 ),
             anomaly_score     = overrides.get( "anomaly_score", 0.1 ),
-            country_code      = overrides.get( "country_code", "US" ),
+            src_country_code  = overrides.get( "src_country_code", None ),
+            dst_country_code  = overrides.get( "dst_country_code", "US" ),
+            src_geo_status    = overrides.get( "src_geo_status", "PRIVATE" ),
+            dst_geo_status    = overrides.get( "dst_geo_status", "RESOLVED" ),
             captured_at       = overrides.get( "captured_at", _DEFAULT_CAPTURED_AT ),
             raw_payload       = {},
         )
         for _ in range( count )
     ]
     db.add_all( entries )
-    await db.flush()
+    await db.flush( )
     return entries

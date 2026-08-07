@@ -1,8 +1,7 @@
 from dataclasses import asdict
-from ipaddress import IPv4Address, IPv6Address
 
 from api_keys.schemas import APIKeyCacheEntry
-from geoip import resolve_log_country
+from geoip import lookup_country
 from ingest.anomaly import _score_batch_heuristics, compute_anomaly_score
 from ingest.schemas import (
     IngestBatchRequest,
@@ -17,9 +16,6 @@ from sqlalchemy import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-def lookup_country( src_ip: IPv4Address | IPv6Address, dst_ip: IPv4Address | IPv6Address ) -> str | None:
-    return resolve_log_country( str( src_ip ), str( dst_ip ) )
 
 async def insert_log_entries(
     db: AsyncSession,
@@ -67,10 +63,15 @@ async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: In
     # Building a standard dict here just to fill in the data
     scoring_inputs: list[ dict ] = [ ]
     for index, entry in validated:
+        src_country_code, src_geo_status = lookup_country( str( entry.src_ip ) )
+        dst_country_code, dst_geo_status = lookup_country( str( entry.dst_ip ) )
         scoring_inputs.append(
         {
             **entry.model_dump( mode="json" ),
-            "country_code": lookup_country( entry.src_ip, entry.dst_ip ),
+            "src_country_code": src_country_code,
+            "dst_country_code": dst_country_code,
+            "src_geo_status":   src_geo_status,
+            "dst_geo_status":   dst_geo_status
         } )
 
     # Do batch level heuristics first
