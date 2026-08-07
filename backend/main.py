@@ -4,6 +4,7 @@ from math import floor
 from typing import Annotated
 
 import rate_limiter as _rl  # access to the module for rebinding globals
+from analytics import router as analytics_router
 from api_keys import router as api_keys_router
 from auth import router as auth_router
 from cache import close_redis, init_redis, new_redis_client
@@ -88,6 +89,7 @@ app.include_router( api_keys_router.router, prefix="/api-keys", tags=[ "API keys
 app.include_router( ingest_router.router, prefix="/ingest", tags=[ "Ingest" ] )
 app.include_router( websocket_router.router, prefix="/ws", tags=[ "Websocket" ] )
 app.include_router( logs_router.router, prefix="/logs", tags=[ "Logs" ] )
+app.include_router( analytics_router.router, prefix="/analytics", tags=[ "Analytics" ] )
 if settings.enable_test_endpoints:
     from testing.router import router as test_only_router
     app.include_router( test_only_router )

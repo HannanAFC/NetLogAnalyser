@@ -28,7 +28,7 @@ class GetLogsResponse( BaseModel ):
     next_cursor:       str | None
     has_more:          bool
 
-@dataclass( )
+@dataclass
 class CursorData:
     id:                int
     captured_at:       datetime

@@ -91,6 +91,10 @@ class Settings( BaseSettings ):
     anomaly_weight_port_scan_shape:      float = Field( ge=0.0, le=1.0, default=0.7 )
     anomaly_weight_host_sweep_shape:     float = Field( ge=0.0, le=1.0, default=0.6 )
 
+    # Analytics endpoint
+    analytics_max_range_days:            int = 30
+    analytics_summary_expire_seconds:    int = 30
+
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 
 JSON_API_CSP = (

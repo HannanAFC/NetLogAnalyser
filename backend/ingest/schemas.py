@@ -2,14 +2,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Literal
+from typing import Any
 from uuid import UUID
 
 from config import settings
 from pydantic import BaseModel, ConfigDict, Field
 
-Protocol = Literal[ "TCP", "UDP", "ICMP", "OTHER" ]
+
+class ProtocolEnum( str, Enum ):
+    TCP   = "TCP"
+    UDP   = "UDP"
+    ICMP  = "ICMP"
+    OTHER = "OTHER"
 
 # forbid extra entries so that users can't spoof by adding in anomaly_score etc
 class LogEntryCreate( BaseModel ):
@@ -19,7 +25,7 @@ class LogEntryCreate( BaseModel ):
     dst_ip:            IPv4Address | IPv6Address
     src_port:          int = Field( ge=0, le=65535 )
     dst_port:          int = Field( ge=0, le=65535 )
-    protocol: Protocol
+    protocol:          ProtocolEnum
     packet_size_bytes: int = Field( ge=0 )
     flags:             str | None = Field( default=None, max_length=20 )
     raw_payload:       dict
