@@ -101,7 +101,8 @@ function LogHistoryPage( )
 									<th className="px-3 py-2 font-medium">Destination</th>
 									<th className="px-3 py-2 font-medium">Protocol</th>
 									<th className="px-3 py-2 text-right font-medium">Size</th>
-									<th className="px-3 py-2 font-medium">Country</th>
+									<th className="px-3 py-2 font-medium">Source country</th>
+									<th className="px-3 py-2 font-medium">Destination country</th>
 									<th className="px-3 py-2 font-medium">Anomaly</th>
 								</tr>
 							</thead>
@@ -144,7 +145,8 @@ function LogHistoryPage( )
 										<th className="px-3 py-2 font-medium">Destination</th>
 										<th className="px-3 py-2 font-medium">Protocol</th>
 										<th className="px-3 py-2 text-right font-medium">Size</th>
-										<th className="px-3 py-2 font-medium">Country</th>
+										<th className="px-3 py-2 font-medium">Source country</th>
+										<th className="px-3 py-2 font-medium">Destination country</th>
 										<th className="px-3 py-2 font-medium">Anomaly</th>
 									</tr>
 								</thead>

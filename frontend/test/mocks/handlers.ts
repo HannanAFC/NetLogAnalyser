@@ -110,7 +110,10 @@ const MOCK_LOG_ENTRIES = Array.from( { length: 50 }, ( _, i ) =>
 		protocol:          id % 3 === 0 ? 'UDP' : 'TCP',
 		packet_size_bytes: 1500,
 		flags:             id % 2 === 0 ? 'SYN,ACK' : null,
-		country_code:      id % 5 === 0 ? 'US' : null,
+		src_country_code:  id % 7 === 0 ? 'US' : null,
+		dst_country_code:  id % 5 === 0 ? 'US' : null,
+		src_geo_status:    id % 7 === 0 ? 'resolved' : 'private',
+		dst_geo_status:    id % 5 === 0 ? 'resolved' : 'private',
 		anomaly_score:     id % 7 === 0 ? 0.85 : 0,
 		anomaly_reasons:   id % 7 === 0 ? [ { name: 'test_anomaly', score: 0.85, detail: 'Test anomaly detail' } ] : [],
 		captured_at:       `2024-01-01T00:00:${ padded }Z`

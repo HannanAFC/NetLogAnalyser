@@ -61,7 +61,10 @@ export function LogEntryRow( { entry }: LogEntryRowProps )
 				{ entry.packet_size_bytes.toLocaleString() } B
 			</td>
 			<td className="whitespace-nowrap px-3 py-2 text-xs">
-				{ entry.country_code ?? '—' }
+				{ entry.src_geo_status === 'resolved' ? entry.src_country_code : entry.src_geo_status.toUpperCase( ) }
+			</td>
+			<td className="whitespace-nowrap px-3 py-2 text-xs">
+				{  entry.dst_geo_status === 'resolved' ? entry.dst_country_code : entry.dst_geo_status.toUpperCase( ) }
 			</td>
 			<td className="whitespace-nowrap px-3 py-2">
 				<AnomalyIndicator score={ entry.anomaly_score } reasons={ entry.anomaly_reasons } />

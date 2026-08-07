@@ -4,7 +4,7 @@ import { ConnectionStatusIndicator } from '#/components/live-feed/connection-sta
 import { LogEntryRow } from '#/components/live-feed/log-entry-row';
 import { getLogEntryKey } from '#/lib/logs/entry-key';
 import { SkeletonLog } from '#/components/skeletons/skeleton-log';
-import { BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { BodyText, Heading } from '#/components/ui/heading';
 
 export const Route = createFileRoute( '/_authenticated/live-feed' )(
 {
@@ -97,7 +97,8 @@ function LiveFeedPage( )
 									<th className="px-3 py-2 font-medium">Destination</th>
 									<th className="px-3 py-2 font-medium">Protocol</th>
 									<th className="px-3 py-2 text-right font-medium">Size</th>
-									<th className="px-3 py-2 font-medium">Country</th>
+									<th className="px-3 py-2 font-medium">Source country</th>
+									<th className="px-3 py-2 font-medium">Destination country</th>
 									<th className="px-3 py-2 font-medium">Anomaly</th>
 								</tr>
 							</thead>
@@ -135,7 +136,8 @@ function LiveFeedPage( )
 									<th className="px-3 py-2 font-medium">Destination</th>
 									<th className="px-3 py-2 font-medium">Protocol</th>
 									<th className="px-3 py-2 text-right font-medium">Size</th>
-									<th className="px-3 py-2 font-medium">Country</th>
+									<th className="px-3 py-2 font-medium">Source country</th>
+									<th className="px-3 py-2 font-medium">Destination country</th>
 									<th className="px-3 py-2 font-medium">Anomaly</th>
 								</tr>
 							</thead>

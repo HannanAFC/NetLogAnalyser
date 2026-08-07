@@ -1,5 +1,7 @@
 export type Protocol = 'TCP' | 'UDP' | 'ICMP' | 'OTHER';
 
+export type GeoStatus = 'resolved' | 'private' | 'unresolved' | 'unavailable';
+
 export interface AnomalyReason
 {
     name:   string;
@@ -17,7 +19,10 @@ export interface LogEntry
     protocol:          Protocol;
     packet_size_bytes: number;
     flags:             string | null;
-    country_code:      string | null;
+    src_country_code:  string | null;
+    dst_country_code:  string | null;
+    src_geo_status:    GeoStatus;
+    dst_geo_status:    GeoStatus;
     anomaly_score:     number;
     anomaly_reasons:   Array< AnomalyReason >;
     captured_at:       string;

@@ -25,7 +25,10 @@ const logEntryPublicSchema = z.object(
 	protocol:          z.enum( [ 'TCP', 'UDP', 'ICMP', 'OTHER' ] ),
 	packet_size_bytes: z.number( ),
 	flags:             z.string( ).nullable( ),
-	country_code:      z.string( ).nullable( ),
+	src_country_code:  z.string( ).nullable( ),
+	dst_country_code:  z.string( ).nullable( ),
+	src_geo_status:    z.enum( [ 'resolved', 'private', 'unresolved', 'unavailable' ] ),
+	dst_geo_status:    z.enum( [ 'resolved', 'private', 'unresolved', 'unavailable' ] ),
 	anomaly_score:     z.number( ),
 	anomaly_reasons:   z.array( anomalyReasonSchema ),
 	captured_at:       z.string( )
