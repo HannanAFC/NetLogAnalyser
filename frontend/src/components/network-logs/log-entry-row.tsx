@@ -35,15 +35,21 @@ function useRelativeTime( isoTimestamp: string ): string
 }
 
 interface LogEntryRowProps {
-	entry: LogEntry
+	entry:      LogEntry;
+	measureRef?: ( node: HTMLTableRowElement | null ) => void;
+	dataIndex?:  number;
 }
 
-export function LogEntryRow( { entry }: LogEntryRowProps )
+export function LogEntryRow( { entry, measureRef, dataIndex }: LogEntryRowProps )
 {
 	const relativeTime = useRelativeTime( entry.captured_at );
 
 	return (
-		<tr className="border-b border-border last:border-0 hover:bg-inset transition-colors duration-150">
+		<tr
+			ref={ measureRef }
+			data-index={ dataIndex }
+			className="border-b border-border last:border-0 hover:bg-inset transition-colors duration-150"
+		>
 			<td className="whitespace-nowrap px-3 py-2 text-xs text-text-secondary">
 				{ relativeTime }
 			</td>
@@ -58,7 +64,7 @@ export function LogEntryRow( { entry }: LogEntryRowProps )
 				{ entry.protocol }
 			</td>
 			<td className="whitespace-nowrap px-3 py-2 text-right text-xs text-text-secondary tabular-nums">
-				{ entry.packet_size_bytes.toLocaleString() } B
+				{ entry.packet_size_bytes.toLocaleString( ) } B
 			</td>
 			<td className="whitespace-nowrap px-3 py-2 text-xs">
 				{ entry.src_geo_status === 'resolved' ? entry.src_country_code : entry.src_geo_status.toUpperCase( ) }

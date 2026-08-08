@@ -1,8 +1,8 @@
-import { Button } from "#/components/ui/button";
-import { Card, CardDescription, CardLabel } from "#/components/ui/card";
-import type { CreatedApiKey } from "#/lib/api-keys/types";
-import { Check, Copy } from "lucide-react";
-import { useState } from "react";
+import { Button } from '#/components/ui/button';
+import { Card, CardDescription, CardLabel } from '#/components/ui/card';
+import type { CreatedApiKey } from '#/lib/api-keys/types';
+import { Check, Copy } from 'lucide-react';
+import { useState } from 'react';
 
 interface CreateKeyProps
 {
@@ -18,7 +18,7 @@ export function CreatedKeyRow( { newKey, setNewKey }: CreateKeyProps )
 	{
 		navigator.clipboard.writeText( text );
 		setCopied( true );
-		setTimeout( () => setCopied( false ), 2000 );
+		setTimeout( ( ) => setCopied( false ), 2000 );
 	}
 
 
@@ -34,7 +34,7 @@ export function CreatedKeyRow( { newKey, setNewKey }: CreateKeyProps )
 				</code>
 				<Button
 					variant='ghost'
-					onClick={ () => handleCopy( newKey.api_key ) }
+					onClick={ ( ) => handleCopy( newKey.api_key ) }
 				>
 					{ copied
 						? <Check className="h-4 w-4 text-success" />

@@ -1,8 +1,8 @@
-import { Button } from "#/components/ui/button";
-import { Card, CardTitle } from "#/components/ui/card";
-import type { ApiKey } from "#/lib/api-keys/types";
-import { formatApiKeyDate } from "#/lib/utils";
-import { Ban } from "lucide-react";
+import { Button } from '#/components/ui/button';
+import { Card, CardTitle } from '#/components/ui/card';
+import type { ApiKey } from '#/lib/api-keys/types';
+import { formatApiKeyDate } from '#/lib/utils';
+import { Ban } from 'lucide-react';
 
 export function ApiKeyRow( { apiKey, onRevoke, isRevoking }: { apiKey: ApiKey; onRevoke: ( id: string ) => void; isRevoking: boolean } )
 {

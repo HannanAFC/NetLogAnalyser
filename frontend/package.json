@@ -26,6 +26,7 @@
     "@tanstack/react-query-devtools": "^5.101.4",
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
+    "@tanstack/react-virtual": "^3.14.9",
     "@tanstack/router-plugin": "^1.132.0",
     "axios": "^1.18.0",
     "clsx": "^2.1.1",
