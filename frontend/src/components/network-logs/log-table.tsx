@@ -48,26 +48,6 @@ function SkeletonRows( { count = 20 }: { count?: number } )
 	);
 }
 
-function FailureStructure( { failureMessage }: { failureMessage: ReactNode } )
-{
-    return (
-        <div className="relative overflow-hidden rounded-lg border border-border">
-            <table className="w-full text-left">
-                <LogTableHead />
-                <tbody>
-                    <SkeletonRows count={10} />
-                </tbody>
-            </table>
-
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 top-0 backdrop-blur-[3px] bg-linear-to-b from-transparent from-0% to-paper to-35%" />
-
-            <div className="absolute inset-x-0 top-[50%] left-[50%] -translate-1/2 w-max max-w-4/5">
-                {failureMessage}
-            </div>
-        </div>
-    );
-}
-
 function LogTableHead( )
 {
 	return (
@@ -144,44 +124,50 @@ export function LogTable(
 	maxHeight = 'md'
 }: LogTableProps )
 {
-	const scrollRef = useRef< HTMLDivElement >( null );
+	const scrollRef                 = useRef< HTMLDivElement >( null );
+	const showErrorOverlay: boolean = ( isError && !isLoading && entries.length === 0 ) || ( !isLoading && !isError && entries.length === 0 );
+	const errorToShow: ReactNode    = ( showErrorOverlay && isError ) ? loadingErrorMessage : noRecentLogsErrorMessage;
 
 	return (
 		<div className="flex flex-col gap-8 mt-8">
-			{ isError && !isLoading && entries.length === 0 &&
-			(
-				<FailureStructure failureMessage={ loadingErrorMessage } />
-			) }
-
-			{ !isLoading && !isError && entries.length === 0 &&
-			(
-				<FailureStructure failureMessage={ noRecentLogsErrorMessage } />
-			) }
-
-			{ isLoading &&
-			(
-				<div className={ `overflow-auto rounded-lg border border-border ${ TableHeightVariantClasses[ maxHeight ] }` }>
-					<table className="w-full text-left">
-						<LogTableHead />
+			<div
+				ref={ scrollRef }
+				className={ `overflow-auto rounded-lg border border-border relative ${ TableHeightVariantClasses[ maxHeight ] }` }
+			>
+				<table className="w-full text-left tabular-nums">
+					<LogTableHead />
+					{ isError && !isLoading && entries.length === 0 &&
+					(
 						<tbody>
-							<SkeletonRows />
+							<SkeletonRows count={ 10 } />
 						</tbody>
-					</table>
-				</div>
-			) }
+					) }
+					{ !isLoading && !isError && entries.length === 0 &&
+					(
+						<tbody>
+							<SkeletonRows count={ 10 } />
+						</tbody>
+					) }
+					{ isLoading &&
+					(
+						<tbody>
+							<SkeletonRows count={ 20 } />
+						</tbody>
+					) }
 
-			{ entries.length > 0 &&
-			(
-				<div
-					ref={ scrollRef }
-					className={ `overflow-auto rounded-lg border border-border ${ TableHeightVariantClasses[ maxHeight ] }` }
-				>
-					<table className="w-full text-left tabular-nums">
-						<LogTableHead />
+					{ entries.length > 0 &&
+					(
 						<VirtualisedLogRows entries={ entries } scrollRef={ scrollRef } maxHeight={ maxHeight } />
-					</table>
+					) }
+				</table>
+
+				<div className={ `pointer-events-none absolute inset-x-0 bottom-0 top-0 backdrop-blur-[3px] bg-linear-to-b from-transparent from-0% to-paper to-35% transition-opacity duration-150 ${ showErrorOverlay ? "opacity-100" : "opacity-0" }` } />
+
+				<div className={ `absolute inset-x-0 top-[50%] left-[50%] -translate-1/2 w-max max-w-4/5 ${ showErrorOverlay ? "opacity-100" : "opacity-0" }` } >
+					{ errorToShow }
 				</div>
-			) }
+			</div>
+
 		</div>
 	);
 }
