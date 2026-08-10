@@ -11,13 +11,12 @@ import {
 import type {
 	AnomaliesFilterParams,
 	GeoParams,
-	ProtocolsParams,
-	SummaryParams,
+	TimeRangeParams,
 	TimeseriesParams,
 	TopTalkersParams
 } from './schemas';
 
-export function useSummary( params: SummaryParams )
+export function useSummary( params: TimeRangeParams )
 {
 	return useQuery( summaryQueryOptions( params ) );
 }
@@ -32,7 +31,7 @@ export function useTopTalkers( params: TopTalkersParams )
 	return useQuery( topTalkersQueryOptions( params ) );
 }
 
-export function useProtocols( params: ProtocolsParams )
+export function useProtocols( params: TimeRangeParams )
 {
 	return useQuery( protocolsQueryOptions( params ) );
 }

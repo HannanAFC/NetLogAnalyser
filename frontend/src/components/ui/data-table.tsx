@@ -104,12 +104,12 @@ export function DataTable< T >(
 
 					{ isLoading &&
 					(
-						<EmptyTableRows count={ loadingSkeletonCount } />
+						<SkeletonTableRows columns={ columns } count={ overlaySkeletonCount } />
 					) }
 
 					{ showOverlay && !isLoading &&
 					(
-						<EmptyTableRows count={ loadingSkeletonCount }></EmptyTableRows>
+						<EmptyTableRows count={ loadingSkeletonCount } />
 					) }
 
 					{ !showOverlay && !isLoading && data.length > 0 &&

@@ -1,10 +1,19 @@
 import type { LogEntry, Protocol } from '#/lib/logs/types';
 
-type TimeBucket = 'minute' | 'hour' | 'day';
+export const DIRECTION_VALUES = [ 'src', 'dst' ] as const;
+export type Direction = ( typeof DIRECTION_VALUES )[ number ];
 
-export type Direction = 'src' | 'dst';
+export const TIME_BUCKET_VALUES = [ 'minute', 'hour', 'day' ] as const;
+export type TimeBucket = ( typeof TIME_BUCKET_VALUES )[ number ];
 
-type TopTalkersMetric = 'packets' | 'bytes';
+export const METRIC_VALUES = [ 'packets', 'bytes' ] as const;
+export type Metric = 'packets' | 'bytes';
+
+export interface TimeRangeParams
+{
+	start: Date;
+	end:   Date;
+}
 
 export interface SummaryResponse
 {
@@ -43,7 +52,7 @@ export interface TopTalkerEntry
 export interface TopTalkersResponse
 {
 	direction: Direction;
-	metric:    TopTalkersMetric;
+	metric:    Metric;
 	rows:      TopTalkerEntry[ ];
 }
 

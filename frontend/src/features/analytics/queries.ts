@@ -1,6 +1,5 @@
-// features/analytics/queries.ts
 import { queryOptions, infiniteQueryOptions } from '@tanstack/react-query';
-import { analyticsKeys } from '#/lib/analytics/query-key';
+import { analyticsKeys } from './query-key';
 import {
 	getSummaryRequest,
 	getTimeseriesRequest,
@@ -10,15 +9,14 @@ import {
 	getAnomaliesRequest
 } from './api';
 import type {
-	SummaryParams,
-	TimeseriesParams,
-	TopTalkersParams,
-	ProtocolsParams,
+	AnomaliesParams,
 	GeoParams,
-	AnomaliesParams
+	TimeRangeParams,
+	TimeseriesParams,
+	TopTalkersParams
 } from './schemas';
 
-export function summaryQueryOptions( params: SummaryParams )
+export function summaryQueryOptions( params: TimeRangeParams )
 {
 	return queryOptions(
 	{
@@ -47,7 +45,7 @@ export function topTalkersQueryOptions( params: TopTalkersParams )
 	} );
 }
 
-export function protocolsQueryOptions( params: ProtocolsParams )
+export function protocolsQueryOptions( params: TimeRangeParams )
 {
 	return queryOptions(
 	{
