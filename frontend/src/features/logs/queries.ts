@@ -2,7 +2,6 @@ import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 
 import { getLogsRequest } from '#/features/logs/api';
 import { logsQueryKey } from '#/lib/logs/query-key';
-import type { GetLogsResponse } from '#/lib/logs/types';
 
 export const DEFAULT_INITIAL_LOGS_LIMIT = 20;
 export const DEFAULT_HISTORY_PAGE_LIMIT = 25;
@@ -32,6 +31,6 @@ export function logsInfiniteQueryOptions( limit: number = DEFAULT_HISTORY_PAGE_L
 		queryKey:         logsQueryKey( limit ),
 		queryFn:          ( { pageParam } ) => getLogsRequest( { cursor: pageParam, limit: limit } ),
 		initialPageParam: undefined as string | undefined,
-		getNextPageParam: ( lastPage: GetLogsResponse ) => lastPage.has_more ? ( lastPage.next_cursor ?? undefined ) : undefined
+		getNextPageParam: ( lastPage ) => lastPage.has_more ? ( lastPage.next_cursor ?? undefined ) : undefined
 	} );
 }

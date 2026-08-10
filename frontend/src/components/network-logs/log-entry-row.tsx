@@ -36,17 +36,15 @@ function useRelativeTime( isoTimestamp: string ): string
 
 interface LogEntryRowProps {
 	entry:      LogEntry;
-	measureRef?: ( node: HTMLTableRowElement | null ) => void;
 	dataIndex?:  number;
 }
 
-export function LogEntryRow( { entry, measureRef, dataIndex }: LogEntryRowProps )
+export function LogEntryRow( { entry, dataIndex }: LogEntryRowProps )
 {
 	const relativeTime = useRelativeTime( entry.captured_at );
 
 	return (
 		<tr
-			ref={ measureRef }
 			data-index={ dataIndex }
 			className="border-b border-border last:border-0 hover:bg-inset transition-colors duration-150"
 		>

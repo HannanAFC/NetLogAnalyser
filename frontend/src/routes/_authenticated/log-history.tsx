@@ -77,6 +77,7 @@ function LogHistoryPage( )
 			</div>
 			<div className='flex flex-col items-center gap-8'>
 				<LogTable
+					className="w-full"
 					isLoading={ isLoading }
 					isError={ isError }
 					loadingErrorMessage={ <LoadingErrorMessage /> }
