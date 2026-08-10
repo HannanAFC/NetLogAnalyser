@@ -94,6 +94,7 @@ class Settings( BaseSettings ):
     # Analytics endpoint
     analytics_max_range_days:            int = 30
     analytics_summary_expire_seconds:    int = 30
+    analytics_timeseries_expire_seconds: int = 30
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 

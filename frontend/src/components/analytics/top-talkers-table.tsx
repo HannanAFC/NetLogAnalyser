@@ -20,7 +20,7 @@ const COLUMNS: SkeletonColumn[ ] =
 	{ header: 'IP' },
 	{ header: 'Packets' },
 	{ header: 'Bytes' },
-	{ header: '	Avg score' }
+	{ header: 'Avg score' }
 ];
 
 function TopTalkerRow( { row }: { row: TopTalkerEntry } )
@@ -72,14 +72,14 @@ export function TopTalkersTable( { range }: TopTalkersTableProps )
 					className="mt-4 w-full"
 					columns={ COLUMNS }
 					data={ data.rows }
-					renderRow={ ( row, index ) => <TopTalkerRow key={ index } row={ row } /> }
-					getRowKey={ ( _row, index ) =>
+					renderRow={ ( row, _index ) => <TopTalkerRow key={ row.ip } row={ row } /> }
+					getRowKey={ ( row, _index ) =>
 					{
-						return index;
+						return row.ip;
 					} }
 					isLoading={ isPending }
 					isError={ isError }
-					errorMessage={ <TableLoadingErrorMessage>An error occured whilst loading the top talkers.</TableLoadingErrorMessage> }
+					errorMessage={ <TableLoadingErrorMessage>An error occurred whilst loading the top talkers.</TableLoadingErrorMessage> }
 					emptyMessage={ <TableNoRecentsErrorMessage>Top talkers not available for the current time range.</TableNoRecentsErrorMessage> }
 					maxHeight='md'
 					virtualize={ false }

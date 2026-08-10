@@ -33,6 +33,11 @@ interface SkeletonTableRowsProps
 	count:   number;
 }
 
+interface EmptyTableRowsProps extends HTMLAttributes< HTMLTableRowElement >
+{
+	count: number;
+}
+
 export function SkeletonTableRows( { columns, count }: SkeletonTableRowsProps )
 {
 	return (
@@ -40,6 +45,18 @@ export function SkeletonTableRows( { columns, count }: SkeletonTableRowsProps )
 			{ Array.from( { length: count }, ( _, i ) =>
 			(
 				<SkeletonTableRow key={ i } columns={ columns } />
+			) ) }
+		</tbody>
+	);
+}
+
+export function EmptyTableRows( { count }: EmptyTableRowsProps )
+{
+	return (
+		<tbody>
+			{ Array.from( { length: count }, ( _, i ) =>
+			(
+				<tr key={ i } className='h-9.5 border-b border-border last:border-0'></tr>
 			) ) }
 		</tbody>
 	);

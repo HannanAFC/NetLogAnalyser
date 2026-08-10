@@ -39,7 +39,7 @@ export function TopAnomaliesPreview( { className, range }: TopAnomaliesPreviewPr
             getRowKey={ ( entry, _index ) => getLogEntryKey( entry ) }
             isLoading={ isLoading }
             isError={ isError }
-            errorMessage={ <TableLoadingErrorMessage>An error occured whilst loading anomalies, please try again.</TableLoadingErrorMessage> }
+            errorMessage={ <TableLoadingErrorMessage>An error occurred whilst loading anomalies, please try again.</TableLoadingErrorMessage> }
             emptyMessage={ <TableNoRecentsErrorMessage>No anomalies detected in the current time range.</TableNoRecentsErrorMessage> }
             maxHeight='sm'
             virtualize={ false }

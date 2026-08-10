@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '#/lib/utils';
-import { SkeletonTableRows } from './skeleton-table';
+import { EmptyTableRows, SkeletonTableRows } from './skeleton-table';
 import type { SkeletonColumn } from './skeleton-table';
 
 export type TableHeightVariant = 'sm' | 'md' | 'lg';
@@ -104,12 +104,12 @@ export function DataTable< T >(
 
 					{ isLoading &&
 					(
-						<SkeletonTableRows columns={ columns } count={ loadingSkeletonCount } />
+						<EmptyTableRows count={ loadingSkeletonCount } />
 					) }
 
 					{ showOverlay && !isLoading &&
 					(
-						<SkeletonTableRows columns={ columns } count={ overlaySkeletonCount } />
+						<EmptyTableRows count={ loadingSkeletonCount }></EmptyTableRows>
 					) }
 
 					{ !showOverlay && !isLoading && data.length > 0 &&

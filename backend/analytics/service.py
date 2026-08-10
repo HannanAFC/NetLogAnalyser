@@ -175,7 +175,7 @@ async def get_timeseries(
     await redis.set(
         cache_key,
         response.model_dump_json( ),
-        ex = settings.analytics_summary_expire_seconds
+        ex = settings.analytics_timeseries_expire_seconds
     )
 
     return response

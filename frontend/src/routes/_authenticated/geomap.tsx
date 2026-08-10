@@ -21,7 +21,7 @@ const useTimeRange = createUseTimeRange( '/_authenticated/geomap' );
 function GeomapPage()
 {
 	const [ range, setRange, search ]  = useTimeRange();
-	const [ direction, setDirection ]  = useState<Direction>( 'src' );
+	const [ direction, setDirection ]  = useState< Direction >( 'src' );
 
 	const { data, isPending, isError } = useGeo( { ...range, direction, limit: 50 } );
 

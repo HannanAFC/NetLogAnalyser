@@ -2,7 +2,7 @@
 import type { GeoParams, ProtocolsParams, SummaryParams, TimeseriesParams, TopTalkersParams, AnomaliesParams } from '#/features/analytics/schemas';
 
 export const analyticsKeys = {
-	all:         [ 'analytics ' ] as const,
+	all:         [ 'analytics' ] as const,
 	summary:     ( params: SummaryParams )     => [ ...analyticsKeys.all, 'summary', params ] as const,
 	timeseries:  ( params: TimeseriesParams )  => [ ...analyticsKeys.all, 'timeseries', params ] as const,
 	topTalkers:  ( params: TopTalkersParams )  => [ ...analyticsKeys.all, 'top-talkers', params ] as const,

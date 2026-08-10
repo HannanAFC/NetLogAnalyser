@@ -11,13 +11,6 @@ export type Direction = z.infer< typeof directionSchema >;
 export const metricSchema = z.enum( [ 'packets', 'bytes' ] );
 export type Metric = z.infer< typeof metricSchema >;
 
-export const protocolSchema = z.enum( [ 'TCP', 'UDP', 'ICMP', 'OTHER' ] );
-export type Protocol = z.infer< typeof protocolSchema >;
-
-export const geoStatusSchema = z.enum( [ 'RESOLVED', 'PRIVATE', 'UNRESOLVED', 'UNAVAILABLE' ] );
-export type GeoStatus = z.infer< typeof geoStatusSchema >;
-
-
 export const timeRangeParamsSchema = z.object(
 {
 	start: z.date( ),

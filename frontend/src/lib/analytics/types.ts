@@ -1,10 +1,10 @@
-import type { LogEntry } from '#/lib/logs/types';
+import type { LogEntry, Protocol } from '#/lib/logs/types';
 
-export type TimeBucket = 'minute' | 'hour' | 'day';
+type TimeBucket = 'minute' | 'hour' | 'day';
 
 export type Direction = 'src' | 'dst';
 
-export type TopTalkersMetric = 'packets' | 'bytes';
+type TopTalkersMetric = 'packets' | 'bytes';
 
 export interface SummaryResponse
 {
@@ -49,7 +49,7 @@ export interface TopTalkersResponse
 
 export interface ProtocolEntry
 {
-	protocol:          string;
+	protocol:          Protocol;
 	count:             number;
 	packet_percentage: number;
 }

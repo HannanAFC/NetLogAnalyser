@@ -1,6 +1,6 @@
 import { BodyText, Eyebrow, Heading } from '#/components/ui/heading';
 import { useSession } from '#/features/auth/hooks';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { timeRangePresetSchema, timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { createUseTimeRange, setCustomRange, setPreset } from '#/lib/time-range/use-time-range';
 import { TimeRangePicker } from '#/components/ui/time-range-picker';
@@ -9,9 +9,9 @@ import { TimeseriesSparkline } from '#/components/dashboard/timeseries-sparkline
 import { TopAnomaliesPreview } from '#/components/dashboard/top-anomalies-preview';
 import { useLiveFeed } from '#/features/live-feed/hooks';
 import { LogTable } from '#/components/network-logs/log-table';
-import { LoadingErrorMessage } from '#/components/live-feed/loading-error-message';
-import { NoRecentLogsErrorMessage } from '#/components/live-feed/no-recent-logs-error-message';
 import { ConnectionStatusIndicator } from '#/components/live-feed/connection-status';
+import { TableNoRecentsErrorMessage } from '#/components/ui/table-no-recents-error-message';
+import { TableLoadingErrorMessage } from '#/components/ui/table-loading-error-message';
 
 const dashboardSearchSchema = timeRangeSearchSchema.extend(
 {
@@ -110,8 +110,16 @@ function DashboardPage( )
 							className='mt-0'
 							isLoading={ isLoadingInitial }
 							isError={ isInitialError }
-							loadingErrorMessage={ <LoadingErrorMessage /> }
-							noRecentLogsErrorMessage={ <NoRecentLogsErrorMessage /> }
+							loadingErrorMessage={ <TableLoadingErrorMessage>Couldn't load recent logs. The live feed will still start once connected.</TableLoadingErrorMessage> }
+							noRecentLogsErrorMessage={
+								<TableNoRecentsErrorMessage>
+									No log entries yet. Send traffic to your ingest endpoint -{' '}
+									<Link to="/settings" className="font-medium text-accent underline underline-offset-2 hover:text-accent-strong">
+										get your API key
+									</Link>
+									{' '}to start sending logs now.
+								</TableNoRecentsErrorMessage>
+							}
 							entries={ entries }
 							maxHeight='sm'
 						/>

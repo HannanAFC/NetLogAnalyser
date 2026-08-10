@@ -31,15 +31,16 @@ export function SummaryStatCards( { range }: SummaryStatCardsProps )
 	}
 
 	const stats = [
-		{ label: 'Total packets',       value: data.total_packets.toLocaleString() },
-		{ label: 'Unique sources',      value: data.unique_src_ips.toLocaleString() },
-		{ label: 'Unique destinations', value: data.unique_dst_ips.toLocaleString() },
-		{ label: 'Avg anomaly score',   value: data.avg_anomaly_score.toFixed( 2 ) },
-		{ label: 'Total bytes',         value: data.total_bytes.toLocaleString() }
+		{ label: 'Total packets',        value: data.total_packets.toLocaleString( ) },
+		{ label: 'Unique sources',       value: data.unique_src_ips.toLocaleString( ) },
+		{ label: 'Unique destinations',  value: data.unique_dst_ips.toLocaleString( ) },
+		{ label: 'Avg anomaly score',    value: data.avg_anomaly_score.toFixed( 2 ) },
+		{ label: 'Total bytes',          value: data.total_bytes.toLocaleString( ) },
+		{ label: 'High level anomalies', value: data.high_anomaly_count.toLocaleString( ) }
 	];
 
 	return (
-		<div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+		<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
 			{ stats.map( ( stat ) => (
 				<Card key={ stat.label }>
 					<StatNumber>{ stat.value }</StatNumber>

@@ -58,14 +58,14 @@ export function ProtocolBreakdown( { range }: ProtocolBreakdownProps )
 				className="mt-4 w-full"
 				columns={ COLUMNS }
 				data={ data.top_dst_ports }
-				renderRow={ ( row, index ) => <PortRow key={ index } row={ row } /> }
-				getRowKey={ ( _row, index ) =>
+				renderRow={ ( row, _index ) => <PortRow key={ row.port } row={ row } /> }
+				getRowKey={ ( row, _index ) =>
 				{
-					return index;
+					return row.port;
 				} }
 				isLoading={ isPending }
 				isError={ isError }
-				errorMessage={ <TableLoadingErrorMessage>An error occured whilst loading the port breakdown.</TableLoadingErrorMessage> }
+				errorMessage={ <TableLoadingErrorMessage>An error occurred whilst loading the port breakdown.</TableLoadingErrorMessage> }
 				emptyMessage={ <TableNoRecentsErrorMessage>Port breakdown not available for the current time range.</TableNoRecentsErrorMessage> }
 				maxHeight='md'
 				virtualize={ false }

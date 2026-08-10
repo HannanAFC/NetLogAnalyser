@@ -32,7 +32,7 @@ export function TimeseriesSparkline( { range }: TimeseriesSparklineProps )
 			x: { scale: scaleUtc },
 			y: { scale: scaleLinear }
 		} );
-	}, [ data ] );
+	}, [ points ] );
 
 	if ( isPending )
 	{

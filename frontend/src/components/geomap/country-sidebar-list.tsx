@@ -38,13 +38,13 @@ function GeoRow( { row }: { row: GeoEntry } )
 export function CountrySidebarList( { rows, isLoading, isError }: CountrySidebarListProps )
 {
 	return (
-		<DataTable
+		<DataTable< GeoEntry >
 			columns={ COLUMNS }
 			data={ rows }
-			renderRow={ ( row, index ) => <GeoRow row={ row } key={ index } /> }
-			getRowKey={ ( _row, index ) =>
+			renderRow={ ( row, _index ) => <GeoRow row={ row } key={ `${ row.country_code }|${ row.geo_status }` } /> }
+			getRowKey={ ( row, _index ) =>
 			{
-				return index;
+				return `${ row.country_code }|${ row.geo_status }`;
 			} }
 			isLoading={ isLoading }
 			isError={ isError }
