@@ -1,11 +1,11 @@
-import { LoadingErrorMessage } from '#/components/logs/loading-error-message';
-import { NoRecentLogsErrorMessage } from '#/components/logs/no-recent-logs-error-message';
 import { LogTable } from '#/components/network-logs/log-table';
 import { Button } from '#/components/ui/button';
 import { BodyText, Heading } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
+import { TableLoadingErrorMessage } from '#/components/ui/table-loading-error-message';
+import { TableNoRecentsErrorMessage } from '#/components/ui/table-no-recents-error-message';
 import { useLogHistory } from '#/features/logs/hooks';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute( '/_authenticated/log-history' )(
 {
@@ -79,8 +79,16 @@ function LogHistoryPage( )
 					className="w-full"
 					isLoading={ isLoading }
 					isError={ isError }
-					loadingErrorMessage={ <LoadingErrorMessage /> }
-					noRecentLogsErrorMessage={ <NoRecentLogsErrorMessage /> }
+					loadingErrorMessage={ <TableLoadingErrorMessage>Couldn't load recent logs. The live feed will still start once connected.</TableLoadingErrorMessage> }
+					noRecentLogsErrorMessage={
+						<TableNoRecentsErrorMessage>
+							No log entries yet. Send traffic to your ingest endpoint -{' '}
+							<Link to="/settings" className="font-medium text-accent underline underline-offset-2 hover:text-accent-strong">
+								get your API key
+							</Link>
+							{' '}to start sending logs now.
+						</TableNoRecentsErrorMessage>
+					}
 					entries={ entries }
 				/>
 				{ entries.length > 0 &&

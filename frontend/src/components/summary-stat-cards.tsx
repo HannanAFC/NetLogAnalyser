@@ -47,16 +47,7 @@ export function SummaryStatCards( { range }: SummaryStatCardsProps )
 
 	return (
 		<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-			{ isPending &&
-			(
-				Array.from( { length: 5 } ).map( ( _, i ) =>
-				(
-					<Card key={ i } className="h-28 animate-pulse" >
-						<></>
-					</Card>
-				) )
-			) }
-			{ !isPending && !isError && stats.map( ( stat ) =>
+			{ stats.map( ( stat ) =>
 			(
 				<Card key={ stat.label }>
 					<StatNumber>{ stat.value }</StatNumber>
