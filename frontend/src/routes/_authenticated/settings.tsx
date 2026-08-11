@@ -1,5 +1,6 @@
 import { ApiKeysSection } from '#/components/settings/api-keys/api-keys-section';
 import { BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { PageWrapper } from '#/components/ui/page-wrapper';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute( '/_authenticated/settings' )(
@@ -55,8 +56,8 @@ function SettingsPage( )
 {
 
 	return (
-		<div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-			<div className="mb-8">
+		<PageWrapper maxWidth="4xl">
+			<div>
 				<Eyebrow>Configuration</Eyebrow>
 				<Heading level="h1" className="mt-1">Settings</Heading>
 				<BodyText className="mt-2">Manage your account, API keys, and preferences.</BodyText>
@@ -72,6 +73,6 @@ function SettingsPage( )
 			</div>
 
 			<ApiKeysSection />
-		</div>
+		</PageWrapper>
 	);
 }

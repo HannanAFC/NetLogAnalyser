@@ -14,6 +14,7 @@ import { resolveBucket } from '#/lib/time-range/timeseries-bucket';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import type { TimeBucket } from '#/features/analytics/schemas';
 import { BodyText, Heading } from '#/components/ui/heading';
+import { PageWrapper } from '#/components/ui/page-wrapper';
 
 const analyticsSearchSchema = timeRangeSearchSchema.extend(
 {
@@ -46,42 +47,34 @@ function AnalyticsPage( )
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 flex flex-col gap-8">
-			<section className="flex flex-col gap-4">
-				<Heading level="h1" className="max-w-2xl">Analytics</Heading>
-				<BodyText className='w-max max-w-full'>
-					Get detailed insights via all the analytical avenues - with access to detailed time filters.
-				</BodyText>
-			</section>
+		<PageWrapper>
+			<Heading level="h1" className="max-w-2xl">Analytics</Heading>
+			<BodyText className='w-max max-w-full'>
+				Get detailed insights via all the analytical avenues - with access to detailed time filters.
+			</BodyText>
 
-			<section title='Time filters'>
 			<TimeRangePicker
 				search={ search }
 				onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
 			/>
-			</section>
 
-			<section className="flex flex-col gap-6">
-				<Heading level='h2'>Summary</Heading>
-				<SummaryStatCards range={ range } />
-			</section>
+			<Heading level='h2'>Summary</Heading>
+			<SummaryStatCards range={ range } />
 
-			<section className="flex flex-col gap-6">
-				<Heading level='h2'>Packet volume</Heading>
-				<TimeseriesBucketSelector
-					start={ range.start }
-					end={ range.end }
-					bucket={ search.bucket }
-					resolvedBucket={ resolved.bucket }
-					onChange={ handleBucketChange }
-				/>
-				<TimeseriesChart range={ range } bucket={ resolved.bucket } />
-			</section>
+			<Heading level='h2'>Packet volume</Heading>
+			<TimeseriesBucketSelector
+				start={ range.start }
+				end={ range.end }
+				bucket={ search.bucket }
+				resolvedBucket={ resolved.bucket }
+				onChange={ handleBucketChange }
+			/>
+			<TimeseriesChart range={ range } bucket={ resolved.bucket } />
 
 			<div className="grid gap-6 md:grid-cols-2">
 				<ProtocolBreakdown range={ range } />
 				<TopTalkersTable range={ range } />
 			</div>
-		</div>
+		</PageWrapper>
 	);
 }

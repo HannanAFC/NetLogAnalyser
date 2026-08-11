@@ -3,6 +3,7 @@ import { NoRecentLogsErrorMessage } from '#/components/logs/no-recent-logs-error
 import { LogTable } from '#/components/network-logs/log-table';
 import { Button } from '#/components/ui/button';
 import { BodyText, Heading } from '#/components/ui/heading';
+import { PageWrapper } from '#/components/ui/page-wrapper';
 import { useLogHistory } from '#/features/logs/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -68,14 +69,12 @@ function LogHistoryPage( )
 	}
 
  	return (
-		<section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-			<div className='flex flex-col gap-4'>
-				<Heading level='h1'>Log History</Heading>
-				<BodyText>
-					View historical network log data in full detail.
-				</BodyText>
-			</div>
-			<div className='flex flex-col items-center gap-8'>
+		<PageWrapper>
+			<Heading level='h1'>Log History</Heading>
+			<BodyText className="mt-2">
+				View historical network log data in full detail.
+			</BodyText>
+			<div className='flex flex-col items-center gap-8 mt-8'>
 				<LogTable
 					className="w-full"
 					isLoading={ isLoading }
@@ -103,6 +102,6 @@ function LogHistoryPage( )
 					</Button>
 				) }
 			</div>
-		</section>
+		</PageWrapper>
 	);
 }

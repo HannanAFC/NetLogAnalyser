@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useLiveFeed } from '#/features/live-feed/hooks';
 import { ConnectionStatusIndicator } from '#/components/live-feed/connection-status';
 import { BodyText, Heading } from '#/components/ui/heading';
+import { PageWrapper } from '#/components/ui/page-wrapper';
 import { LogTable } from '#/components/network-logs/log-table';
 import { TableNoRecentsErrorMessage } from '#/components/ui/table-no-recents-error-message';
 import { TableLoadingErrorMessage } from '#/components/ui/table-loading-error-message';
@@ -60,16 +61,14 @@ function LiveFeedPage( )
 	const { entries, connectionStatus, isLoadingInitial, isInitialError } = useLiveFeed( );
 
 	return (
-		<section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+		<PageWrapper>
 			<div className="flex items-center justify-between">
-				<div className='flex flex-col gap-4'>
-					<Heading level='h1'>Live Feed</Heading>
-					<BodyText>
-						New log entries appear in real time - newest first.
-					</BodyText>
-				</div>
+				<Heading level='h1'>Live Feed</Heading>
 				<ConnectionStatusIndicator status={ connectionStatus } />
 			</div>
+			<BodyText className="mt-2">
+				New log entries appear in real time - newest first.
+			</BodyText>
 			<LogTable
 				isLoading={isLoadingInitial}
 				isError={isInitialError}
@@ -85,6 +84,6 @@ function LiveFeedPage( )
 				}
 				entries={entries}
 			/>
-		</section>
+		</PageWrapper>
 	);
 }

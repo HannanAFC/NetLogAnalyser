@@ -4,12 +4,14 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { CountrySidebarList } from '#/components/geomap/country-sidebar-list';
 import { WorldChoropleth } from '#/components/geomap/world-choropleth';
+import { PageWrapper } from '#/components/ui/page-wrapper';
 import { TimeRangePicker } from '#/components/ui/time-range-picker';
 import { Button } from '#/components/ui/button';
 import { useGeo } from '#/features/analytics/hooks';
 import { timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import type { Direction } from '#/features/analytics/schemas';
+import { BodyText, Heading } from '#/components/ui/heading';
 
 export const Route = createFileRoute( '/_authenticated/geomap' )( {
 	validateSearch: timeRangeSearchSchema,
@@ -29,7 +31,11 @@ function GeomapPage()
 	const unresolvedRows = ( data?.rows ?? [] ).filter( ( row ) => row.country_code === null );
 
 	return (
-		<div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+		<PageWrapper>
+			<Heading level="h1" className="max-w-2xl">Geomap</Heading>
+			<BodyText className='w-max max-w-full'>
+				Figure out where all your network traffic is going to and coming from.
+			</BodyText>
 			<div className="flex flex-wrap items-center gap-4">
 				<TimeRangePicker
 					search={ search }
@@ -54,6 +60,6 @@ function GeomapPage()
 					<CountrySidebarList rows={ [ ...resolvedRows, ...unresolvedRows ] } isLoading={ isPending } isError={ isError } />
 				</div>
 			) }
-		</div>
+		</PageWrapper>
 	);
 }

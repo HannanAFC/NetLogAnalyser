@@ -101,39 +101,20 @@ export const Route = createRootRoute(
 	} )
 } );
 
-function AuthenticatedHeader( )
-{
-	const { toggle } = useSidebar( );
-
-	return (
-		<>
-			<Button
-				type="button"
-				onClick={ toggle }
-				aria-label="Toggle navigation"
-				variant='ghost'
-			>
-				<Menu className="h-5 w-5" />
-			</Button>
-			<IndexLink />
-		</>
-	);
-}
-
 function RootComponent( )
 {
 	const { data: session } = useSession( );
 
 	return (
 		<SidebarProvider>
-			<RootInner session={ session } />
+			<RootLayout session={ session } />
 		</SidebarProvider>
 	);
 }
 
-function RootInner( { session }: { session: unknown } )
+function RootLayout( { session }: { session: unknown } )
 {
-	const { open, close } = useSidebar( );
+	const { toggle, open, close } = useSidebar( );
 
 	return (
 		<>
@@ -141,11 +122,20 @@ function RootInner( { session }: { session: unknown } )
 			<div className="flex min-h-screen flex-col bg-paper text-text-primary">
 				<header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 					<div className="flex items-center gap-3">
-						{ !!session && <AuthenticatedHeader /> }
-						{ !session &&
-						(
+						{ !!session &&
+						<>
+							<Button
+								type="button"
+								onClick={ toggle }
+								aria-label="Toggle navigation"
+								variant='ghost'
+							>
+								<Menu className="h-5 w-5" />
+							</Button>
 							<IndexLink />
-						) }
+						</>
+						}
+						{ !session && <IndexLink /> }
 					</div>
 
 					<nav className="flex items-center gap-4">

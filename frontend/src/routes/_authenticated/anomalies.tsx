@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { AnomaliesTable } from '#/components/anomalies/anomalies-table';
+import { PageWrapper } from '#/components/ui/page-wrapper';
 import { TimeRangePicker } from '#/components/ui/time-range-picker';
 import { timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
@@ -31,7 +32,7 @@ function AnomaliesPage( )
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+		<PageWrapper>
 			<div className="flex flex-wrap items-center gap-4">
 				<TimeRangePicker
 					search={ search }
@@ -52,6 +53,6 @@ function AnomaliesPage( )
 			</div>
 
 			<AnomaliesTable filter={ { ...range, min_score: search.min_score, limit: 25 } } />
-		</div>
+		</PageWrapper>
 	);
 }
