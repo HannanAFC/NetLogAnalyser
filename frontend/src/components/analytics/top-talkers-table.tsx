@@ -72,8 +72,8 @@ export function TopTalkersTable( { range }: TopTalkersTableProps )
 					className="mt-4 w-full"
 					columns={ COLUMNS }
 					data={ data.rows }
-					renderRow={ ( row, _index ) => <TopTalkerRow key={ row.ip } row={ row } /> }
-					getRowKey={ ( row, _index ) =>
+					renderRow={ ( row ) => <TopTalkerRow key={ row.ip } row={ row } /> }
+					getRowKey={ ( row ) =>
 					{
 						return row.ip;
 					} }

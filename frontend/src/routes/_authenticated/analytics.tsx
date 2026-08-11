@@ -11,7 +11,7 @@ import { TimeRangePicker } from '#/components/ui/time-range-picker';
 import { timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { timeBucketSchema } from '#/features/analytics/schemas';
 import { resolveBucket } from '#/lib/time-range/timeseries-bucket';
-import { createUseTimeRange, setCustomRange, setPreset } from '#/lib/time-range/use-time-range';
+import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import type { TimeBucket } from '#/features/analytics/schemas';
 import { BodyText, Heading } from '#/components/ui/heading';
 
@@ -57,8 +57,7 @@ function AnalyticsPage( )
 			<section title='Time filters'>
 			<TimeRangePicker
 				search={ search }
-				onPresetChange={ ( preset ) => setPreset( setRange, preset ) }
-				onCustomRangeChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+				onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
 			/>
 			</section>
 

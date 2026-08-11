@@ -47,7 +47,7 @@ export function LogTable(
 			columns={ LOG_COLUMNS }
 			data={ entries }
 			renderRow={ ( entry, index ) => <LogEntryRow entry={ entry } dataIndex={ index } key={ getLogEntryKey( entry ) } /> }
-			getRowKey={ ( entry, _index ) => getLogEntryKey( entry ) }
+			getRowKey={ ( entry ) => getLogEntryKey( entry ) }
 			isLoading={ isLoading }
 			isError={ isError }
 			errorMessage={ loadingErrorMessage }

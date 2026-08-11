@@ -8,7 +8,7 @@ import { TimeRangePicker } from '#/components/ui/time-range-picker';
 import { Button } from '#/components/ui/button';
 import { useGeo } from '#/features/analytics/hooks';
 import { timeRangeSearchSchema } from '#/lib/time-range/schema';
-import { createUseTimeRange, setCustomRange, setPreset } from '#/lib/time-range/use-time-range';
+import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import type { Direction } from '#/features/analytics/schemas';
 
 export const Route = createFileRoute( '/_authenticated/geomap' )( {
@@ -33,8 +33,7 @@ function GeomapPage()
 			<div className="flex flex-wrap items-center gap-4">
 				<TimeRangePicker
 					search={ search }
-					onPresetChange={ ( preset ) => setPreset( setRange, preset ) }
-					onCustomRangeChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+					onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
 				/>
 				<div role="group" aria-label="Direction" className="flex gap-1">
 					<Button type="button" variant={ direction === 'src' ? 'primary' : 'ghost' } onClick={ () => setDirection( 'src' ) }>

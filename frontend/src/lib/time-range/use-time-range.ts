@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import type { TimeRangeParams } from '#/features/analytics/schemas';
 
 import { resolveTimeRange } from './resolve-time-range';
-import type { TimeRangePreset, TimeRangeSearch } from './schema';
+import type { TimeRangeSearch } from './schema';
 
 type SetTimeRange = ( next: Partial< TimeRangeSearch > ) => void;
 
@@ -26,11 +26,6 @@ export function createUseTimeRange( routeId: string )
 
 		return [ range, setRange, search ];
 	};
-}
-
-export function setPreset( setRange: SetTimeRange, preset: TimeRangePreset )
-{
-	setRange( { preset, start: undefined, end: undefined } );
 }
 
 export function setCustomRange( setRange: SetTimeRange, start: Date, end: Date )

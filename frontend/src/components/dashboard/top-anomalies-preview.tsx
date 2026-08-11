@@ -35,8 +35,8 @@ export function TopAnomaliesPreview( { className, range }: TopAnomaliesPreviewPr
             className={ className }
             columns={ LOG_COLUMNS }
             data={ rows }
-            renderRow={ ( entry ) => <TopAnomaliesRow row={ entry } /> }
-            getRowKey={ ( entry, _index ) => getLogEntryKey( entry ) }
+            renderRow={ ( entry ) => <TopAnomaliesRow key={ getLogEntryKey( entry ) } row={ entry } /> }
+            getRowKey={ ( entry ) => getLogEntryKey( entry ) }
             isLoading={ isLoading }
             isError={ isError }
             errorMessage={ <TableLoadingErrorMessage>An error occurred whilst loading anomalies, please try again.</TableLoadingErrorMessage> }

@@ -2,7 +2,7 @@ import { BodyText, Eyebrow, Heading } from '#/components/ui/heading';
 import { useSession } from '#/features/auth/hooks';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { timeRangePresetSchema, timeRangeSearchSchema } from '#/lib/time-range/schema';
-import { createUseTimeRange, setCustomRange, setPreset } from '#/lib/time-range/use-time-range';
+import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import { TimeRangePicker } from '#/components/ui/time-range-picker';
 import { SummaryStatCards } from '#/components/summary-stat-cards';
 import { TimeseriesSparkline } from '#/components/dashboard/timeseries-sparkline';
@@ -88,10 +88,9 @@ function DashboardPage( )
 
 			<section className="mt-8 flex flex-col gap-8">
 				<TimeRangePicker
-					search={ search }
-					onPresetChange={ ( preset ) => setPreset( setRange, preset ) }
-					onCustomRangeChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
-				/>
+						search={ search }
+						onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+					/>
 				<Heading level='h2'>Summary</Heading>
 				<SummaryStatCards range={ range } />
 				<Heading level='h2'>Packet volume</Heading>

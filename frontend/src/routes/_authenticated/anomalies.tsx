@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { AnomaliesTable } from '#/components/anomalies/anomalies-table';
 import { TimeRangePicker } from '#/components/ui/time-range-picker';
 import { timeRangeSearchSchema } from '#/lib/time-range/schema';
-import { createUseTimeRange, setCustomRange, setPreset } from '#/lib/time-range/use-time-range';
+import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 
 const anomaliesSearchSchema = timeRangeSearchSchema.extend(
 {
@@ -35,8 +35,7 @@ function AnomaliesPage( )
 			<div className="flex flex-wrap items-center gap-4">
 				<TimeRangePicker
 					search={ search }
-					onPresetChange={ ( preset ) => setPreset( setRange, preset ) }
-					onCustomRangeChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+					onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
 				/>
 				<label className="flex items-center gap-2 text-sm">
 					Min score

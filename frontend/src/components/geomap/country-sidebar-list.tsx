@@ -1,5 +1,6 @@
 // components/geomap/country-sidebar-list.tsx
 import type { GeoEntry } from '#/lib/analytics/types';
+import { Card } from '../ui/card';
 import { DataTable } from '../ui/data-table';
 import type { SkeletonColumn } from '../ui/skeleton-table';
 import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
@@ -38,20 +39,22 @@ function GeoRow( { row }: { row: GeoEntry } )
 export function CountrySidebarList( { rows, isLoading, isError }: CountrySidebarListProps )
 {
 	return (
-		<DataTable< GeoEntry >
-			columns={ COLUMNS }
-			data={ rows }
-			renderRow={ ( row, _index ) => <GeoRow row={ row } key={ `${ row.country_code }|${ row.geo_status }` } /> }
-			getRowKey={ ( row, _index ) =>
-			{
-				return `${ row.country_code }|${ row.geo_status }`;
-			} }
-			isLoading={ isLoading }
-			isError={ isError }
-			errorMessage={ <TableLoadingErrorMessage>Unable to load geo data.</TableLoadingErrorMessage> }
-			emptyMessage={ <TableNoRecentsErrorMessage>No geo data for the given time range.</TableNoRecentsErrorMessage> }
-			maxHeight='md'
-			virtualize={ false }
-		/>
+		<Card>
+			<DataTable< GeoEntry >
+				columns={ COLUMNS }
+				data={ rows }
+				renderRow={ ( row ) => <GeoRow row={ row } key={ `${ row.country_code }|${ row.geo_status }` } /> }
+				getRowKey={ ( row ) =>
+				{
+					return `${ row.country_code }|${ row.geo_status }`;
+				} }
+				isLoading={ isLoading }
+				isError={ isError }
+				errorMessage={ <TableLoadingErrorMessage>Unable to load geo data.</TableLoadingErrorMessage> }
+				emptyMessage={ <TableNoRecentsErrorMessage>No geo data for the given time range.</TableNoRecentsErrorMessage> }
+				maxHeight='md'
+				virtualize={ false }
+			/>
+		</Card>
 	);
 }

@@ -58,8 +58,8 @@ export function ProtocolBreakdown( { range }: ProtocolBreakdownProps )
 				className="mt-4 w-full"
 				columns={ COLUMNS }
 				data={ data.top_dst_ports }
-				renderRow={ ( row, _index ) => <PortRow key={ row.port } row={ row } /> }
-				getRowKey={ ( row, _index ) =>
+				renderRow={ ( row ) => <PortRow key={ row.port } row={ row } /> }
+				getRowKey={ ( row ) =>
 				{
 					return row.port;
 				} }
