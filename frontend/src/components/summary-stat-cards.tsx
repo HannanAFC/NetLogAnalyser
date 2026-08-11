@@ -1,5 +1,5 @@
 import { useSummary } from '#/features/analytics/hooks';
-import { Card } from '#/components/ui/card';
+import { Card, CardDescription } from '#/components/ui/card';
 import { BodySm, StatNumber } from '#/components/ui/heading';
 import type { TimeRangeParams } from '#/features/analytics/schemas';
 
@@ -12,22 +12,28 @@ export function SummaryStatCards( { range }: SummaryStatCardsProps )
 {
 	const { data, isPending, isError } = useSummary( range );
 
-	if ( isPending )
+	if ( isError )
 	{
 		return (
-			<div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-				{ Array.from( { length: 5 } ).map( ( _, i ) => (
-					<Card key={ i } className="h-20 animate-pulse" >
-                        <></>
-                    </Card>
+			<Card variant='critical'>
+				<CardDescription variant='critical'>
+					Couldn't load summary for this range.
+				</CardDescription>
+			</Card>
+		);
+	}
+	else if ( isPending )
+	{
+		return (
+			<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+				{ Array.from( { length: 6 } ).map( ( _, i ) =>
+				(
+					<Card key={ i } className="h-28 animate-pulse" >
+						<></>
+					</Card>
 				) ) }
 			</div>
 		);
-	}
-
-	if ( isError )
-	{
-		return <p className="text-text-secondary text-sm">Couldn't load summary for this range.</p>;
 	}
 
 	const stats = [
@@ -41,7 +47,17 @@ export function SummaryStatCards( { range }: SummaryStatCardsProps )
 
 	return (
 		<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-			{ stats.map( ( stat ) => (
+			{ isPending &&
+			(
+				Array.from( { length: 5 } ).map( ( _, i ) =>
+				(
+					<Card key={ i } className="h-28 animate-pulse" >
+						<></>
+					</Card>
+				) )
+			) }
+			{ !isPending && !isError && stats.map( ( stat ) =>
+			(
 				<Card key={ stat.label }>
 					<StatNumber>{ stat.value }</StatNumber>
 					<BodySm>{ stat.label }</BodySm>
