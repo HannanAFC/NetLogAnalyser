@@ -9,8 +9,8 @@ import { useState } from 'react';
 import { MapPopup } from './map-popup';
 import { useDebounce } from '#/lib/utils';
 
-const FILL_FALLBACKS = [ '#e0f2fe', '#93c5fd', '#3b82f6', '#1d4ed8', '#1e3a8a' ];
-const EMPTY_FALLBACK = '#e5e7eb';
+const FILL_FALLBACKS = [ 'oklch( 0.86 0.04 250 )', 'oklch( 0.74 0.09 250 )', 'oklch( 0.62 0.14 250 )', 'oklch( 0.52 0.17 250 )', 'oklch( 0.42 0.16 252 )' ];
+const EMPTY_FALLBACK = 'oklch( 0.94 0.008 252 )';
 
 interface WorldChoroplethProps
 {
@@ -38,7 +38,7 @@ export function WorldChoropleth( { rows }: WorldChoroplethProps )
 	const [ tooltipPosition, setTooltipPosition ] = useState< TooltipPositionProps >(
 	{
 		x: 0,
-		y: 0,
+		y: 0
 	} );
 
 	const debouncedPosition = useDebounce( tooltipPosition, 150 );
@@ -64,7 +64,7 @@ export function WorldChoropleth( { rows }: WorldChoroplethProps )
 						row && countryName ?
 						{
 							...row,
-							countryName: countryName,
+							countryName: countryName
 						} : null;
 
 						return (
@@ -72,7 +72,7 @@ export function WorldChoropleth( { rows }: WorldChoroplethProps )
 								key={ geo.rsmKey }
 								geography={ geo }
 								style={ {
-									default: { transition: 'all 150ms', fill, stroke: 'var(--border, #ccc)', outline: 'none' },
+									default: { transition: 'all 150ms', fill, stroke: 'var(--color-border)', outline: 'none' },
 									hover:   { fill, outline: 'none', opacity: 0.8 },
 									pressed: { outline: 'none' }
 								} }

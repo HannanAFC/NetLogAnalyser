@@ -61,7 +61,7 @@ export function useDebounce< T >( value: T, delay = 500 ): T
 		const handler = setTimeout( ( ) =>
 		{
 			setDebouncedValue( value );
-		}, delay);
+		}, delay );
 
 		return ( ) => clearTimeout( handler );
 	}, [ value, delay ] );

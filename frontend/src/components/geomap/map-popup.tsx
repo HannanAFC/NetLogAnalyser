@@ -1,5 +1,6 @@
-import { cn } from "#/lib/utils";
-import { Card, type CardProps } from "../ui/card";
+import { cn } from '#/lib/utils';
+import { Card } from '../ui/card';
+import type { CardProps } from '../ui/card';
 
 interface MapPopupProps extends CardProps
 {

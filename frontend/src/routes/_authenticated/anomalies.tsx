@@ -29,7 +29,7 @@ function AnomaliesPage( )
 	const search   = Route.useSearch( );
 	const navigate = Route.useNavigate( );
 	const [ minScore, setMinScore ] = useState( search.min_score );
-	const debouncedMinScore = useDebounce( minScore, 500 );	
+	const debouncedMinScore = useDebounce( minScore, 500 );
 	const mountedRef = useRef( false );
 
 	const sliderStyle = useMemo( ( ) =>
