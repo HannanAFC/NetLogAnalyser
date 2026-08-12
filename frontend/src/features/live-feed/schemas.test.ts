@@ -12,7 +12,10 @@ const VALID_BATCH = {
 			protocol:          'TCP',
 			packet_size_bytes: 1500,
 			flags:             'SYN',
-			country_code:      'US',
+			src_country_code:  'US',
+			dst_country_code:  null,
+			src_geo_status:    'resolved',
+			dst_geo_status:    'private',
 			anomaly_score:     0.05,
 			anomaly_reasons:   [ ],
 			captured_at:       '2025-08-01T12:00:00Z'
@@ -59,7 +62,10 @@ describe( 'logEntryBatchMessageSchema', ( ) =>
 					protocol:          'TCP',
 					packet_size_bytes: 1500,
 					flags:             null,
-					country_code:      null,
+					src_country_code:  'US',
+					dst_country_code:  null,
+					src_geo_status:    'resolved',
+					dst_geo_status:    'private',
 					anomaly_score:     0,
 					anomaly_reasons:   [ ],
 					captured_at:       '2025-08-01T12:00:00Z'
