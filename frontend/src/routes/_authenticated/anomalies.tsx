@@ -8,6 +8,7 @@ import { timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BodyText, Heading } from '#/components/ui/heading';
+import { useDebounce } from '#/lib/utils';
 
 const anomaliesSearchSchema = timeRangeSearchSchema.extend(
 {
@@ -27,21 +28,22 @@ function AnomaliesPage( )
 	const [ range, setRange ] = useTimeRange( );
 	const search   = Route.useSearch( );
 	const navigate = Route.useNavigate( );
-	const [ debounceValue, setDebounceValue ] = useState< number >( search.min_score );
+	const [ minScore, setMinScore ] = useState( search.min_score );
+	const debouncedMinScore = useDebounce( minScore, 500 );	
 	const mountedRef = useRef( false );
 
 	const sliderStyle = useMemo( ( ) =>
 	{
-		const pct = debounceValue * 100;
+		const pct = minScore * 100;
 		let fill = 'var( --color-low )';
-		if ( debounceValue > 0.66 ) fill = 'var( --color-critical )';
-		else if ( debounceValue > 0.33 ) fill = 'var( --color-medium )';
+		if ( minScore > 0.66 ) fill = 'var( --color-critical )';
+		else if ( minScore > 0.33 ) fill = 'var( --color-medium )';
 
 		return {
 			'--range-pct': `${ pct }%`,
 			'--range-fill': fill
 		} as React.CSSProperties;
-	}, [ debounceValue ] );
+	}, [ minScore ] );
 
 	useEffect( ( ) =>
 	{
@@ -51,23 +53,14 @@ function AnomaliesPage( )
 			return;
 		}
 
-		const handler = setTimeout( ( ) =>
-		{
-			changeMinScore( debounceValue );
-		}, 500 );
+		navigate( { search: ( prev ) => ( { ...prev, min_score: debouncedMinScore } ), replace: true } );
 
-		return ( ) => clearTimeout( handler );
-	}, [ debounceValue, changeMinScore ] );
-
-	function changeMinScore( value: number )
-	{
-		navigate( { search: ( prev ) => ( { ...prev, min_score: value } ), replace: true } );
-	}
+	}, [ debouncedMinScore, navigate ] );
 
 	return (
 		<PageWrapper>
 			<Heading level='h1'>Anomalies</Heading>
-			<BodyText className="mt-2">
+			<BodyText>
 				View all detected anomalies - filter by time range and minimum anomaly score.
 			</BodyText>
 			<div className="flex flex-row gap-4 flex-wrap">
@@ -85,10 +78,10 @@ function AnomaliesPage( )
 						min={ 0 }
 						max={ 1 }
 						step={ 0.05 }
-						value={ debounceValue }
-						onChange={ ( e ) => setDebounceValue( Number( e.target.value ) ) }
+						value={ minScore }
+						onChange={ ( e ) => setMinScore( Number( e.target.value ) ) }
 					/>
-					<span>{ debounceValue.toFixed( 2 ) }</span>
+					<span>{ minScore.toFixed( 2 ) }</span>
 				</label>
 			</div>
 

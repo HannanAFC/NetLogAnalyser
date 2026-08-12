@@ -1,6 +1,7 @@
 import type { ClassValue } from 'clsx';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useEffect, useState } from 'react';
 
 /** Merge Tailwind classes without style conflicts. */
 export function cn( ...inputs: ClassValue[ ] )
@@ -49,4 +50,21 @@ export function formatRelativeTime( isoTimestamp: string ): string
 	if ( minutes < 60 )       return `${ minutes }m ago`;
 	const hours = Math.round( minutes / 60 );
 	return `${ hours }h ago`;
+}
+
+export function useDebounce< T >( value: T, delay = 500 ): T
+{
+	const [ debouncedValue, setDebouncedValue ] = useState( value );
+
+	useEffect( ( ) =>
+	{
+		const handler = setTimeout( ( ) =>
+		{
+			setDebouncedValue( value );
+		}, delay);
+
+		return ( ) => clearTimeout( handler );
+	}, [ value, delay ] );
+
+	return debouncedValue;
 }

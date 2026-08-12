@@ -74,7 +74,7 @@ function LogHistoryPage( )
 			<BodyText className="mt-2">
 				View historical network log data in full detail.
 			</BodyText>
-			<div className='flex flex-col items-center gap-8 mt-8'>
+			<div className='flex flex-col items-center gap-8'>
 				<LogTable
 					className="w-full"
 					isLoading={ isLoading }

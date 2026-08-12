@@ -14,7 +14,7 @@ import type { LogEntry } from '#/lib/logs/types';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Button } from '#/components/ui/button';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
-import { formatRelativeTime } from '#/lib/utils';
+import { formatApiKeyDate } from '#/lib/utils';
 import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
 import { TanStackDataTable } from '../ui/tanstack-data-table';
 import type { SkeletonColumn } from '../ui/skeleton-table';
@@ -80,7 +80,7 @@ export function AnomaliesTable( { filter }: AnomaliesTableProps )
 				{
 					header: 'Time',
 					meta:   { className: 'text-xs text-text-secondary' },
-					cell:   ( info ) => formatRelativeTime( info.getValue( ) )
+					cell:   ( info ) => formatApiKeyDate( info.getValue( ) )
 				}
 			),
 			columnHelper.accessor(
