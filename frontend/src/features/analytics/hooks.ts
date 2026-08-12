@@ -43,5 +43,14 @@ export function useGeo( params: GeoParams )
 
 export function useAnomalies( params: AnomaliesFilterParams )
 {
-	return useInfiniteQuery( anomaliesInfiniteQueryOptions( params ) );
+	const query = useInfiniteQuery( anomaliesInfiniteQueryOptions( params ) );
+
+	return {
+		pages:              query.data?.pages ?? [ ],
+		isLoading:          query.isLoading,
+		isError:            query.isError,
+		isFetchingNextPage: query.isFetchingNextPage,
+		fetchNextPage:      query.fetchNextPage,
+		hasNextServerPage:  query.hasNextPage
+	};
 }

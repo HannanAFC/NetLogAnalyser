@@ -3,8 +3,6 @@ import type { HTMLAttributes } from 'react';
 
 export interface SkeletonColumn
 {
-	header:            React.ReactNode;
-	headerClassName?:  string;
 	skeletonWidth?:    string;
 }
 

@@ -1,46 +1,91 @@
-import { useState } from 'react';
-
+import { useState, useMemo } from 'react';
 import { useTopTalkers } from '#/features/analytics/hooks';
 import { Button } from '#/components/ui/button';
 import type { Direction, Metric, TimeRangeParams } from '#/features/analytics/schemas';
 import { Card } from '../ui/card';
 import type { SkeletonColumn } from '../ui/skeleton-table';
 import type { TopTalkerEntry } from '#/lib/analytics/types';
-import { DataTable } from '../ui/data-table';
 import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
 import { TableNoRecentsErrorMessage } from '../ui/table-no-recents-error-message';
+import { TanStackDataTable } from '../ui/tanstack-data-table';
+import { createColumnHelper, tableFeatures, useTable, metaHelper } from '@tanstack/react-table';
+import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
 
 interface TopTalkersTableProps
 {
 	range: TimeRangeParams;
 }
 
-const COLUMNS: SkeletonColumn[ ] =
-[
-	{ header: 'IP' },
-	{ header: 'Packets' },
-	{ header: 'Bytes' },
-	{ header: 'Avg score' }
-];
-
-function TopTalkerRow( { row }: { row: TopTalkerEntry } )
+interface TopTalkersColumnMeta
 {
-	return (
-		<tr className="border-b border-border last:border-0 hover:bg-inset transition-colors duration-150">
-			<td className="whitespace-nowrap px-3 py-2 font-mono text-sm">{ row.ip }</td>
-			<td className="whitespace-nowrap px-3 py-2 text-sm">{ row.count.toLocaleString( ) }</td>
-			<td className="whitespace-nowrap px-3 py-2 text-sm">{ row.total_bytes.toLocaleString( ) }</td>
-			<td className="whitespace-nowrap px-3 py-2 text-sm">{ row.avg_anomaly_score.toFixed( 2 ) }</td>
-		</tr>
-	);
+	className?: string;
 }
+
+const SKELETON_COLUMNS: SkeletonColumn[ ] =
+[
+	{ },
+	{ }
+];
+const EMPTY_ROWS: TopTalkerEntry[ ] = [ ];
+
+const features = tableFeatures(
+{
+	columnMeta: metaHelper< TopTalkersColumnMeta >( )
+} );
+
+const columnHelper = createColumnHelper< typeof features, TopTalkerEntry >( );
 
 export function TopTalkersTable( { range }: TopTalkersTableProps )
 {
 	const [ direction, setDirection ] = useState< Direction >( 'src' );
 	const [ metric, setMetric ]       = useState< Metric >( 'packets' );
 
-	const { data, isPending, isError } = useTopTalkers( { ...range, direction, metric, limit: 10 } );
+	const columns = useMemo( ( ) =>
+		columnHelper.columns(
+		[
+			columnHelper.accessor(
+				'ip',
+				{
+					header: 'IP',
+					meta:   { className: 'font-mono text-sm' },
+					cell:   ( info ) => info.getValue( )
+				}
+			),
+			columnHelper.accessor(
+				'count',
+				{
+					header: 'Packets',
+					cell:   ( info ) => info.getValue( )
+				}
+			),
+			columnHelper.accessor(
+				'total_bytes',
+				{
+					header: 'Bytes',
+					meta:   { className: 'text-text-secondary tabular-nums' },
+					cell:   ( info ) => info.getValue( ) + ' B'
+				}
+			),
+			columnHelper.accessor(
+				'avg_anomaly_score',
+				{
+					header: 'Avg score',
+					cell:   ( info ) => <AnomalyIndicator score={ info.getValue( ) } reasons={ [ ] } />
+				}
+			)
+		] ),
+		[ ]
+	);
+
+	const { data, isLoading, isError } = useTopTalkers( { ...range, direction, metric, limit: 10 } );
+
+	const table = useTable(
+	{
+		key:      'anomalies-table',
+		features: features,
+		columns:  columns,
+		data:     data?.rows ?? EMPTY_ROWS
+	} );
 
 	return (
 		<Card>
@@ -63,28 +108,16 @@ export function TopTalkersTable( { range }: TopTalkersTableProps )
 				</div>
 			</div>
 
-			{ isPending && <div className="h-50 animate-pulse" aria-hidden="true" /> }
-			{ isError && <p className="text-text-secondary text-sm">Couldn't load top talkers.</p> }
-
-			{ data &&
-            (
-				<DataTable< TopTalkerEntry >
-					className="mt-4 w-full"
-					columns={ COLUMNS }
-					data={ data.rows }
-					renderRow={ ( row ) => <TopTalkerRow key={ row.ip } row={ row } /> }
-					getRowKey={ ( row ) =>
-					{
-						return row.ip;
-					} }
-					isLoading={ isPending }
-					isError={ isError }
-					errorMessage={ <TableLoadingErrorMessage>An error occurred whilst loading the top talkers.</TableLoadingErrorMessage> }
-					emptyMessage={ <TableNoRecentsErrorMessage>Top talkers not available for the current time range.</TableNoRecentsErrorMessage> }
-					maxHeight='md'
-					virtualize={ false }
-				/>
-			) }
+			<TanStackDataTable
+				table={ table }
+				skeletonColumns={ SKELETON_COLUMNS }
+				isLoading={ isLoading }
+				isError={ isError }
+				errorMessage={ <TableLoadingErrorMessage>An error occurred whilst loading the top talkers.</TableLoadingErrorMessage> }
+				emptyMessage={ <TableNoRecentsErrorMessage>Top talkers not available for the current time range.</TableNoRecentsErrorMessage> }
+				maxHeight='md'
+				virtualize={ false }
+			/>
 		</Card>
 	);
 }

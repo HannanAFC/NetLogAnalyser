@@ -5,6 +5,7 @@ import { createRootRoute, HeadContent, Link, Outlet } from '@tanstack/react-rout
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { FormDevtoolsPanel } from '@tanstack/react-form-devtools';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
+import { TableDevtoolsPanel } from '@tanstack/react-table-devtools';
 import { NotFound } from '#/components/not-found';
 import { Sidebar, SidebarProvider, useSidebar } from '#/components/sidebar';
 import { Button } from '#/components/ui/button';
@@ -185,12 +186,16 @@ function RootLayout( { session }: { session: unknown } )
 							render: <TanStackRouterDevtoolsPanel />
 						},
 						{
-							name: 'TanStack Query',
+							name:   'TanStack Query',
 							render: <ReactQueryDevtoolsPanel />
 						},
 						{
-							name: 'TanStack Form',
+							name:   'TanStack Form',
 							render: <FormDevtoolsPanel />
+						},
+						{
+							name:   'TanStack Table',
+							render: <TableDevtoolsPanel />
 						}
 					] }
 				/>

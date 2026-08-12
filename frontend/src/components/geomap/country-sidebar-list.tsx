@@ -1,10 +1,12 @@
 // components/geomap/country-sidebar-list.tsx
 import type { GeoEntry } from '#/lib/analytics/types';
+import { createColumnHelper, metaHelper, tableFeatures, useTable } from '@tanstack/react-table';
 import { Card } from '../ui/card';
-import { DataTable } from '../ui/data-table';
 import type { SkeletonColumn } from '../ui/skeleton-table';
 import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
 import { TableNoRecentsErrorMessage } from '../ui/table-no-recents-error-message';
+import { useMemo } from 'react';
+import { TanStackDataTable } from '../ui/tanstack-data-table';
 
 const GEO_STATUS_LABEL: Record< string, string > = {
 	private:     'Private IP',
@@ -20,40 +22,68 @@ interface CountrySidebarListProps
 	isError:   boolean;
 }
 
-const COLUMNS: SkeletonColumn[ ] =
+const SKELETON_COLUMNS: SkeletonColumn[ ] =
 [
-	{ header: 'Location' },
-	{ header: 'Count' }
+	{ },
+	{ }
 ];
 
-function GeoRow( { row }: { row: GeoEntry } )
+interface CountryTableColumnMeta
 {
-	return (
-		<tr className="border-b border-border last:border-0 hover:bg-inset transition-colors duration-150">
-			<td className="whitespace-nowrap px-3 py-2 font-mono text-sm">{ row.country_code ?? GEO_STATUS_LABEL[ row.geo_status ] }</td>
-			<td className="whitespace-nowrap px-3 py-2 text-sm">{ row.count.toLocaleString( ) }</td>
-		</tr>
-	);
+	className?: string;
 }
+
+const features = tableFeatures(
+{
+	columnMeta: metaHelper< CountryTableColumnMeta >( )
+} );
+
+const columnHelper = createColumnHelper< typeof features, GeoEntry >( );
 
 export function CountrySidebarList( { rows, isLoading, isError }: CountrySidebarListProps )
 {
+	const columns = useMemo( ( ) =>
+		columnHelper.columns(
+		[
+			columnHelper.accessor(
+				'country_code',
+				{
+					header: 'Location',
+					meta:   { className: 'font-mono text-sm' },
+					cell:   ( info ) => info.getValue( ) ?? GEO_STATUS_LABEL[ info.row.original.geo_status ]
+				}
+			),
+			columnHelper.accessor(
+				'count',
+				{
+					header: 'Count',
+					cell:   ( info ) => info.getValue( )
+				}
+			)
+		] ),
+		[ ]
+	);
+
+	const table = useTable(
+	{
+		key:                'anomalies-table',
+		features:           features,
+		columns:            columns,
+		data:               rows
+	} );
+
 	return (
 		<Card>
-			<DataTable< GeoEntry >
-				columns={ COLUMNS }
-				data={ rows }
-				renderRow={ ( row ) => <GeoRow row={ row } key={ `${ row.country_code }|${ row.geo_status }` } /> }
-				getRowKey={ ( row ) =>
-				{
-					return `${ row.country_code }|${ row.geo_status }`;
-				} }
+			<TanStackDataTable
+				table={ table }
+				skeletonColumns={ SKELETON_COLUMNS }
 				isLoading={ isLoading }
 				isError={ isError }
 				errorMessage={ <TableLoadingErrorMessage>Unable to load geo data.</TableLoadingErrorMessage> }
 				emptyMessage={ <TableNoRecentsErrorMessage>No geo data for the given time range.</TableNoRecentsErrorMessage> }
 				maxHeight='md'
 				virtualize={ false }
+				className='h-full min-h-30'
 			/>
 		</Card>
 	);

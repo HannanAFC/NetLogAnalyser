@@ -37,3 +37,16 @@ export function formatApiKeyDate( iso: string | null ): string
 		minute: '2-digit'
 	} ).format( new Date( iso ) );
 }
+
+export function formatRelativeTime( isoTimestamp: string ): string
+{
+	const deltaMs = Date.now() - new Date( isoTimestamp ).getTime( );
+	const deltaSeconds = Math.round( deltaMs / 1000 );
+
+	if ( deltaSeconds < 5 )   return 'just now';
+	if ( deltaSeconds < 60 )  return `${ deltaSeconds }s ago`;
+	const minutes = Math.round( deltaSeconds / 60 );
+	if ( minutes < 60 )       return `${ minutes }m ago`;
+	const hours = Math.round( minutes / 60 );
+	return `${ hours }h ago`;
+}

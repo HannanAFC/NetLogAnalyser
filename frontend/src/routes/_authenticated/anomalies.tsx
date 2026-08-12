@@ -7,6 +7,7 @@ import { TimeRangePicker } from '#/components/ui/time-range-picker';
 import { timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { BodyText, Heading } from '#/components/ui/heading';
 
 const anomaliesSearchSchema = timeRangeSearchSchema.extend(
 {
@@ -65,8 +66,13 @@ function AnomaliesPage( )
 
 	return (
 		<PageWrapper>
-			<div className="flex flex-wrap items-center gap-4">
+			<Heading level='h1'>Anomalies</Heading>
+			<BodyText className="mt-2">
+				View all detected anomalies - filter by time range and minimum anomaly score.
+			</BodyText>
+			<div className="flex flex-row gap-4 flex-wrap">
 				<TimeRangePicker
+					className='block max-w-max'
 					search={ search }
 					onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
 				/>
