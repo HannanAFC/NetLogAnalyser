@@ -127,6 +127,83 @@ export function resetGetLogsCallCount( )
 	getLogsCallCount = 0;
 }
 
+// ── Analytics mock data ────────────────────────────────────────────
+
+export const FAKE_SUMMARY =
+{
+	start:              '2024-01-01T00:00:00Z',
+	end:                '2024-01-02T00:00:00Z',
+	total_packets:      1000,
+	unique_src_ips:     42,
+	unique_dst_ips:     57,
+	avg_anomaly_score:  0.13,
+	high_anomaly_count: 4,
+	total_bytes:        1500000
+};
+
+export const FAKE_TIMESERIES =
+{
+	bucket: 'hour',
+	points:
+	[
+		{ ts: '2024-01-01T00:00:00Z', count: 100, avg_anomaly_score: 0.1, total_bytes: 50000 },
+		{ ts: '2024-01-01T01:00:00Z', count: 200, avg_anomaly_score: 0.2, total_bytes: 100000 },
+		{ ts: '2024-01-01T02:00:00Z', count: 150, avg_anomaly_score: 0.15, total_bytes: 75000 }
+	]
+};
+
+export const FAKE_TOP_TALKERS =
+{
+	direction: 'src',
+	metric:    'packets',
+	rows:
+	[
+		{ ip: '192.168.1.10', count: 300, avg_anomaly_score: 0.05, total_bytes: 150000 },
+		{ ip: '192.168.1.11', count: 200, avg_anomaly_score: 0.1, total_bytes: 100000 }
+	]
+};
+
+export const FAKE_PROTOCOLS =
+{
+	by_protocol:
+	[
+		{ protocol: 'TCP', count: 800, packet_percentage: 0.8 },
+		{ protocol: 'UDP', count: 200, packet_percentage: 0.2 }
+	],
+	top_dst_ports:
+	[
+		{ port: 443, count: 500 },
+		{ port: 80, count: 300 }
+	]
+};
+
+export const FAKE_GEO =
+{
+	direction: 'src',
+	rows:
+	[
+		{ country_code: 'US', geo_status: 'resolved', count: 400, packet_percentage: 0.5 },
+		{ country_code: null, geo_status: 'private', count: 400, packet_percentage: 0.5 }
+	]
+};
+
+export let getSummaryCallCount = 0;
+export let getTimeseriesCallCount = 0;
+export let getTopTalkersCallCount = 0;
+export let getProtocolsCallCount = 0;
+export let getGeoCallCount = 0;
+export let getAnomaliesCallCount = 0;
+
+export function resetAnalyticsCallCounts( )
+{
+	getSummaryCallCount = 0;
+	getTimeseriesCallCount = 0;
+	getTopTalkersCallCount = 0;
+	getProtocolsCallCount = 0;
+	getGeoCallCount = 0;
+	getAnomaliesCallCount = 0;
+}
+
 export const handlers = [
 	http.post( '*/auth/login', async( { request } ) =>
 	{
@@ -327,5 +404,78 @@ export const handlers = [
 			: null;
 
 		return HttpResponse.json( { entries, next_cursor: nextCursor, has_more: hasMore } );
+	} ),
+
+	// ── Analytics ───────────────────────────────────────────────────
+
+	http.get( '*/analytics/summary', ( ) =>
+	{
+		getSummaryCallCount += 1;
+		return HttpResponse.json( FAKE_SUMMARY );
+	} ),
+
+	http.get( '*/analytics/timeseries', ( ) =>
+	{
+		getTimeseriesCallCount += 1;
+		return HttpResponse.json( FAKE_TIMESERIES );
+	} ),
+
+	http.get( '*/analytics/top-talkers', ( ) =>
+	{
+		getTopTalkersCallCount += 1;
+		return HttpResponse.json( FAKE_TOP_TALKERS );
+	} ),
+
+	http.get( '*/analytics/protocols', ( ) =>
+	{
+		getProtocolsCallCount += 1;
+		return HttpResponse.json( FAKE_PROTOCOLS );
+	} ),
+
+	http.get( '*/analytics/geo', ( ) =>
+	{
+		getGeoCallCount += 1;
+		return HttpResponse.json( FAKE_GEO );
+	} ),
+
+	http.get( '*/analytics/anomalies', ( { request } ) =>
+	{
+		getAnomaliesCallCount += 1;
+		const url = new URL( request.url );
+		const rawLimit = url.searchParams.get( 'limit' ) || '25';
+		const limit = Math.min( Math.max( parseInt( rawLimit, 10 ) || 25, 1 ), 50 );
+		const cursor = url.searchParams.get( 'cursor' );
+
+		let startIndex = 0;
+		if ( cursor )
+		{
+			try
+			{
+				const decoded = JSON.parse( atob( cursor ) ) as { id: number; captured_at: string };
+				const idx = MOCK_LOG_ENTRIES.findIndex(
+					( e ) => e.id === decoded.id && e.captured_at === decoded.captured_at
+				);
+				if ( idx === -1 )
+				{
+					return HttpResponse.json( { detail: 'Invalid cursor' }, { status: 400 } );
+				}
+				startIndex = idx + 1;
+			}
+			catch
+			{
+				return HttpResponse.json( { detail: 'Invalid cursor' }, { status: 400 } );
+			}
+		}
+
+		const slice = MOCK_LOG_ENTRIES.slice( startIndex, startIndex + limit + 1 );
+		const hasMore = slice.length > limit;
+		const rows = hasMore ? slice.slice( 0, limit ) : slice;
+
+		const lastRow = rows[ rows.length - 1 ];
+		const nextCursor = hasMore && lastRow
+			? btoa( JSON.stringify( { id: lastRow.id, captured_at: lastRow.captured_at } ) )
+			: null;
+
+		return HttpResponse.json( { rows, next_cursor: nextCursor, has_more: hasMore } );
 	} )
 ];

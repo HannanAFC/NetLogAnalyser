@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 
 import { tokenStore } from '#/lib/auth/token-store';
 
-import { resetApiKeysCallCounts, resetGetLogsCallCount, resetRefreshCallCount, setRefreshShouldFail } from './mocks/handlers';
+import { resetAnalyticsCallCounts, resetApiKeysCallCounts, resetGetLogsCallCount, resetRefreshCallCount, setRefreshShouldFail } from './mocks/handlers';
 import { server } from './mocks/server';
 
 beforeAll( ( ) =>
@@ -19,6 +19,7 @@ afterEach( () =>
 	setRefreshShouldFail( false );
 	resetApiKeysCallCounts( );
 	resetGetLogsCallCount( );
+	resetAnalyticsCallCounts( );
 } );
 
 afterAll( ( ) =>
