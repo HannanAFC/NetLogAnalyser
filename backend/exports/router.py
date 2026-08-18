@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Annotated, Union
+from typing import Annotated
 from uuid import UUID
 
 from auth.dependencies import get_current_user
@@ -69,7 +68,6 @@ async def list_exports(
 		.order_by( DataExport.created_at.desc( ) )
 		.limit( 20 )
 	)
-	await asyncio.sleep( 5 )
 	return GetExportsResponse( rows=[ ExportRecordPublic.model_validate( row ) for row in result.scalars( ).all( ) ] )
 
 
@@ -89,16 +87,20 @@ async def download_export(
 	db:    Annotated[ AsyncSession, Depends( get_db ) ],
 	redis: Annotated[ Redis, Depends( get_redis ) ]
 ):
-	value = await resolve_download_token( db, redis, token )
+	value       = await resolve_download_token( db, redis, token )
+	export_row: DataExport | None = None
 
 	if value is None:
 		raise HTTPException( status_code=status.HTTP_404_NOT_FOUND, detail="Download link not found or expired" )
-	elif "https" in str( value ):
-		return RedirectResponse( str( value ) )
 
-	export_row = await db.get( DataExport, value )
+	export_row = await db.get( DataExport, value.export_id )
 	if export_row is None or export_row.status != "READY":
 		raise HTTPException( status_code=status.HTTP_404_NOT_FOUND, detail="Export not found or not ready" )
+	
+	if value.presigned_url and "https" in value.presigned_url:
+		export_row.last_downloaded_at = datetime.now( timezone.utc )
+		await db.commit( )
+		return RedirectResponse( value.presigned_url )
 
 	path = Path( settings.export_local_path ) / export_row.storage_key
 	if not path.exists( ):

@@ -42,5 +42,9 @@ class ExportRecordPublic( BaseModel ):
 class GetExportsResponse( BaseModel ):
 	rows: list[ ExportRecordPublic ]
 
+class CachedDataExportLink( BaseModel ):
+	presigned_url: str | None = None
+	export_id:     UUID
+
 class DownloadLinkResponse( BaseModel ):
 	download_url: str

@@ -17,7 +17,7 @@ from auth.security import generate_url_safe_token, hash_token
 from config import settings
 from database import AsyncSessionLocal
 from exports.format import EXPORT_FIELDNAMES, flatten_for_csv, to_export_dict
-from exports.schemas import DownloadLinkResponse, ExportStatusEnum
+from exports.schemas import CachedDataExportLink, DownloadLinkResponse, ExportStatusEnum
 from exports.storage import S3ExportStorage, get_export_storage
 from fastapi import HTTPException, status
 from models.models import DataExport, LogEntry, User
@@ -227,7 +227,7 @@ async def setup_ttl_download_link(
 
 	await redis.set(
 		f"{ DOWNLOAD_TOKEN_PREFIX }:{ token_hash }",
-		value,
+		CachedDataExportLink( presigned_url=value, export_id=export_row.id ).model_dump_json( ),
 		ex=ttl_seconds
 	)
 	return f"{ settings.backend_url }/exports/download?token={ raw_token }"
@@ -236,7 +236,7 @@ async def resolve_download_token(
 	db:        AsyncSession,
 	redis:     Redis,
 	raw_token: str
-) -> UUID | str | None:
+) -> CachedDataExportLink | None:
 	"""
 	Resolves a download token to the corresponding file response, if there is an issue with the link a HTTPException is raised.
 	Parameters:
@@ -244,14 +244,12 @@ async def resolve_download_token(
 		redis (Redis): Redis client.
 		raw_token (str): Token from the download link.
 	Returns:
-		response (FileResponse): A response to download the file.
+		cached (CachedDataExportLink | None): Cached export link object.
 	"""
 	token_hash = hash_token( raw_token )
-	value      = await redis.get( f"{ DOWNLOAD_TOKEN_PREFIX }:{ token_hash }" )
-	if "https" in str( value ):
-		return str( value )
-	elif value is not None:
-		return UUID( str( value ) )
+	cached     = await redis.get( f"{ DOWNLOAD_TOKEN_PREFIX }:{ token_hash }" )
+	if cached:
+		return CachedDataExportLink.model_validate_json( cached )
 	else:
 		return None
 

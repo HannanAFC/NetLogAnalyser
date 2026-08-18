@@ -520,7 +520,8 @@ class TestGetDownloadLink:
 		raw_token = url.split( "token=" )[ 1 ]
 
 		resolved = await export_service.resolve_download_token( db_session, redis_client, raw_token )
-		assert resolved == export_row.id
+		assert resolved is not None
+		assert resolved.export_id is not None and resolved.export_id == export_row.id
 
 
 class TestResolveDownloadToken:
