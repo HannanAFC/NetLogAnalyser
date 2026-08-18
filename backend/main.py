@@ -10,6 +10,8 @@ from auth import router as auth_router
 from cache import close_redis, init_redis, new_redis_client
 from config import SecurityHeadersMiddleware, settings
 from database import engine, get_db
+from exports import router as exports_router
+from exports.startup_checks import verify_export_storage
 from fastapi import Depends, FastAPI, Request, status
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +19,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from geoip import close_geoip, init_geoip
 from ingest import router as ingest_router
+from logging_config import configure_logging
 from logs import router as logs_router
 from rate_limiter import (
     create_rate_limiter,
@@ -27,7 +30,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from users import router as users_router
 from websocket import router as websocket_router
 from websocket.pubsub import start_pubsub_listener, stop_pubsub_listener
+from worker.pool import close_arq_pool, init_arq_pool
 
+verify_export_storage( )
 
 @asynccontextmanager
 async def lifespan( _app: FastAPI ):
@@ -35,6 +40,8 @@ async def lifespan( _app: FastAPI ):
     init_redis( )
     init_geoip( )
     start_pubsub_listener( new_redis_client )
+    await init_arq_pool( )
+    configure_logging( )
 
     # Replace default rate limits with ones built from env variables
     _rl.auth_rate_limiter = await create_rate_limiter(
@@ -63,6 +70,7 @@ async def lifespan( _app: FastAPI ):
     # shutdown
     await stop_pubsub_listener( )
     await close_redis( )
+    await close_arq_pool( )
     close_geoip( )
     await engine.dispose( )
 
@@ -90,6 +98,7 @@ app.include_router( ingest_router.router, prefix="/ingest", tags=[ "Ingest" ] )
 app.include_router( websocket_router.router, prefix="/ws", tags=[ "Websocket" ] )
 app.include_router( logs_router.router, prefix="/logs", tags=[ "Logs" ] )
 app.include_router( analytics_router.router, prefix="/analytics", tags=[ "Analytics" ] )
+app.include_router( exports_router.router, prefix="/exports", tags=[ "Exports" ] )
 if settings.enable_test_endpoints:
     from testing.router import router as test_only_router
     app.include_router( test_only_router )

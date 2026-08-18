@@ -25,6 +25,8 @@ services:
     container_name: NetLogAnalyser-Backend
     env_file:
       - .env
+    environment:
+      - PYTHONUNBUFFERED=1
     ports:
       - "8000:8000"
     depends_on:
@@ -34,9 +36,32 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
+      - export_data:/app/data/exports
     networks:
       - NetLogAnalyser-Network
     restart: unless-stopped
+
+  export-worker:
+    build: ./backend
+    container_name: NetLogAnalyser-EW
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: arq worker.settings.WorkerSettings
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - ./backend:/app
+      - export_data:/app/data/exports
+    networks:
+      - NetLogAnalyser-Network
+    healthcheck:
+      test: ["CMD-SHELL", "arq --check worker.settings.WorkerSettings"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:18-alpine
@@ -91,6 +116,7 @@ volumes:
   postgres_data:
   frontend_node_modules:
   redis_data:
+  export_data:
 
 networks:
   NetLogAnalyser-Network:

@@ -4,6 +4,7 @@ from config import settings
 from email_service.client import send_email
 from email_service.templates import (
     password_reset_email,
+    retention_warning_email,
     verification_email,
     welcome_email,
 )
@@ -42,3 +43,14 @@ async def send_welcome_email( *, to: str, display_name: str ) -> None:
     """
     subject, html, text = welcome_email( display_name=display_name )
     await send_email( sender=settings.resend_onboarding_email, to=to, subject=subject, html=html, text=text )
+
+async def send_retention_warning_email( *, to: str, display_name: str, download_url, deletion_date: str ) -> None:
+    """
+    Sends a deletion warning email to a user.
+    Parameters:
+        to (str): Address to send the email to.
+        display_name (str): The display name to use in the email.
+        download_url (str): The link to the download.
+    """
+    subject, html, text = retention_warning_email( display_name=display_name, download_url=download_url, deletion_date=deletion_date )
+    await send_email( sender=settings.resend_general_email, to=to, subject=subject, html=html, text=text )

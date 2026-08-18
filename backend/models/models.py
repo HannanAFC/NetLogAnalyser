@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from config import settings
 from database import Base
+from exports.schemas import ExportStatusEnum, ExportTriggeredByEnum, StorageBackendEnum
 from geoip import GeoStatus
 from sqlalchemy import (
     BigInteger,
@@ -36,6 +37,7 @@ class User( Base ):
     password_reset_tokens:     Mapped[ list[ PasswordResetToken ] ]       = relationship( back_populates="user", cascade="all, delete-orphan" )
     log_entries:               Mapped[ list[ LogEntry ] ]                 = relationship( back_populates="user", cascade="all, delete-orphan" )
     email_verification_tokens: Mapped[ list[ EmailVerificationToken ] ]   = relationship( back_populates="user", cascade="all, delete-orphan" )
+    data_exports:              Mapped[ list[ DataExport ] ]               = relationship( back_populates="user", cascade="all, delete-orphan" )
 
     def __repr__(self):
         return f"""
@@ -171,6 +173,17 @@ class PasswordResetToken( Base ):
     used_at:    Mapped[ datetime | None ] = mapped_column( DateTime( timezone=True ), nullable=True )
     user:       Mapped[ User ]            = relationship( back_populates="password_reset_tokens" )
 
+    def __repr__(self):
+            return f"""
+id: { self.id }
+user_id: { self.user_id }
+token_hash: { self.token_hash }
+created_at: { self.created_at }
+expires_at: { self.expires_at }
+used_at: { self.used_at }
+user: { self.user }
+                    """
+
 class EmailVerificationToken( Base ):
     __tablename__ = "email_verification_tokens"
 
@@ -185,3 +198,46 @@ class EmailVerificationToken( Base ):
     __table_args__ = (
         Index( "ix_email_verification_tokens_user_id_used_at", "user_id", "used_at" ),
     )
+
+    def __repr__(self):
+        return f"""
+id: { self.id }
+user_id: { self.user_id }
+token_hash: { self.token_hash }
+expires_at: { self.expires_at }
+used_at: { self.used_at }
+created_at: { self.created_at }
+user: { self.user }
+                    """
+
+class DataExport( Base ):
+    __tablename__ = "data_exports"
+
+    id:                  Mapped[ uuid.UUID ]             = mapped_column( PGUUID( as_uuid=True ), primary_key=True, default=uuid.uuid4 )
+    user_id:             Mapped[ uuid.UUID ]             = mapped_column( PGUUID( as_uuid=True ), ForeignKey( "users.id", ondelete="CASCADE" ), index=True, nullable=False )
+    storage_backend:     Mapped[ StorageBackendEnum ]    = mapped_column( ENUM( StorageBackendEnum, name="data_exports_storage_backend_enum" ), nullable=False )
+    storage_key:         Mapped[ str ]                   = mapped_column( String( 512 ), nullable=False )
+    status:              Mapped[ ExportStatusEnum ]      = mapped_column( ENUM( ExportStatusEnum, name="data_exports_status_enum" ), nullable=False )
+    file_size_bytes:     Mapped[ int | None ]            = mapped_column( BigInteger )
+    triggered_by:        Mapped[ ExportTriggeredByEnum ] = mapped_column( ENUM( ExportTriggeredByEnum, name="data_exports_triggered_by_enum" ), nullable=False )
+    created_at:          Mapped[ datetime ]              = mapped_column( DateTime( timezone=True ), server_default=func.now( ), nullable=False, index=True )
+    expires_at:          Mapped[ datetime ]              = mapped_column( DateTime( timezone=True ), nullable=False )
+    last_downloaded_at:  Mapped[ datetime | None ]       = mapped_column( DateTime( timezone=True ) )
+    purged_at:           Mapped[ datetime | None ]       = mapped_column( DateTime( timezone=True ) )
+    user:                Mapped[ User ]                  = relationship( back_populates="data_exports" )
+
+    def __repr__(self):
+        return f"""
+id: { self.id }
+user_id: { self.user_id }
+storage_backend: { self.storage_backend }
+storage_key: { self.storage_key }
+status: { self.status }
+file_size_bytes: { self.file_size_bytes }
+triggered_by: { self.triggered_by }
+created_at: { self.created_at }
+expires_at: { self.expires_at }
+last_downloaded_at: { self.last_downloaded_at }
+purged_at: { self.purged_at }
+user: { self.user }
+                """

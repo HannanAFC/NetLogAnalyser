@@ -70,6 +70,7 @@ class Settings( BaseSettings ):
     resend_onboarding_email:                 str = "NetLogAnalyser <onboarding@netloganalyser.com>"
     resend_verify_email:                     str = "NetLogAnalyser <verify@netloganalyser.com>"
     resend_recovery_email:                   str = "NetLogAnalyser <recovery@netloganalyser.com>"
+    resend_general_email:                    str = "NetLogAnalyser <robot@netloganalyser.com>"
     email_verification_token_expire_minutes: int = 60
 
     # Test config
@@ -95,6 +96,27 @@ class Settings( BaseSettings ):
     analytics_max_range_days:            int = 30
     analytics_summary_expire_seconds:    int = 30
     analytics_timeseries_expire_seconds: int = 30
+
+    # Data retention
+    retention_enabled:                    bool = True
+    retention_days:                       int = 30
+    retention_grace_period_days:          int = 7
+    retention_export_email_enabled:       bool = True
+    retention_delete_chunk_size:          int = 5000
+    retention_job_lock_ttl_seconds:       int = 30
+
+    # Export storage
+    export_storage_backend:                Literal[ "local", "s3" ] = "local"
+    export_local_path:                     str = "/app/data/exports"
+    export_s3_bucket:                      str | None = None
+    export_s3_endpoint_url:                str | None = None
+    export_s3_region:                      str | None = None
+    export_s3_access_key_id:               SecretStr | None = None
+    export_s3_secret_access_key:           SecretStr | None = None
+    export_link_ttl_hours:                 int = 72
+    export_max_per_user_per_day:           int = 3
+    export_authenticated_link_ttl_seconds: int = 300
+
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 
