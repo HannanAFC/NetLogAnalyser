@@ -88,7 +88,7 @@ export function TopAnomaliesPreview( { range }: TopAnomaliesPreviewProps )
 
     const table = useTable(
     {
-        key:                'anomalies-table',
+        key:                'top-anomalies-table',
         features:           features,
         columns:            columns,
         data:               rows

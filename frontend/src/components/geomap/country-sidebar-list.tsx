@@ -66,7 +66,7 @@ export function CountrySidebarList( { rows, isLoading, isError }: CountrySidebar
 
 	const table = useTable(
 	{
-		key:                'anomalies-table',
+		key:                'country-table',
 		features:           features,
 		columns:            columns,
 		data:               rows

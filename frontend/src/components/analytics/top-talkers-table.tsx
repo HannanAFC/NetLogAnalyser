@@ -81,7 +81,7 @@ export function TopTalkersTable( { range }: TopTalkersTableProps )
 
 	const table = useTable(
 	{
-		key:      'anomalies-table',
+		key:      'top-talkers-table',
 		features: features,
 		columns:  columns,
 		data:     data?.rows ?? EMPTY_ROWS

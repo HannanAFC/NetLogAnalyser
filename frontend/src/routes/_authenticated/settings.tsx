@@ -1,11 +1,22 @@
 import { ApiKeysSection } from '#/components/settings/api-keys/api-keys-section';
+import { ExportsSection } from '#/components/settings/exports/exports-section';
 import { BodyText, Eyebrow, Heading } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
-import { createFileRoute } from '@tanstack/react-router';
+import { cn } from '#/lib/utils';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import type { HTMLAttributes } from 'react';
+import z from 'zod';
+
+const settingsPageSearchSchema = z
+	.object(
+	{
+		tab: z.enum( [ 'api-keys', 'exports' ] ).default( 'api-keys' ).catch( 'api-keys' )
+	} );
 
 export const Route = createFileRoute( '/_authenticated/settings' )(
 {
-	component: SettingsPage,
+	component:      SettingsPage,
+	validateSearch: settingsPageSearchSchema,
 	head: ( ) => (
 	{
 		links:
@@ -52,8 +63,14 @@ export const Route = createFileRoute( '/_authenticated/settings' )(
 	} )
 } );
 
+export interface SettingsSectionProps extends HTMLAttributes< HTMLDivElement > { };
+
 function SettingsPage( )
 {
+	const { tab } = Route.useSearch( );
+	const baseButtonClass = 'relative px-4 py-2.5 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-accent';
+	const inActiveButtonClass = baseButtonClass + ' text-primary after:opacity-0';
+	const activeButtonClass   = baseButtonClass + ' text-accent-strong after:opacity-100';
 
 	return (
 		<PageWrapper maxWidth="4xl">
@@ -64,15 +81,37 @@ function SettingsPage( )
 			</div>
 
 			<div className="mb-6 flex gap-1 border-b border-border">
-				<button
-					type="button"
-					className="relative px-4 py-2.5 text-sm font-medium text-accent-strong after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-accent"
+				<Link
+					className={ tab === 'api-keys' ? activeButtonClass : inActiveButtonClass }
+					from={ Route.fullPath }
+					search={ { tab: 'api-keys' } }
 				>
 					API keys
-				</button>
+				</Link>
+				<Link
+					className={ tab === 'exports' ? activeButtonClass : inActiveButtonClass }
+					from={ Route.fullPath }
+					search={ { tab: 'exports' } }
+				>
+					Exports
+				</Link>
 			</div>
-
-			<ApiKeysSection />
+			<div className="relative overflow-hidden">
+				<div
+					className={ cn( 'transition-all duration-300 ease-out', tab === 'api-keys' ? 'relative translate-x-0 opacity-100' : 'pointer-events-none absolute inset-x-0 top-0 -translate-x-8 opacity-0' ) }
+					aria-hidden={ tab !== 'api-keys' }
+					inert={ tab !== 'api-keys' }
+				>
+					<ApiKeysSection />
+				</div>
+				<div
+					className={ cn( 'transition-all duration-300 ease-out', tab === 'exports' ? 'relative translate-x-0 opacity-100' : 'pointer-events-none absolute inset-x-0 top-0 translate-x-8 opacity-0' ) }
+					aria-hidden={ tab !== 'exports' }
+					inert={ tab !== 'exports' }
+				>
+					<ExportsSection />
+				</div>
+			</div>
 		</PageWrapper>
 	);
 }

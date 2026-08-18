@@ -132,7 +132,7 @@ export function LogTable(
 
 	const table = useTable(
 	{
-		key:      'anomalies-table',
+		key:      'log-table',
 		features: features,
 		columns:  columns,
 		data:     entries,

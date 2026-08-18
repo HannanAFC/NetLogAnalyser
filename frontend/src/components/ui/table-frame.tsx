@@ -68,7 +68,7 @@ export function TableFrame(
 				<div
 					className={ cn(
 						'absolute inset-x-0 top-[50%] left-[50%] -translate-1/2 w-max max-w-4/5',
-						showOverlay ? 'opacity-100' : 'opacity-0'
+						showOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'
 					) }
 				>
 					{ overlayContent }

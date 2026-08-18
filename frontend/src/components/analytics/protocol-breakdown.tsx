@@ -60,7 +60,7 @@ export function ProtocolBreakdown( { range }: ProtocolBreakdownProps )
 
 	const table = useTable(
 	{
-		key:                'anomalies-table',
+		key:                'protocols-table',
 		features:           features,
 		columns:            columns,
 		data:               data?.top_dst_ports ?? EMPTY_ROWS
