@@ -9,6 +9,7 @@ from cache import get_redis
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.models import User
+from rate_limiter import get_general_rate_limiter
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 from users.schemas import (
@@ -20,7 +21,7 @@ from users.schemas import (
 from users.service import update_user_details, update_user_password
 from worker.pool import get_arq_pool
 
-router = APIRouter( )
+router = APIRouter( dependencies=[ Depends( get_general_rate_limiter ) ]  )
 
 
 @router.get( "/me" )
