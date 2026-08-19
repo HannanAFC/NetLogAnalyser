@@ -1,6 +1,6 @@
 import type { ForgotPasswordPayload, LoginPayload, RegisterRequestBody, ResendVerificationPayload, ResetPasswordPayload } from '#/features/auth/schemas';
 import { apiClient } from '#/lib/api/client';
-import type { AuthTokenResponse, RefreshResponse, RegisterResponse, User } from '#/lib/auth/types';
+import type { AuthTokenResponse, RefreshResponse, RegisterResponse } from '#/lib/auth/types';
 
 export async function loginRequest( payload: LoginPayload ): Promise< AuthTokenResponse >
 {
@@ -23,12 +23,6 @@ export async function refreshRequest( ): Promise< RefreshResponse >
 export async function logoutRequest( ): Promise< void >
 {
 	await apiClient.post( '/auth/logout' );
-}
-
-export async function getMe( ): Promise< User >
-{
-	const { data } = await apiClient.get< User >( '/users/me' );
-	return data;
 }
 
 export async function verifyEmailRequest( token: string ): Promise< void >

@@ -8,7 +8,7 @@ describe( 'loginSchema', ( ) =>
 		const result = loginSchema.safeParse(
 		{
 			email: 'jane@example.com',
-			password: 'anything'
+			password: 'Str0ngP@ss'
 		} );
 
 		expect( result.success ).toBe( true );
@@ -41,8 +41,8 @@ describe( 'registerSchema', ( ) =>
 		{
 			email: 'jane@example.com',
 			display_name: 'jane',
-			password: 'anything',
-			confirm_password: 'anything'
+			password: 'Str0ngP@ss',
+			confirm_password: 'Str0ngP@ss'
 		} );
 
 		expect( result.success ).toBe( true );
@@ -54,8 +54,8 @@ describe( 'registerSchema', ( ) =>
 		{
 			email: 'not-an-email',
 			display_name: 'jane',
-			password: 'anything',
-			confirm_password: 'anything'
+			password: 'Str0ngP@ss',
+			confirm_password: 'Str0ngP@ss'
 		} );
 
 		expect( result.success ).toBe( false );
@@ -67,8 +67,8 @@ describe( 'registerSchema', ( ) =>
 		{
 			email: 'not-an-email',
 			display_name: '',
-			password: 'anything',
-			confirm_password: 'anything'
+			password: 'Str0ngP@ss',
+			confirm_password: 'Str0ngP@ss'
 		} );
 
 		expect( result.success ).toBe( false );
@@ -93,7 +93,7 @@ describe( 'registerSchema', ( ) =>
 		{
 			email: 'not-an-email',
 			display_name: 'jane',
-			password: 'anything',
+			password: 'Str0ngP@ss',
 			confirm_password: 'different'
 		} );
 
@@ -126,8 +126,8 @@ describe( 'resetPasswordSchema', ( ) =>
 		const result = resetPasswordSchema.safeParse(
 		{
 			token: 'some-token',
-			password: 'longenough',
-			confirm_password: 'longenough'
+			password: 'Str0ngP@ss',
+			confirm_password: 'Str0ngP@ss'
 		} );
 
 		expect( result.success ).toBe( true );
@@ -138,8 +138,8 @@ describe( 'resetPasswordSchema', ( ) =>
 		const result = resetPasswordSchema.safeParse(
 		{
 			token: 'some-token',
-			password: 'short',
-			confirm_password: 'short'
+			password: 'Strong@',
+			confirm_password: 'Strong@'
 		} );
 
 		expect( result.success ).toBe( false );
@@ -151,7 +151,7 @@ describe( 'resetPasswordSchema', ( ) =>
 		{
 			email: 'not-an-email',
 			display_name: 'jane',
-			password: 'anything',
+			password: 'Str0ngP@ss',
 			confirm_password: 'different'
 		} );
 

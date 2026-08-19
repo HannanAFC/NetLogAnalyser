@@ -1,7 +1,6 @@
 import { Card } from '#/components/ui/card';
 import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
-import { useResendVerification, useVerifyEmail } from '#/features/auth/hooks';
-import { sessionQueryOptions } from '#/features/auth/queries';
+import { useResendVerification, useSession, useVerifyEmail } from '#/features/auth/hooks';
 import { resendVerificationSchema } from '#/features/auth/schemas';
 import { apiError } from '#/lib/api/errors';
 import { fieldError } from '#/lib/utils';
@@ -19,11 +18,6 @@ const verifySearchSchema = z.object(
 export const Route = createFileRoute( '/verify-email' )(
 {
 	validateSearch: verifySearchSchema,
-	beforeLoad: async( { context } ) =>
-	{
-		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-		if ( session ) throw redirect( { to: '/dashboard' } );
-	},
 	component: VerifyEmailPage,
 	head: ( ) => (
 	{
@@ -74,6 +68,8 @@ export const Route = createFileRoute( '/verify-email' )(
 function VerifyEmailPage( )
 {
 	const { token } = Route.useSearch( );
+	const { data: session } = useSession( );
+	if ( session && !token ) throw redirect( { to: '/dashboard' } );
 	const verifyEmail = useVerifyEmail( );
 	const resendVerification = useResendVerification( );
 	const [ verified, setVerified ] = useState( false );
@@ -135,12 +131,12 @@ function VerifyEmailPage( )
 						</svg>
 					</div>
 					<Heading level="h1" className="mb-2">Email verified</Heading>
-					<BodyText>Your email has been confirmed. You can now sign in.</BodyText>
+					<BodyText>Your email has been confirmed. { session ? 'You can now use it when signing in.' : 'You can now sign in.' }</BodyText>
 					<Link
-						to="/login"
+						to={ session ? '/dashboard' : '/login' }
 						className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90"
 					>
-						Continue to sign in
+						{ session ? 'Continue to dashboard' : 'Continue to sign in' }
 					</Link>
 				</Card>
 			</div>

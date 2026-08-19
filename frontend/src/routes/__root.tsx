@@ -13,6 +13,7 @@ import { IndexLink } from '#/components/ui/index-link';
 import { env } from '#/lib/env';
 import { Menu } from 'lucide-react';
 import '../styles.css';
+import { OverlayProvider } from '#/lib/overlay/overlay-context';
 
 export const Route = createRootRoute(
 {
@@ -107,9 +108,11 @@ function RootComponent( )
 	const { data: session } = useSession( );
 
 	return (
-		<SidebarProvider>
-			<RootLayout session={ session } />
-		</SidebarProvider>
+		<OverlayProvider>
+			<SidebarProvider>
+				<RootLayout session={ session } />
+			</SidebarProvider>
+		</OverlayProvider>
 	);
 }
 

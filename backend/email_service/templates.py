@@ -123,7 +123,7 @@ def _muted( *, text: str ) -> str:
 def _link( *, text: str, href: str ) -> str:
     """Inline text link."""
     return f"""\
-        <a href="'{ href } target="_blank" rel="noopener"
+        <a href="{ href }" target="_blank" rel="noopener"
             style="
                 text-decoration:underline;
                 color:{_COLOR_ACCENT};"
@@ -287,6 +287,76 @@ def retention_warning_email( *, display_name: str, download_url: str, deletion_d
                 )
             )
         ) )
+    )
+
+    return subject, html, text
+
+def change_email_verification_email( *, display_name: str, raw_token: str ) -> tuple[str, str, str]:
+    """Email verification - sent on email change request."""
+    link = f"{settings.frontend_url}/verify-email?token={raw_token}"
+
+    subject = "Confirm your email - NetLogAnalyser"
+
+    text = (
+        f"Hi, {display_name}.\n\n"
+        f"Confirm your new email address to change start using it.\n"
+        f"{link}\n\n"
+        f"This link expires in {settings.email_verification_token_expire_minutes} minutes.\n"
+        f"If you didn't request to change your email, change your password immediately - your account may have been compromised.\n\n"
+        f"- The NetLogAnalyser team"
+    )
+
+    html = _base_layout(
+        title=subject,
+        body=_card(content=(
+            _heading(text="Confirm your email")
+            + _body(
+                text=(
+                    f"Hi {display_name}, "
+                    f"confirm your new email address to change start using it."
+                )
+            )
+            + _button(label="Confirm email address", href=link)
+            + _muted(
+                text=(
+                    f"This link expires in {settings.email_verification_token_expire_minutes} minutes. "
+                    f"If you didn't request to change your email, change your password immediately - your account may have been compromised."
+                )
+            )
+        )),
+    )
+
+    return subject, html, text
+
+def email_changed_email( *, display_name: str, email: str ) -> tuple[str, str, str]:
+    """Email changed email - sent once email has successfully been changed"""
+    subject = "Welcome to NetLogAnalyser"
+
+    text = (
+        f"Hi {display_name},\n\n"
+        f"Your email has successfully been changed to {email}.\n\n"
+        f"If you did not request this, immediately change your password if possible and contact us at:\n"
+        f"{settings.support_email}:\n"
+        f"- The NetLogAnalyser team"
+    )
+
+    html = _base_layout(
+        title=subject,
+        body=_card(content=(
+            _heading(text="Email changed")
+            + _body(
+                text=(
+                    f"Hi {display_name}, your email has successfully been changed to {email}. "
+                    f"If you did not request this, immediately change your password if possible and contact us at:\n"
+                )
+            )
+            + _link(
+                text=(
+                    f"{settings.support_email}:\n"
+                ),
+                href=f"mailto:{settings.support_email}"
+            )
+        ))
     )
 
     return subject, html, text

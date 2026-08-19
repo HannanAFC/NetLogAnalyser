@@ -84,7 +84,7 @@ export function ExportsSection( { className }: SettingsSectionProps )
 				{
 					header: 'Size',
 					meta:   { className: 'text-text-secondary tabular-nums' },
-					cell:   ( info ) => info.getValue( ) ? ( info.getValue( ) / 1000000 ).toFixed( 2 ) + ' MB' : "-"
+					cell:   ( info ) => info.getValue( ) ? ( info.getValue( ) / 1000000 ).toFixed( 2 ) + ' MB' : '-'
 				}
 			),
             columnHelper.accessor(
@@ -201,7 +201,7 @@ export function ExportsSection( { className }: SettingsSectionProps )
                 isError={ isError }
                 emptyMessage={
                     <TableNoRecentsErrorMessage>
-                        You have not exported any data yet. Start an export below!
+                        You have not exported any data yet. Start an export above!
                     </TableNoRecentsErrorMessage>
                 }
                 errorMessage={

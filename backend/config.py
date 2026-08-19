@@ -71,6 +71,7 @@ class Settings( BaseSettings ):
     resend_verify_email:                     str = "NetLogAnalyser <verify@netloganalyser.com>"
     resend_recovery_email:                   str = "NetLogAnalyser <recovery@netloganalyser.com>"
     resend_general_email:                    str = "NetLogAnalyser <robot@netloganalyser.com>"
+    support_email:                           str = "support@netloganalyser.com"
     email_verification_token_expire_minutes: int = 60
 
     # Test config

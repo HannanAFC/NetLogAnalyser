@@ -1,3 +1,4 @@
+import { AccountSection } from '#/components/settings/account/account-section';
 import { ApiKeysSection } from '#/components/settings/api-keys/api-keys-section';
 import { ExportsSection } from '#/components/settings/exports/exports-section';
 import { BodyText, Eyebrow, Heading } from '#/components/ui/heading';
@@ -10,7 +11,7 @@ import z from 'zod';
 const settingsPageSearchSchema = z
 	.object(
 	{
-		tab: z.enum( [ 'api-keys', 'exports' ] ).default( 'api-keys' ).catch( 'api-keys' )
+		tab: z.enum( [ 'api-keys', 'exports', 'account' ] ).default( 'api-keys' ).catch( 'api-keys' )
 	} );
 
 export const Route = createFileRoute( '/_authenticated/settings' )(
@@ -80,7 +81,7 @@ function SettingsPage( )
 				<BodyText className="mt-2">Manage your account, API keys, and preferences.</BodyText>
 			</div>
 
-			<div className="mb-6 flex gap-1 border-b border-border">
+			<div className="mb-6 flex gap-1 border-b border-border w-full overflow-x-auto">
 				<Link
 					className={ tab === 'api-keys' ? activeButtonClass : inActiveButtonClass }
 					from={ Route.fullPath }
@@ -94,6 +95,13 @@ function SettingsPage( )
 					search={ { tab: 'exports' } }
 				>
 					Exports
+				</Link>
+				<Link
+					className={ tab === 'account' ? activeButtonClass : inActiveButtonClass }
+					from={ Route.fullPath }
+					search={ { tab: 'account' } }
+				>
+					Account
 				</Link>
 			</div>
 			<div className="relative overflow-hidden">
@@ -110,6 +118,13 @@ function SettingsPage( )
 					inert={ tab !== 'exports' }
 				>
 					<ExportsSection />
+				</div>
+				<div
+					className={ cn( 'transition-all duration-300 ease-out', tab === 'account' ? 'relative translate-x-0 opacity-100' : 'pointer-events-none absolute inset-x-0 top-0 translate-x-8 opacity-0' ) }
+					aria-hidden={ tab !== 'account' }
+					inert={ tab !== 'account' }
+				>
+					<AccountSection />
 				</div>
 			</div>
 		</PageWrapper>

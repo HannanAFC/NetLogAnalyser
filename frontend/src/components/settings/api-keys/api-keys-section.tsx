@@ -98,14 +98,13 @@ export function ApiKeysSection( { className }: SettingsSectionProps )
 				</BodySm>
 			) }
 
-			
 			<div>
 				<BodySm className="mb-2 font-semibold uppercase tracking-[0.08em] text-text-tertiary">
 					Active keys ({ activeKeys.length })
 				</BodySm>
 				<div className="space-y-2">
 				{ activeKeys.length > 0 && (
-				
+
 					activeKeys.map( ( key ) =>
 					(
 						<ApiKeyRow
@@ -134,12 +133,12 @@ export function ApiKeysSection( { className }: SettingsSectionProps )
 				</BodySm>
 				<div className="space-y-2">
 					{ revokedKeys.length > 0 && (
-						
+
 						revokedKeys.map( ( key ) =>
 						(
 							<RevokedKeyRow key={ key.id } apiKey={ key } />
 						) )
-						
+
 					) }
 					{ isLoading && (
 						<ApiKeyRowSkeleton />

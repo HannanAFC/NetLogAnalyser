@@ -473,7 +473,7 @@ export function CustomDateRangePicker(
 					'rounded-lg border border-border bg-card',
 					'shadow-soft p-3',
 					'flex flex-col gap-3',
-					'w-md',
+					'max-w-full md:w-md',
 					'transition-all duration-150 ease-out origin-top-left',
 					open
 						? 'opacity-100 scale-100'
