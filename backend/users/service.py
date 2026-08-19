@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from uuid import UUID
 
 from auth.schemas import UserPublic
@@ -82,7 +83,8 @@ async def delete_user_data(
             select( DataExport )
             .where(
                 DataExport.status == "READY",
-                DataExport.purged_at.is_( None )
+                DataExport.purged_at.is_( None ),
+                DataExport.user_id == user_id
             )
         )
         expired = result.scalars( ).all( )
@@ -105,6 +107,9 @@ async def delete_user_data(
                 continue
         
             try:
+                async with db.begin_nested( ):
+                    export_row.purged_at = datetime.now( timezone.utc )
+                    await db.flush( )
                 await db.commit( )
                 purged += 1
                 logger.info(
