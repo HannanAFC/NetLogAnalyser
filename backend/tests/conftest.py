@@ -2,6 +2,7 @@ import os
 import uuid
 from collections.abc import AsyncGenerator
 from datetime import datetime, timezone
+from pathlib import Path
 from unittest.mock import AsyncMock
 
 from auth.security import (
@@ -17,8 +18,6 @@ os.environ["DATABASE_URL"] = (
 )
 
 os.environ["REDIS_URL"] = "redis://redis/15"
-
-os.environ["EXPORT_LOCAL_PATH"] = "/data/exports/test"
 
 import pytest
 from cache import get_redis
@@ -53,6 +52,11 @@ VALID_EMAIL_2        = "test-2@example.com"
 VALID_PASSWORD_2     = "Str0ng!Pass"
 VALID_DISPLAY_NAME_2 = "Test 2"
 VALID_KEY_LABEL_2    = "Testing Key 2"
+
+print( "cwd:", os.getcwd( ) )
+print( "user:", os.getuid( ) if hasattr( os, "getuid" ) else "N/A" )
+print( "target:", Path( "output" ).resolve( ) )
+print( "cwd writable:", os.access( os.getcwd( ), os.W_OK ) )
 
 @pytest.fixture( scope="session" )
 def anyio_backend( ):
