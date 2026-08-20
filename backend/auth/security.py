@@ -87,3 +87,11 @@ def generate_url_safe_token( bytes: int ) -> str:
         token (str): URL safe token.
     """
     return secrets.token_urlsafe( bytes )
+
+def generate_ws_ticket ( ) -> str:
+    """
+    Create an authentication token/ticket for establishing a websocket.
+    Returns:
+        ws_ticket (str): The websocket ticket.
+    """
+    return secrets.token_urlsafe( 32 )

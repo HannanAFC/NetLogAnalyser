@@ -31,3 +31,10 @@ class ApiKeyPublic( BaseModel ):
     created_at:   datetime
     last_used_at: datetime | None
     revoked_at:   datetime | None
+
+class APIKeyCacheEntry( BaseModel ):
+    model_config = ConfigDict( from_attributes=True )
+
+    id:          UUID
+    user_id:     UUID
+    revoked_at:  datetime | None

@@ -1,5 +1,7 @@
 import { Card } from '#/components/ui/card';
-import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { BodySm } from '#/components/ui/heading';
+import { PageWrapper } from '#/components/ui/page-wrapper';
+import { PageHeading } from '#/components/ui/page-heading';
 import { useLogin } from '#/features/auth/hooks';
 import { sessionQueryOptions } from '#/features/auth/queries';
 import { loginSchema } from '#/features/auth/schemas';
@@ -87,12 +89,8 @@ function LoginPage()
 		} );
 
 	return (
-		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
-			<div>
-				<Eyebrow>Secure access</Eyebrow>
-				<Heading level="h1" className="">Login</Heading>
-				<BodyText className="mt-2">Enter your credentials to access the live operations view.</BodyText>
-			</div>
+		<PageWrapper maxWidth="md" className="py-16 gap-6">
+			<PageHeading eyebrow="Secure access" title="Login" description="Enter your credentials to access the live operations view." />
 
 			<Card>
 				<form
@@ -134,24 +132,24 @@ function LoginPage()
 						validators={{ onChange: loginSchema.shape.password, onBlur: loginSchema.shape.password }}
 					>
 						{ ( field ) =>
-							(
-								<div>
-									<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Password</Label>
-									<Input
-										id={ field.name }
-										type="password"
-										autoComplete="current-password"
-										value={ field.state.value }
-										onBlur={ field.handleBlur }
-										onChange={ ( e ) => field.handleChange( e.target.value ) }
-									/>
+						(
+							<div>
+								<Label htmlFor={ field.name } className="block text-sm font-medium text-text-primary">Password</Label>
+								<Input
+									id={ field.name }
+									type="password"
+									autoComplete="current-password"
+									value={ field.state.value }
+									onBlur={ field.handleBlur }
+									onChange={ ( e ) => field.handleChange( e.target.value ) }
+								/>
 								{ field.state.meta.errors.length > 0 && (
 									<BodySm className="text-danger">
-											{ field.state.meta.errors[ 0 ]?.message }
+										{ field.state.meta.errors[ 0 ]?.message }
 									</BodySm>
-									)}
-								</div>
-							)}
+								)}
+							</div>
+						)}
 					</form.Field>
 
 					{ login.isError && isEmailNotVerifiedError( login.error ) &&
@@ -200,6 +198,6 @@ function LoginPage()
 					</Link>
 				</BodySm>
 			</Card>
-		</div>
+		</PageWrapper>
 	);
 }

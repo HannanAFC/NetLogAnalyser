@@ -69,7 +69,7 @@ const sections: NavSection[ ] =
 		label: 'Analyse',
 		items:
 		[
-			{ label: 'Geo map', to: '/geo-map', icon: Globe },
+			{ label: 'Geo map', to: '/geomap', icon: Globe },
 			{ label: 'Analytics', to: '/analytics', icon: BarChart3 }
 		]
 	}

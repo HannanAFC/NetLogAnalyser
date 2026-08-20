@@ -1,6 +1,6 @@
 FROM node:25-slim
 
-RUN npm install -g pnpm@11.9.0
+RUN npm install -g pnpm@11
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*

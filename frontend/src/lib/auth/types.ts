@@ -1,10 +1,4 @@
-export interface User
-{
-	id: string;
-	email: string;
-	display_name: string;
-	created_at: string;
-}
+import type { User } from '../users/types';
 
 export interface AuthTokenResponse
 {

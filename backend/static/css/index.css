@@ -505,6 +505,8 @@ header {
     padding: 10px 16px;
     flex: 1;
     letter-spacing: -0.01em;
+    overflow-x: auto;
+    text-wrap-mode: nowrap;
 }
 
 .copy-btn {

@@ -32,7 +32,9 @@ export default [
 			'@stylistic/computed-property-spacing': ['error', 'always' ],
 			'@stylistic/keyword-spacing': [ 'error', { before: true, after: true } ],
 			'@stylistic/space-before-function-paren': [ 'error', 'never' ],
-			'@stylistic/space-before-blocks': [ 'error', 'always'],			'@stylistic/brace-style': [ 'error', 'allman' ],			'@stylistic/arrow-spacing': [ 'error', { before: true, after: true } ],
+			'@stylistic/space-before-blocks': [ 'error', 'always'],
+			'@stylistic/brace-style': [ 'error', 'allman' ],
+			'@stylistic/arrow-spacing': [ 'error', { before: true, after: true } ],
 			'@stylistic/no-trailing-spaces': 'error',
 			'@stylistic/type-annotation-spacing': 'error',
 			'@stylistic/comma-spacing': [ 'error', { before: false, after: true } ]

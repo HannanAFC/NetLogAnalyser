@@ -2,19 +2,22 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import TypeVar
+from typing import Literal, TypeVar
 
 from auth.dependencies import hash_token
 from auth.schemas import LoginRequest, RegisterRequest
 from auth.security import generate_url_safe_token, hash_password, verify_password
 from config import settings
 from email_service.service import (
+    send_change_email_verification_email,
+    send_email_changed_email,
     send_password_reset_email,
     send_verification_email,
     send_welcome_email,
 )
 from fastapi import HTTPException, status
 from models.models import EmailVerificationToken, PasswordResetToken, User
+from redis.asyncio import Redis
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
@@ -144,7 +147,7 @@ async def issue_password_reset_token( db: AsyncSession, user_row: User ) -> None
         raw_token=raw_token
     )
 
-async def issue_verification_token( db: AsyncSession, user_row: User ) -> None:
+async def issue_verification_token( db: AsyncSession, user_row: User, type: Literal[ "register", "change" ] = "register" ) -> None:
     """
     Send an email verification email to a user.
     Parameters:
@@ -165,13 +168,20 @@ async def issue_verification_token( db: AsyncSession, user_row: User ) -> None:
     if settings.enable_test_endpoints:
         record_token( email=user_row.email, token_type="verification", raw_token=raw_token )
 
-    await send_verification_email(
-        to=user_row.email,
-        display_name=user_row.display_name,
-        raw_token=raw_token
-    )
+    if type == "register":
+        await send_verification_email(
+            to=user_row.email,
+            display_name=user_row.display_name,
+            raw_token=raw_token
+        )
+    elif type == "change":
+        await send_change_email_verification_email(
+            to=user_row.email,
+            display_name=user_row.display_name,
+            raw_token=raw_token
+        )
 
-async def verify_email_token( db: AsyncSession, raw_token: str ) -> User:
+async def verify_email_token( db: AsyncSession, redis: Redis, raw_token: str, type: Literal[ "register", "change" ] = "register" ) -> User:
     """
     Verify an email verification token received from a user, raises HTTP error 400 if invalid token.
     Parameters:
@@ -203,7 +213,22 @@ async def verify_email_token( db: AsyncSession, raw_token: str ) -> User:
     user_row.email_verified_at = datetime.now( timezone.utc )
     await db.flush( )
 
-    await send_welcome_email( to=user_row.email, display_name=user_row.display_name )
+    cached = await redis.get( f"useremail:{ user_row.id }" )
+
+    if cached is None:
+        await send_welcome_email( to=user_row.email, display_name=user_row.display_name )
+    elif cached:
+        cached_email = str( cached )
+        result = await db.execute(
+            select( User )
+            .where( User.email == cached_email.lower( ) )
+        )
+        existing = result.scalar_one_or_none( )
+        if existing:
+            raise HTTPException( detail="Email is already taken.", status_code=status.HTTP_400_BAD_REQUEST )
+        user_row.email = cached_email
+
+        await send_email_changed_email( to=user_row.email, display_name=user_row.display_name, email=user_row.email )
 
     return user_row
 

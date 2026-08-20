@@ -3,7 +3,9 @@ import { useSession } from '#/features/auth/hooks';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { createRootRoute, HeadContent, Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-
+import { FormDevtoolsPanel } from '@tanstack/react-form-devtools';
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
+import { TableDevtoolsPanel } from '@tanstack/react-table-devtools';
 import { NotFound } from '#/components/not-found';
 import { Sidebar, SidebarProvider, useSidebar } from '#/components/sidebar';
 import { Button } from '#/components/ui/button';
@@ -11,6 +13,8 @@ import { IndexLink } from '#/components/ui/index-link';
 import { env } from '#/lib/env';
 import { Menu } from 'lucide-react';
 import '../styles.css';
+import { OverlayProvider } from '#/lib/overlay/overlay-context';
+import { ErrorComponent } from '#/components/error-component';
 
 export const Route = createRootRoute(
 {
@@ -22,6 +26,7 @@ export const Route = createRootRoute(
 		</>
 	),
 	notFoundComponent: NotFound,
+	errorComponent:    ErrorComponent,
 	head: ( ) => (
 	{
 		links:
@@ -53,40 +58,48 @@ export const Route = createRootRoute(
 			{
 				rel: 'stylesheet',
 				href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap'
+			},
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/'
 			}
 		],
 		meta:
 		[
 			{
-				title: 'NetLogAnalyser'
+				title: 'NetLogAnalyser - Real-time network log analysis'
 			},
 			{
 				name: 'description',
-				content: 'Monitor, visualise, and analyse your network traffic in real time. Detect anomalies, track source geography, and investigate threats through a live dashboard.'
+				content: 'Real-time network log ingestion, anomaly detection, and live dashboards.'
 			},
 			{
 				name: 'keywords',
 				content: 'network monitoring, log analysis, real-time traffic, anomaly detection, network security, packet analysis, threat detection'
 			},
 			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Real-Time Network Log Analysis'
-			},
-			{
-				name: 'og:site_name',
-				content: 'NetLogAnalyser'
-			},
-			{
-				name: 'og:description',
-				content: 'Monitor, visualise, and analyse your network traffic in real time. Detect anomalies, track source geography, and investigate threats through a live dashboard.'
-			},
-			{
 				name: 'og:type',
 				content: 'website'
 			},
 			{
+				name: 'og:title',
+				content: 'NetLogAnalyser - Real-Time Network Log Analysis'
+			},
+			{
+				name: 'og:description',
+				content: 'Real-time network log ingestion, anomaly detection, and live dashboards.'
+			},
+			{
+				name: 'og:url',
+				content: 'https://www.netloganalyser.com/'
+			},
+			{
+				name: 'og:image',
+				content: 'og-image.png'
+			},
+			{
 				name: 'twitter:card',
-				content: 'summary'
+				content: 'summary_large_image'
 			},
 			{
 				name: 'twitter:title',
@@ -94,45 +107,36 @@ export const Route = createRootRoute(
 			},
 			{
 				name: 'twitter:description',
-				content: 'Monitor, visualise, and analyse your network traffic in real time. Detect anomalies, track source geography, and investigate threats through a live dashboard.'
+				content: 'Real-time network log ingestion, anomaly detection, and live dashboards.'
+			},
+			{
+				name: 'twitter:image',
+				content: 'og-image.png'
+			},
+			{
+				name: 'twitter:url',
+				content: 'https://www.netloganalyser.com/'
 			}
 		]
 	} )
 } );
-
-function AuthenticatedHeader( )
-{
-	const { toggle } = useSidebar( );
-
-	return (
-		<>
-			<Button
-				type="button"
-				onClick={ toggle }
-				aria-label="Toggle navigation"
-				variant='ghost'
-			>
-				<Menu className="h-5 w-5" />
-			</Button>
-			<IndexLink />
-		</>
-	);
-}
 
 function RootComponent( )
 {
 	const { data: session } = useSession( );
 
 	return (
-		<SidebarProvider>
-			<RootInner session={ session } />
-		</SidebarProvider>
+		<OverlayProvider>
+			<SidebarProvider>
+				<RootLayout session={ session } />
+			</SidebarProvider>
+		</OverlayProvider>
 	);
 }
 
-function RootInner( { session }: { session: unknown } )
+function RootLayout( { session }: { session: unknown } )
 {
-	const { open, close } = useSidebar( );
+	const { toggle, open, close } = useSidebar( );
 
 	return (
 		<>
@@ -140,11 +144,20 @@ function RootInner( { session }: { session: unknown } )
 			<div className="flex min-h-screen flex-col bg-paper text-text-primary">
 				<header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 					<div className="flex items-center gap-3">
-						{ !!session && <AuthenticatedHeader /> }
-						{ !session &&
-						(
+						{ !!session &&
+						<>
+							<Button
+								type="button"
+								onClick={ toggle }
+								aria-label="Toggle navigation"
+								variant='ghost'
+							>
+								<Menu className="h-5 w-5" />
+							</Button>
 							<IndexLink />
-						) }
+						</>
+						}
+						{ !session && <IndexLink /> }
 					</div>
 
 					<nav className="flex items-center gap-4">
@@ -174,9 +187,14 @@ function RootInner( { session }: { session: unknown } )
 				</div>
 
 				<footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-border px-4 py-5 sm:px-6 lg:px-8">
-					<span className="text-xs text-text-tertiary">
-						NetLogAnalyser · v0.1.0
-					</span>
+					<div className='flex flex-col gap-2'>
+						<span className="text-xs text-text-tertiary">
+							NetLogAnalyser · v{ env.appVersion }
+						</span>
+						<Link to='/legal' className='text-xs text-text-tertiary'>
+							Legal
+						</Link>
+					</div>
 					<a href={ env.apiBaseUrl } className="text-xs font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary">
 						API docs
 					</a>
@@ -192,6 +210,18 @@ function RootInner( { session }: { session: unknown } )
 						{
 							name:   'TanStack Router',
 							render: <TanStackRouterDevtoolsPanel />
+						},
+						{
+							name:   'TanStack Query',
+							render: <ReactQueryDevtoolsPanel />
+						},
+						{
+							name:   'TanStack Form',
+							render: <FormDevtoolsPanel />
+						},
+						{
+							name:   'TanStack Table',
+							render: <TableDevtoolsPanel />
 						}
 					] }
 				/>

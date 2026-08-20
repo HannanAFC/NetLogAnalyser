@@ -80,7 +80,7 @@ def _card( *, content: str ) -> str:
     """
 
 
-def _button( *, label: str, href: str ) -> str:
+def _button( *, label: str, href: str, download: bool = False ) -> str:
     """CTA button - matches the site's mono-label + accent style."""
     return f"""\
         <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 4px;">
@@ -89,7 +89,7 @@ def _button( *, label: str, href: str ) -> str:
                     background:{_COLOR_ACCENT};
                     border-radius:6px;
                 ">
-                    <a href="{ href }" target="_blank" rel="noopener" style="
+                    <a href="{ href }" target="_blank" rel="noopener"{ " download" if download == True else "" } style="
                         display:inline-block;
                         padding:13px 32px;
                         font-family:{_FONT_MONO};
@@ -123,7 +123,7 @@ def _muted( *, text: str ) -> str:
 def _link( *, text: str, href: str ) -> str:
     """Inline text link."""
     return f"""\
-        <a href="'{ href } target="_blank" rel="noopener"
+        <a href="{ href }" target="_blank" rel="noopener"
             style="
                 text-decoration:underline;
                 color:{_COLOR_ACCENT};"
@@ -251,6 +251,112 @@ def welcome_email( *, display_name: str ) -> tuple[str, str, str]:
                 )
             )
         )),
+    )
+
+    return subject, html, text
+
+def retention_warning_email( *, display_name: str, download_url: str, deletion_date: str ) -> tuple[ str, str, str ]:
+    """Retention warning - sent from automatic deletion job."""
+
+    subject = "Monthly log export - NetLogAnalyser"
+
+    text = (
+        f"Hi { display_name },\n\n"
+        f"Your network logs will be deleted on { deletion_date }, you can download your data before this happens using the link below.\n"
+        f"{ download_url }\n\n"
+        f"This link expires in { settings.export_link_ttl_hours } hours.\n"
+        f"You can also start an export via the website.\n"
+        f"- The NetLogAnalyser team"
+    )
+
+    html = _base_layout(
+        title=subject,
+        body=_card( content=(
+            _heading( text="Monthly log export" )
+            + _body(
+                text=(
+                    f"Hi { display_name }, your network logs will be deleted on { deletion_date }, "
+                    f"you can download your data before this happens by clicking the button below."
+                )
+            )
+            + _button( label="Download", href=download_url, download=True )
+            + _muted(
+                text=(
+                    f"This link expires in { settings.export_link_ttl_hours } hours. "
+                    f"You can also start an export via the website."
+                )
+            )
+        ) )
+    )
+
+    return subject, html, text
+
+def change_email_verification_email( *, display_name: str, raw_token: str ) -> tuple[str, str, str]:
+    """Email verification - sent on email change request."""
+    link = f"{settings.frontend_url}/verify-email?token={raw_token}"
+
+    subject = "Confirm your email - NetLogAnalyser"
+
+    text = (
+        f"Hi, {display_name}.\n\n"
+        f"Confirm your new email address to change start using it.\n"
+        f"{link}\n\n"
+        f"This link expires in {settings.email_verification_token_expire_minutes} minutes.\n"
+        f"If you didn't request to change your email, change your password immediately - your account may have been compromised.\n\n"
+        f"- The NetLogAnalyser team"
+    )
+
+    html = _base_layout(
+        title=subject,
+        body=_card(content=(
+            _heading(text="Confirm your email")
+            + _body(
+                text=(
+                    f"Hi {display_name}, "
+                    f"confirm your new email address to change start using it."
+                )
+            )
+            + _button(label="Confirm email address", href=link)
+            + _muted(
+                text=(
+                    f"This link expires in {settings.email_verification_token_expire_minutes} minutes. "
+                    f"If you didn't request to change your email, change your password immediately - your account may have been compromised."
+                )
+            )
+        )),
+    )
+
+    return subject, html, text
+
+def email_changed_email( *, display_name: str, email: str ) -> tuple[str, str, str]:
+    """Email changed email - sent once email has successfully been changed"""
+    subject = "Welcome to NetLogAnalyser"
+
+    text = (
+        f"Hi {display_name},\n\n"
+        f"Your email has successfully been changed to {email}.\n\n"
+        f"If you did not request this, immediately change your password if possible and contact us at:\n"
+        f"{settings.support_email}:\n"
+        f"- The NetLogAnalyser team"
+    )
+
+    html = _base_layout(
+        title=subject,
+        body=_card(content=(
+            _heading(text="Email changed")
+            + _body(
+                text=(
+                    f"Hi {display_name}, your email has successfully been changed to {email}. "
+                    f"If you did not request this, immediately change your password if possible and contact us at:\n"
+                )
+            )
+            + _link(
+                text=(
+                    f"{settings.support_email}:\n"
+                ),
+                href=f"mailto:{settings.support_email}"
+            )
+        ))
     )
 
     return subject, html, text

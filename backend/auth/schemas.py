@@ -40,6 +40,8 @@ class UserPublic( BaseModel ):
     created_at:   datetime
 
 class RegisterRequest( PasswordComplexityMixin ):
+    model_config = ConfigDict( str_strip_whitespace=True )
+
     email:            EmailStr = Field( max_length=255 )
     display_name:     str      = Field( min_length=1, max_length=50 )
     
