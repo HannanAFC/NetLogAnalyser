@@ -12,11 +12,15 @@ from auth.security import (
 )
 from models.models import APIKey, User
 
-os.environ["DATABASE_URL"] = (
+os.environ.setdefault(
+    "DATABASE_URL",
     "postgresql+psycopg://NetlogAnalyserUserTest:TestPass@test-db/NetLogAnalyserDBTest"
 )
 
-os.environ["REDIS_URL"] = "redis://redis/15"
+os.environ.setdefault(
+    "REDIS_URL",
+    "redis://localhost/15"
+)
 
 import pytest
 from cache import get_redis
