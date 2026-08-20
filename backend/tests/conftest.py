@@ -19,6 +19,11 @@ os.environ["DATABASE_URL"] = (
 
 os.environ["REDIS_URL"] = "redis://redis/15"
 
+print( "cwd:", os.getcwd( ) )
+print( "user:", os.getuid( ) if hasattr( os, "getuid" ) else "N/A" )
+print( "target:", Path( "output" ).resolve( ) )
+print( "cwd writable:", os.access( os.getcwd( ), os.W_OK ) )
+
 import pytest
 from cache import get_redis
 from database import Base, get_db
@@ -52,11 +57,6 @@ VALID_EMAIL_2        = "test-2@example.com"
 VALID_PASSWORD_2     = "Str0ng!Pass"
 VALID_DISPLAY_NAME_2 = "Test 2"
 VALID_KEY_LABEL_2    = "Testing Key 2"
-
-print( "cwd:", os.getcwd( ) )
-print( "user:", os.getuid( ) if hasattr( os, "getuid" ) else "N/A" )
-print( "target:", Path( "output" ).resolve( ) )
-print( "cwd writable:", os.access( os.getcwd( ), os.W_OK ) )
 
 @pytest.fixture( scope="session" )
 def anyio_backend( ):
