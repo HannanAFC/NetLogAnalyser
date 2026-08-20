@@ -27,45 +27,14 @@ export const Route = createFileRoute( '/reset-password' )(
 	component: ResetPasswordPage,
 	head: ( ) => (
 	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/reset-password'
-			}
-		],
 		meta:
 		[
 			{
 				title: 'Reset Password | NetLogAnalyser'
 			},
 			{
-				name: 'description',
-				content: 'Reset you NetLogAnalyser account password to start monitoring you network traffic again.'
-			},
-			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Reset Password'
-			},
-			{
-				name: 'og:description',
-				content: 'Reset you NetLogAnalyser account password to start monitoring you network traffic again.'
-			},
-			{
-				name: 'twitter:title',
-				content: 'NetLogAnalyser - Reset Password'
-			},
-			{
-				name: 'twitter:description',
-				content: 'Reset you NetLogAnalyser account password to start monitoring you network traffic again.'
-			},
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com/reset-password'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com/reset-password'
+				name:    'robots',
+				content: 'noindex, nofollow'
 			}
 		]
 	} )

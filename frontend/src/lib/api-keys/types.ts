@@ -18,4 +18,4 @@ export interface CreatedApiKey
 }
 
 export interface CreateApiKeyResponse extends CreatedApiKey {};
-export interface GetApiKeysResponse extends Array<ApiKey> {};
+export interface GetApiKeysResponse extends Array< ApiKey > {};

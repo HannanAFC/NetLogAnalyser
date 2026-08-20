@@ -18,7 +18,9 @@ async def send_email( *, sender: str, to: str, subject: str, html: str, text: st
     """
     if settings.environment == "development" and settings.resend_api_key == "":
         print(
-            f"Development Environemnt \nFrom: { sender } \nTo: { to } \nSubject: { subject } \n{ text }"
+            f"Development Environemnt \nFrom: { sender } \nTo: { to } \nSubject: { subject } \n{ text }",
+            "HTML:",
+            html
         )
         return
 

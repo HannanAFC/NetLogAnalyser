@@ -45,7 +45,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 					'inline-flex items-center font-mono font-medium',
 					'cursor-pointer no-underline',
 					'transition-[opacity,background,color,border-color] duration-150',
-					'tracking-[0.01em]',
+					'tracking-[0.01em] disabled:opacity-50',
 					variantClasses[ variant ],
 					sizeClasses[ size ],
 					className

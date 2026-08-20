@@ -1,0 +1,16 @@
+{
+    "python.analysis.typeCheckingMode": "standard",
+    "files.exclude": {
+        "**/.git": false
+    },
+    "diffEditor.ignoreTrimWhitespace": false,
+    "python.terminal.activateEnvironment": false,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave":
+        {
+            "source.fixAll": "never",
+            "source.organizeImports": "explicit"
+        }
+    },
+}

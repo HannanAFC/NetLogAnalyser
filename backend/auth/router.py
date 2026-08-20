@@ -38,10 +38,12 @@ from auth.service import (
     resend_verification_email,
     verify_email_token,
 )
+from cache import get_redis
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from models.models import PasswordResetToken, RefreshToken, User
 from rate_limiter import get_auth_rate_limiter, get_forgot_password_rate_limiter
+from redis.asyncio import Redis
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -205,9 +207,14 @@ async def reset_password(
     return ResetPasswordResponse( )
 
 @router.get( "/verify-email" )
-async def verify_email( token: str, db: AsyncSession = Depends( get_db ) ):
-    await verify_email_token( db, token )
+async def verify_email(
+    token: str,
+    db: Annotated[ AsyncSession, Depends( get_db ) ],
+    redis:   Annotated[ Redis, Depends( get_redis ) ]
+):
+    user = await verify_email_token( db, redis, token )
     await db.commit( )
+    await db.refresh( user )
     return VerifyEmailResponse( )
 
 
@@ -215,7 +222,7 @@ async def verify_email( token: str, db: AsyncSession = Depends( get_db ) ):
     "/resend-verification",
     dependencies=[ Depends( get_forgot_password_rate_limiter ) ]
 )
-async def resend_verification( payload: ResendVerificationRequest, db: AsyncSession = Depends( get_db ) ):
+async def resend_verification( payload: ResendVerificationRequest, db: Annotated[ AsyncSession, Depends( get_db ) ] ):
     await resend_verification_email( db, payload.email )
     await db.commit()
     return ResendVerificationResponse( )

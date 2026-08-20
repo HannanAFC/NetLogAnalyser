@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -21,6 +21,7 @@ class Settings( BaseSettings ):
 
     # Database
     database_url:                        str
+    geoip_db_path:                       str = "geoip/GeoLite2-Country.mmdb"
 
     # Auth
     secret_key:                          SecretStr
@@ -42,6 +43,8 @@ class Settings( BaseSettings ):
     # Websocket
     ws_heartbeat_interval:               int = 30
     ws_max_connections_per_user:         int = 5
+    ws_ticket_ttl_seconds:               int = 30
+    ws_stale_connection_seconds:         int = 90
 
     # Cookies
     cookie_secure:                       bool = True
@@ -67,12 +70,54 @@ class Settings( BaseSettings ):
     resend_onboarding_email:                 str = "NetLogAnalyser <onboarding@netloganalyser.com>"
     resend_verify_email:                     str = "NetLogAnalyser <verify@netloganalyser.com>"
     resend_recovery_email:                   str = "NetLogAnalyser <recovery@netloganalyser.com>"
+    resend_general_email:                    str = "NetLogAnalyser <robot@netloganalyser.com>"
+    support_email:                           str = "support@netloganalyser.com"
     email_verification_token_expire_minutes: int = 60
 
     # Test config
-    enable_test_endpoints: bool = False
-    test_endpoint_key: str = ""
-    test_email_domain: str = "@example.com"   # matches uniqueTestEmail() in your frontend integration suite
+    enable_test_endpoints:               bool = False
+    test_endpoint_key:                   str = ""
+    test_email_domain:                   str = "@example.com"
+
+    # Anomaly detection
+    anomaly_packet_size_mtu:             int = 1500
+    anomaly_packet_size_jumbo_max:       int = 9000
+    anomaly_packet_size_tiny_max:        int = 40
+    anomaly_port_scan_low:               int = 5
+    anomaly_port_scan_high:              int = 25
+    anomaly_host_sweep_low:              int = 5
+    anomaly_host_sweep_high:             int = 20
+    anomaly_weight_packet_size:          float = Field( ge=0.0, le=1.0, default=0.5 )
+    anomaly_weight_tcp_flags:            float = Field( ge=0.0, le=1.0, default=0.9 )
+    anomaly_weight_mismatch_ports:       float = Field( ge=0.0, le=1.0, default=0.6 )
+    anomaly_weight_port_scan_shape:      float = Field( ge=0.0, le=1.0, default=0.7 )
+    anomaly_weight_host_sweep_shape:     float = Field( ge=0.0, le=1.0, default=0.6 )
+
+    # Analytics endpoint
+    analytics_max_range_days:            int = 30
+    analytics_summary_expire_seconds:    int = 30
+    analytics_timeseries_expire_seconds: int = 30
+
+    # Data retention
+    retention_enabled:                    bool = True
+    retention_days:                       int = 30
+    retention_grace_period_days:          int = 7
+    retention_export_email_enabled:       bool = True
+    retention_delete_chunk_size:          int = 5000
+    retention_job_lock_ttl_seconds:       int = 30
+
+    # Export storage
+    export_storage_backend:                Literal[ "local", "s3" ] = "local"
+    export_local_path:                     str = "data/exports"
+    export_s3_bucket:                      str | None = None
+    export_s3_endpoint_url:                str | None = None
+    export_s3_region:                      str | None = None
+    export_s3_access_key_id:               SecretStr | None = None
+    export_s3_secret_access_key:           SecretStr | None = None
+    export_link_ttl_hours:                 int = 72
+    export_max_per_user_per_day:           int = 3
+    export_authenticated_link_ttl_seconds: int = 300
+
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
 

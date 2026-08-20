@@ -9,12 +9,33 @@ export type LoginPayload = z.infer< typeof loginSchema >;
 
 // Mirrors the backend's password_policy -
 // keep the two in sync if that policy changes.
+export const passwordSchema = z
+	.string( )
+	.min( 8, 'Password must be at least 8 characters' )
+	.regex( /[A-Z]/, 'Password must contain at least one uppercase letter' )
+	.regex( /[a-z]/, 'Password must contain at least one lowercase letter' )
+	.regex( /[0-9]/, 'Password must contain at least one digit' )
+	.regex(
+		/[^A-Za-z0-9]/,
+		'Password must contain at least one special character'
+	);
+
+export const emailSchema = z
+	.email( 'Enter a valid email address' )
+	.max( 255, 'Email must be a maximum of 255 characters long' );
+
+export const displayNameSchema = z
+	.string( )
+	.min( 1, 'Display name is required' )
+	.max( 50, 'Display name must be a maximum of 50 characters long' );
+
+
 export const registerSchema = z
 	.object(
 	{
-		email:            z.email( 'Enter a valid email address' ).max( 255, 'Email must be a maximum of 255 characters long' ),
-		display_name:     z.string( ).min( 1, 'Display name is required' ).max( 50, 'Display name must be a maximum of 50 characters long' ),
-		password:         z.string( ).min( 8, 'Password must be at least 8 characters' ),
+		email:            emailSchema,
+		display_name:     displayNameSchema,
+		password:         passwordSchema,
 		confirm_password: z.string( )
 	} )
 	.refine ( ( data ) => data.password === data.confirm_password,
@@ -31,12 +52,18 @@ export const forgotPasswordSchema = z.object(
 } );
 export type ForgotPasswordPayload = z.infer< typeof forgotPasswordSchema >;
 
-export const resetPasswordSchema = z.object(
-{
-	token:            z.string( ).min( 1 ),
-	password:         z.string( ).min( 8, 'Password must be at least 8 characters' ),
-	confirm_password: z.string( )
-} );
+export const resetPasswordSchema = z
+	.object(
+	{
+		token:            z.string( ).min( 1 ),
+		password:         passwordSchema,
+		confirm_password: z.string( )
+	} )
+	.refine ( ( data ) => data.password === data.confirm_password,
+	{
+		message: "Passwords don't match",
+		path: [ 'confirm_password' ]
+	} );
 export type ResetPasswordPayload = z.infer< typeof resetPasswordSchema >;
 export type ResetPasswordRequestBody = Omit< ResetPasswordPayload, 'confirm_password' >;
 
