@@ -469,7 +469,7 @@ export function CustomDateRangePicker(
 
 			<div
 				className={ cn(
-					'absolute left-0 top-full mt-2 z-50',
+					'absolute left-0 top-full mt-2 z-50 min-w-sm',
 					'rounded-lg border border-border bg-card',
 					'shadow-soft p-3',
 					'flex flex-col gap-3',
