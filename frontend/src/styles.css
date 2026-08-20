@@ -291,7 +291,27 @@
 		outline: 2px solid var( --color-accent );
 		outline-offset: 2px;
 	}
-}
+
+	.prose-legal h2
+	{
+		@apply mt-8 mb-3 text-xl font-semibold text-text-primary;
+	}
+
+	.prose-legal h3
+	{
+		@apply mt-6 mb-2 text-lg font-medium text-text-primary;
+	}
+
+	.prose-legal p
+	{
+		@apply mb-4 text-text-secondary leading-relaxed;
+	}
+	
+	.prose-legal ul
+	{
+		@apply mb-4 list-disc space-y-1 pl-6 text-text-secondary;
+	}
+	}
 
 @media ( prefers-reduced-motion: reduce )
 {

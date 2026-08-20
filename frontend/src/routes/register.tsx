@@ -11,6 +11,11 @@ import { fieldError } from '#/lib/utils';
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
+import type { MouseEvent } from 'react';
+import { Button } from '#/components/ui/button';
+import { useOverlay } from '#/lib/overlay/overlay-context';
+import { PrivacyOverlay } from '#/components/register/privacy-overlay';
+import { TermsOverlay } from '#/components/register/terms-overlay';
 
 export const Route = createFileRoute( '/register' )(
 {
@@ -70,6 +75,7 @@ function RegisterPage( )
 {
 	const register = useRegister( );
 	const [ registeredEmail, setRegisteredEmail ] = useState< string | null >( null );
+	const { open, close } = useOverlay( );
 
 	const form = useForm(
 		{
@@ -88,6 +94,22 @@ function RegisterPage( )
 				}
 			}
 		} );
+
+	function handleOpenPrivacy( event: MouseEvent )
+	{
+		event.preventDefault( );
+		const id = open(
+			<PrivacyOverlay onConfirm={ ( ) => close( id ) } />
+		);
+	}
+
+	function handleOpenTerms( event: MouseEvent )
+	{
+		event.preventDefault( );
+		const id = open(
+			<TermsOverlay onConfirm={ ( ) => close( id ) } />
+		);
+	}
 
 	if ( registeredEmail )
 	{
@@ -255,16 +277,26 @@ function RegisterPage( )
 						<BodySm className="text-critical">{ apiError( register.error ) ?? "Couldn't create that account. Try a different email." }</BodySm>
 					)}
 
+					<Label className='flex gap-4 items-center cursor-pointer'>
+						<Input
+							id='consent'
+							type='checkbox'
+						/>
+						<BodySm>
+							You accept the <a role='button' onClick={ handleOpenPrivacy } className='underline'>privacy policy</a> and <a role='button' onClick={ handleOpenTerms } className='underline'> terms of use</a>.
+						</BodySm>
+					</Label>
+
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
 						(
-							<button
+							<Button
 								type="submit"
 								disabled={ !canSubmit || isPristine || register.isPending }
-								className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+								className=" w-full "
 							>
 								{ register.isPending ? 'Creating account…' : 'Create account' }
-							</button>
+							</Button>
 						)}
 					</form.Subscribe>
 				</form>

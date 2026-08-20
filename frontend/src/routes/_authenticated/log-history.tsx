@@ -12,45 +12,14 @@ export const Route = createFileRoute( '/_authenticated/log-history' )(
   	component: LogHistoryPage,
 	head: ( ) => (
 	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/log-history'
-			}
-		],
 		meta:
 		[
 			{
 				title: 'Log History | NetLogAnalyser'
 			},
 			{
-				name: 'description',
-				content: 'View historical network log data in full detail.'
-			},
-			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Log History'
-			},
-			{
-				name: 'og:description',
-				content: 'View historical network log data in full detail.'
-			},
-			{
-				name: 'twitter:title',
-				content: 'NetLogAnalyser - Log History'
-			},
-			{
-				name: 'twitter:description',
-				content: 'View historical network log data in full detail.'
-			},
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com/log-history'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com/log-history'
+				name:    'robots',
+				content: 'noindex, nofollow'
 			}
 		]
 	} )

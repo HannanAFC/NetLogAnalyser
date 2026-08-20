@@ -15,7 +15,20 @@ import { BodyText, Heading } from '#/components/ui/heading';
 
 export const Route = createFileRoute( '/_authenticated/geomap' )( {
 	validateSearch: timeRangeSearchSchema,
-	component:      GeomapPage
+	component:      GeomapPage,
+	head: ( ) => (
+	{
+		meta:
+		[
+			{
+				title: 'Geomap | NetLogAnalyser'
+			},
+			{
+				name:    'robots',
+				content: 'noindex, nofollow'
+			}
+		]
+	} )
 } );
 
 const useTimeRange = createUseTimeRange( '/_authenticated/geomap' );

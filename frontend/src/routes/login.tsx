@@ -1,5 +1,5 @@
 import { Card } from '#/components/ui/card';
-import { BodySm, BodyText } from '#/components/ui/heading';
+import { BodySm } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
 import { PageHeading } from '#/components/ui/page-heading';
 import { useLogin } from '#/features/auth/hooks';

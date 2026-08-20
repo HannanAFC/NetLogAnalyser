@@ -59,9 +59,9 @@ export function Card( { className, variant = 'default', glow, children, ...props
 				cardVariantClasses[ variant ],
 				glow && [
 					'relative overflow-hidden',
-					'hover:border-success/30',
+					'hover:border-accent/30',
 					/* Pseudo-element glow overlay */
-					'before:absolute before:inset-0 before:bg-success/3 before:opacity-0 before:transition-opacity before:duration-200',
+					'before:absolute before:inset-0 before:bg-accent/3 before:opacity-0 before:transition-opacity before:duration-200',
 					'hover:before:opacity-100'
 				],
 				className

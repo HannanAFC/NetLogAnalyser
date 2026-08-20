@@ -24,7 +24,20 @@ const analyticsSearchSchema = timeRangeSearchSchema.extend(
 export const Route = createFileRoute( '/_authenticated/analytics' )(
 {
 	validateSearch: analyticsSearchSchema,
-	component:      AnalyticsPage
+	component:      AnalyticsPage,
+	head: ( ) => (
+	{
+		meta:
+		[
+			{
+				title: 'Analytics | NetLogAnalyser'
+			},
+			{
+				name:    'robots',
+				content: 'noindex, nofollow'
+			}
+		]
+	} )
 } );
 
 const useTimeRange = createUseTimeRange( '/_authenticated/analytics' );

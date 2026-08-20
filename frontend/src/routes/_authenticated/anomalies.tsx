@@ -18,7 +18,20 @@ const anomaliesSearchSchema = timeRangeSearchSchema.extend(
 export const Route = createFileRoute( '/_authenticated/anomalies' )(
 {
 	validateSearch: anomaliesSearchSchema,
-	component:      AnomaliesPage
+	component:      AnomaliesPage,
+	head: ( ) => (
+	{
+		meta:
+		[
+			{
+				title: 'Anomalies | NetLogAnalyser'
+			},
+			{
+				name:    'robots',
+				content: 'noindex, nofollow'
+			}
+		]
+	} )
 } );
 
 const useTimeRange = createUseTimeRange( '/_authenticated/anomalies' );

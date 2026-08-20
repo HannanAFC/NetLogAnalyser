@@ -20,45 +20,14 @@ export const Route = createFileRoute( '/forgot-password' )(
 	component: ForgotPasswordPage,
 	head: ( ) => (
 	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/forgot-password'
-			}
-		],
 		meta:
 		[
 			{
 				title: 'Forgot Password | NetLogAnalyser'
 			},
 			{
-				name: 'description',
-				content: 'Recover your NetLogAnalyser account by requesting a password reset.'
-			},
-			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Forgot Password'
-			},
-			{
-				name: 'og:description',
-				content: 'Recover your NetLogAnalyser account by requesting a password reset.'
-			},
-			{
-				name: 'twitter:title',
-				content: 'NetLogAnalyser - Forgot Password'
-			},
-			{
-				name: 'twitter:description',
-				content: 'Recover your NetLogAnalyser account by requesting a password reset.'
-			},
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com/forgot-password'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com/forgot-password'
+				name:    'robots',
+				content: 'noindex, nofollow'
 			}
 		]
 	} )

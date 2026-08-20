@@ -12,45 +12,14 @@ export const Route = createFileRoute( '/_authenticated/live-feed' )(
   	component: LiveFeedPage,
   	head: ( ) => (
 	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/live-feed'
-			}
-		],
 		meta:
 		[
 			{
 				title: 'Live Feed | NetLogAnalyser'
 			},
 			{
-				name: 'description',
-				content: 'View your network logs in real-time.'
-			},
-			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Live Feed'
-			},
-			{
-				name: 'og:description',
-				content: 'View your network logs in real-time.'
-			},
-			{
-				name: 'twitter:title',
-				content: 'NetLogAnalyser - Live Feed'
-			},
-			{
-				name: 'twitter:description',
-				content: 'View your network logs in real-time.'
-			},
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com/live-feed'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com/live-feed'
+				name:    'robots',
+				content: 'noindex, nofollow'
 			}
 		]
 	} )

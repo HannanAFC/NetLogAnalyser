@@ -348,7 +348,7 @@ export function AccountSection( { className }: SettingsSectionProps )
                 >
                     Delete
                 </Button>
-            </Card>;
+            </Card>
         </div>
     );
 }

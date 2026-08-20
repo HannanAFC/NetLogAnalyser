@@ -15,5 +15,6 @@ function required( name: string, value: string | undefined ): string
 export const env =
 {
 	apiBaseUrl: required( 'VITE_API_BASE_URL', import.meta.env.VITE_API_BASE_URL ),
-	wsBaseUrl: required( 'VITE_WS_BASE_URL', import.meta.env.VITE_WS_BASE_URL )
+	wsBaseUrl:  required( 'VITE_WS_BASE_URL', import.meta.env.VITE_WS_BASE_URL ),
+	appVersion: required( 'VITE_APP_VERSION', import.meta.env.VITE_APP_VERSION )
 };

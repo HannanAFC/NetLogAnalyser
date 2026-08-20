@@ -115,14 +115,28 @@ export function ExportsSection( { className }: SettingsSectionProps )
             {
                 id:     'download',
                 header: 'Download',
+                meta:   { className: 'flex justify-center' },
                 cell:   ( { row } ) =>
-                    <button
-                        type="button"
-                        className="cursor-pointer text-text-secondary hover:text-text-primary transition-colors flex"
-                        onClick={ ( ) => handleDownloadExport( row.original.id ) }
-                    >
-                        <DownloadIcon />
-                    </button>
+                {
+                    if ( row.original.purged_at === null )
+                    {
+                        return (
+                            <button
+                                type="button"
+                                className="cursor-pointer text-text-secondary hover:text-text-primary transition-colors flex"
+                                onClick={ ( ) => handleDownloadExport( row.original.id ) }
+                            >
+                                <DownloadIcon size={ 18 } />
+                            </button>
+                        );
+                    }
+                    else
+                    {
+                        return (
+                            <>N/A</>
+                        );
+                    }
+                }
             } )
 		] ),
 		[ ]

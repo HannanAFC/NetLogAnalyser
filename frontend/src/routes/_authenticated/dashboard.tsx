@@ -25,45 +25,14 @@ export const Route = createFileRoute( '/_authenticated/dashboard' )(
 	validateSearch: dashboardSearchSchema,
 	head: ( ) => (
 	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/dashboard'
-			}
-		],
 		meta:
 		[
 			{
 				title: 'Dashboard | NetLogAnalyser'
 			},
 			{
-				name: 'description',
-				content: 'View everything at a glance, traffic summaries, top anomalies and your live ingest feed.'
-			},
-			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Dashboard'
-			},
-			{
-				name: 'og:description',
-				content: 'View everything at a glance, traffic summaries, top anomalies and your live ingest feed.'
-			},
-			{
-				name: 'twitter:title',
-				content: 'NetLogAnalyser - Dashboard'
-			},
-			{
-				name: 'twitter:description',
-				content: 'View everything at a glance, traffic summaries, top anomalies and your live ingest feed.'
-			},
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com/dashboard'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com/dashboard'
+				name:    'robots',
+				content: 'noindex, nofollow'
 			}
 		]
 	} )

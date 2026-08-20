@@ -11,28 +11,7 @@ export const Route = createFileRoute( '/' )(
 	{
 		await context.queryClient.ensureQueryData( sessionQueryOptions );
 	},
-	component: IndexPage,
-	head: ( ) => (
-	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com'
-			}
-		],
-		meta:
-		[
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com'
-			}
-		]
-	} )
+	component: IndexPage
 } );
 
 function IndexPage( )
@@ -47,7 +26,7 @@ function IndexPage( )
 				<em>before it turns into noise.</em>
 			</Heading>
 			<BodyText className="max-w-xl">
-				Route packet ingestion, anomaly detection, and historical analysis through one product dashboard built for operators who need fast signal, not more clutter.
+				Send network packet data via the API, get real-time anomaly detection, geo-mapping, and a live dashboard. NetLogAnalyser turns raw traffic logs into actionable insight.
 			</BodyText>
 			<div className="flex gap-3">
 				{ session ? (

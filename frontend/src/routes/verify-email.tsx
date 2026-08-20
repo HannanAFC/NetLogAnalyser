@@ -21,45 +21,14 @@ export const Route = createFileRoute( '/verify-email' )(
 	component: VerifyEmailPage,
 	head: ( ) => (
 	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/verify-email'
-			}
-		],
 		meta:
 		[
 			{
 				title: 'Verify Email | NetLogAnalyser'
 			},
 			{
-				name: 'description',
-				content: 'Verify you NetLogAnalyser account to start monitoring your network traffic.'
-			},
-			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Verify Email'
-			},
-			{
-				name: 'og:description',
-				content: 'Verify you NetLogAnalyser account to start monitoring your network traffic.'
-			},
-			{
-				name: 'twitter:title',
-				content: 'NetLogAnalyser - Verify Email'
-			},
-			{
-				name: 'twitter:description',
-				content: 'Verify you NetLogAnalyser account to start monitoring your network traffic.'
-			},
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com/verify-email'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com/verify-email'
+				name:    'robots',
+				content: 'noindex, nofollow'
 			}
 		]
 	} )

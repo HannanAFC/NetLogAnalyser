@@ -20,45 +20,14 @@ export const Route = createFileRoute( '/_authenticated/settings' )(
 	validateSearch: settingsPageSearchSchema,
 	head: ( ) => (
 	{
-		links:
-		[
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/settings'
-			}
-		],
 		meta:
 		[
 			{
 				title: 'Settings | NetLogAnalyser'
 			},
 			{
-				name: 'description',
-				content: 'Manage your NetLogAnalyser account - create, view and revoke API keys and edit account settings.'
-			},
-			{
-				name: 'og:title',
-				content: 'NetLogAnalyser - Settings'
-			},
-			{
-				name: 'og:description',
-				content: 'Manage your NetLogAnalyser account - create, view and revoke API keys and edit account settings.'
-			},
-			{
-				name: 'twitter:title',
-				content: 'NetLogAnalyser - Settings'
-			},
-			{
-				name: 'twitter:description',
-				content: 'Manage your NetLogAnalyser account - create, view and revoke API keys and edit account settings.'
-			},
-			{
-				name: 'og:url',
-				content: 'https://www.netloganalyser.com/settings'
-			},
-			{
-				name: 'twitter:url',
-				content: 'https://www.netloganalyser.com/settings'
+				name:    'robots',
+				content: 'noindex, nofollow'
 			}
 		]
 	} )
