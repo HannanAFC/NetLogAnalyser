@@ -47,7 +47,7 @@ class ExportStorage( Protocol ):
 
 class LocalExportStorage:
 	def __init__( self, base_path: str):
-		self._base = Path( base_path )
+		self._base = Path.cwd( ) / Path( base_path )
 		try:
 			self._base.mkdir( parents=True, exist_ok=True )
 		except Exception:

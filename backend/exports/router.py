@@ -102,7 +102,7 @@ async def download_export(
 		await db.commit( )
 		return RedirectResponse( value.presigned_url )
 
-	path = Path( settings.export_local_path ) / export_row.storage_key
+	path = Path.cwd( ) / Path( settings.export_local_path ) / export_row.storage_key
 	if not path.exists( ):
 		raise HTTPException( status_code=status.HTTP_404_NOT_FOUND, detail="Export file missing" )
 

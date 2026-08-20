@@ -2,7 +2,6 @@ import os
 import uuid
 from collections.abc import AsyncGenerator
 from datetime import datetime, timezone
-from pathlib import Path
 from unittest.mock import AsyncMock
 
 from auth.security import (
@@ -18,11 +17,6 @@ os.environ["DATABASE_URL"] = (
 )
 
 os.environ["REDIS_URL"] = "redis://redis/15"
-
-print( "cwd:", os.getcwd( ) )
-print( "user:", os.getuid( ) if hasattr( os, "getuid" ) else "N/A" )
-print( "target:", Path( "output" ).resolve( ) )
-print( "cwd writable:", os.access( os.getcwd( ), os.W_OK ) )
 
 import pytest
 from cache import get_redis

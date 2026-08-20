@@ -17,7 +17,7 @@ def verify_export_storage( ) -> None:
 	if settings.export_storage_backend != "local":
 		return  # Not applicable to S3
 
-	path = Path( settings.export_local_path )
+	path = Path.cwd( ) / Path( settings.export_local_path )
 
 	if not path.is_absolute( ):
 		raise RuntimeError(

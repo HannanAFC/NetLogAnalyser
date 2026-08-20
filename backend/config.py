@@ -108,7 +108,7 @@ class Settings( BaseSettings ):
 
     # Export storage
     export_storage_backend:                Literal[ "local", "s3" ] = "local"
-    export_local_path:                     str = "/app/data/exports"
+    export_local_path:                     str = "data/exports"
     export_s3_bucket:                      str | None = None
     export_s3_endpoint_url:                str | None = None
     export_s3_region:                      str | None = None
