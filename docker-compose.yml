@@ -2,6 +2,7 @@ services:
 
   frontend:
     build: ./frontend
+    profiles: ["dev"]
     container_name: NetLogAnalyser-Frontend
     env_file:
       - .env
@@ -30,14 +31,12 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      db:
-        condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
       - ./backend:/app
       - export_data:/app/data/exports
-      - geoip-data:/app/shared/geoip
+      - geoip-data:/a-
     networks:
       - NetLogAnalyser-Network
     restart: unless-stopped
@@ -51,8 +50,8 @@ services:
       - PYTHONUNBUFFERED=1
     command: arq worker.settings.WorkerSettings
     depends_on:
-      - redis
-      - db
+      redis:
+        condition: service_healthy
     volumes:
       - ./backend:/app
       - export_data:/app/data/exports
@@ -66,6 +65,7 @@ services:
 
   db:
     image: postgres:18-alpine
+    profiles: ["dev"]
     container_name: NetLogAnalyser-DB
     env_file:
       - .env
@@ -83,6 +83,7 @@ services:
 
   test-db:
     image: postgres:18-alpine
+    profiles: ["dev"]
     container_name: NetLogAnalyser-TestDB
     environment:
       - POSTGRES_USER=NetlogAnalyserUserTest

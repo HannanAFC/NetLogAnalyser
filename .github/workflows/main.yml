@@ -23,7 +23,9 @@ jobs:
     if: |
       !(
         (github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'docs')) ||
-        (github.event_name == 'push' && contains(github.event.head_commit.message, 'docs'))
+        (github.event_name == 'push' && contains(github.event.head_commit.message, 'docs')) ||
+        (github.event_name == 'pull_request' && contains(github.event.head_commit.message, '[skip-tests]')) ||
+        (github.event_name == 'push' && contains(github.event.head_commit.message, '[skip-tests]'))
       )
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -77,6 +79,13 @@ jobs:
         working-directory: backend
 
   frontend-tests:
+    if: |
+      !(
+        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'docs')) ||
+        (github.event_name == 'push' && contains(github.event.head_commit.message, 'docs')) ||
+        (github.event_name == 'pull_request' && contains(github.event.head_commit.message, '[skip-tests]')) ||
+        (github.event_name == 'push' && contains(github.event.head_commit.message, '[skip-tests]'))
+      )
     runs-on: ubuntu-latest
     needs: backend-tests
     timeout-minutes: 15
@@ -180,7 +189,7 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     needs: frontend-tests
-    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging' && !contains(github.event.head_commit.message, '[skip-deploy]')
     environment:
       name: Staging
       url: ${{ vars.STAGING_URL }}
@@ -199,7 +208,7 @@ jobs:
             --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
             --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
             --header "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
-            --data '{"applicationId": "${{ secrets.DOKPLOY_STAGING_APP_ID }}"}'
+            --data '{"composeId": "${{ secrets.DOKPLOY_STAGING_APP_ID }}"}'
 
       - name: Deploy Frontend (Render)
         env:
@@ -209,7 +218,7 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     needs: frontend-tests
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[skip-deploy]')
     environment:
       name: Production
       url: ${{ vars.PRODUCTION_URL }}
@@ -228,7 +237,7 @@ jobs:
             --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
             --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
             --header "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
-            --data '{"applicationId": "${{ secrets.DOKPLOY_PROD_APP_ID }}"}'
+            --data '{"composeId": "${{ secrets.DOKPLOY_PROD_APP_ID }}"}'
 
       - name: Deploy Frontend (Render)
         env:
