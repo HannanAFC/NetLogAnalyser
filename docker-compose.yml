@@ -37,6 +37,7 @@ services:
     volumes:
       - ./backend:/app
       - export_data:/app/data/exports
+      - geoip-data:/app/shared/geoip
     networks:
       - NetLogAnalyser-Network
     restart: unless-stopped
@@ -112,11 +113,19 @@ services:
       timeout: 5s
       retries: 5
 
+  geoipupdate:
+    image: maxmindinc/geoipupdate
+    env_file:
+      - .env
+    volumes:
+      - geoip-data:/usr/share/GeoIP
+
 volumes:
   postgres_data:
   frontend_node_modules:
   redis_data:
   export_data:
+  geoip-data:
 
 networks:
   NetLogAnalyser-Network:
