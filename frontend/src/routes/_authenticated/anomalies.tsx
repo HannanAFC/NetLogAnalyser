@@ -78,7 +78,6 @@ function AnomaliesPage( )
 			</BodyText>
 			<div className="flex flex-row gap-4 flex-wrap">
 				<TimeRangePicker
-					className='block max-w-max'
 					search={ search }
 					onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
 				/>
