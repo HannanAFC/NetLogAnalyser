@@ -18,6 +18,8 @@ os.environ["DATABASE_URL"] = (
 
 os.environ["REDIS_URL"] = "redis://redis/15"
 
+os.environ["EXPORT_LOCAL_PATH"] = "/data/exports/test"
+
 import pytest
 from cache import get_redis
 from database import Base, get_db
