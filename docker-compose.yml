@@ -36,7 +36,7 @@ services:
     volumes:
       - ./backend:/app
       - export_data:/app/data/exports
-      - geoip-data:/a-
+      - geoip-data:/app/shared/geoip
     networks:
       - NetLogAnalyser-Network
     restart: unless-stopped
