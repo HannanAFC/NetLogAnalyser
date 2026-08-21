@@ -13,6 +13,23 @@ import { useDebounce } from '#/lib/utils';
 const anomaliesSearchSchema = timeRangeSearchSchema.extend(
 {
 	min_score: z.number( ).min( 0 ).max( 1 ).default( 0.5 )
+} )
+.transform( ( data ) =>
+{
+	const hasStart = data.start !== undefined;
+	const hasEnd   = data.end   !== undefined;
+
+	if ( hasStart !== hasEnd )
+	{
+		return {
+			preset:    '24h',
+			min_score: data.min_score,
+			start:     undefined,
+			end:       undefined
+		};
+	}
+
+	return data;
 } );
 
 export const Route = createFileRoute( '/_authenticated/anomalies' )(

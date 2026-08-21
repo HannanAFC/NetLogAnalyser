@@ -13,8 +13,26 @@ import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-ra
 import type { Direction } from '#/features/analytics/schemas';
 import { BodyText, Heading } from '#/components/ui/heading';
 
+const geomapSearchSchema = timeRangeSearchSchema
+.transform( ( data ) =>
+{
+	const hasStart = data.start !== undefined;
+	const hasEnd   = data.end   !== undefined;
+
+	if ( hasStart !== hasEnd )
+	{
+		return {
+			preset: '24h',
+			start:  undefined,
+			end:    undefined
+		};
+	}
+
+	return data;
+} );
+
 export const Route = createFileRoute( '/_authenticated/geomap' )( {
-	validateSearch: timeRangeSearchSchema,
+	validateSearch: geomapSearchSchema,
 	component:      GeomapPage,
 	head: ( ) => (
 	{

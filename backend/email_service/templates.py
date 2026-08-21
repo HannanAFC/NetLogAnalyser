@@ -299,7 +299,7 @@ def change_email_verification_email( *, display_name: str, raw_token: str ) -> t
 
     text = (
         f"Hi, {display_name}.\n\n"
-        f"Confirm your new email address to change start using it.\n"
+        f"Confirm your new email address to start using it.\n"
         f"{link}\n\n"
         f"This link expires in {settings.email_verification_token_expire_minutes} minutes.\n"
         f"If you didn't request to change your email, change your password immediately - your account may have been compromised.\n\n"
@@ -313,7 +313,7 @@ def change_email_verification_email( *, display_name: str, raw_token: str ) -> t
             + _body(
                 text=(
                     f"Hi {display_name}, "
-                    f"confirm your new email address to change start using it."
+                    f"confirm your new email address to start using it."
                 )
             )
             + _button(label="Confirm email address", href=link)
@@ -330,7 +330,7 @@ def change_email_verification_email( *, display_name: str, raw_token: str ) -> t
 
 def email_changed_email( *, display_name: str, email: str ) -> tuple[str, str, str]:
     """Email changed email - sent once email has successfully been changed"""
-    subject = "Welcome to NetLogAnalyser"
+    subject = "Email changed successfully - NetLogAnalyser"
 
     text = (
         f"Hi {display_name},\n\n"
