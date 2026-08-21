@@ -26,13 +26,12 @@ services:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       redis:
         condition: service_healthy
     volumes:
-      - ./backend:/app
       - export_data:/app/data/exports
       - geoip-data:/app/shared/geoip
     networks:
@@ -50,7 +49,6 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./backend:/app
       - export_data:/app/data/exports
     networks:
       - NetLogAnalyser-Network
@@ -96,8 +94,8 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis_data:/data
     networks:
