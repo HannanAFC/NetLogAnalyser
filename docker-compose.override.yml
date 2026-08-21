@@ -1,0 +1,15 @@
+services:
+
+  backend:
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+
+  export-worker:
+    volumes:
+      - ./backend:/app
+
+  redis:
+    ports:
+      - "6379:6379"
