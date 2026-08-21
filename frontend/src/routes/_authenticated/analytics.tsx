@@ -18,7 +18,23 @@ import { PageWrapper } from '#/components/ui/page-wrapper';
 
 const analyticsSearchSchema = timeRangeSearchSchema.extend(
 {
-	bucket: timeBucketSchema.optional( )
+	bucket: timeBucketSchema.optional( ).catch( undefined )
+} )
+.transform( ( data ) =>
+{
+	const hasStart = data.start !== undefined;
+	const hasEnd   = data.end   !== undefined;
+
+	if ( hasStart !== hasEnd )
+	{
+		return {
+			preset: '24h',
+			start:  undefined,
+			end:    undefined
+		};
+	}
+
+	return data;
 } );
 
 export const Route = createFileRoute( '/_authenticated/analytics' )(

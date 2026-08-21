@@ -5,8 +5,8 @@ export type TimeRangePreset = z.infer< typeof timeRangePresetSchema >;
 
 export const timeRangeSearchSchema = z.object(
 {
-	preset: timeRangePresetSchema.default( '24h' ),
-	start:  z.iso.datetime( { offset: true } ).optional( ),
-	end:    z.iso.datetime( { offset: true } ).optional( )
+	preset: timeRangePresetSchema.default( '24h' ).catch( '24h' ),
+	start:  z.iso.datetime( { offset: true } ).optional( ).catch( undefined ),
+	end:    z.iso.datetime( { offset: true } ).optional( ).catch( undefined )
 } );
 export type TimeRangeSearch = z.infer< typeof timeRangeSearchSchema >;

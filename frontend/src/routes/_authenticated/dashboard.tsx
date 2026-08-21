@@ -17,6 +17,22 @@ import { TableLoadingErrorMessage } from '#/components/ui/table-loading-error-me
 const dashboardSearchSchema = timeRangeSearchSchema.extend(
 {
 	preset: timeRangePresetSchema.default( '1h' )
+} )
+.transform( ( data ) =>
+{
+	const hasStart = data.start !== undefined;
+	const hasEnd   = data.end   !== undefined;
+
+	if ( hasStart !== hasEnd )
+	{
+		return {
+			preset: '1h',
+			start:  undefined,
+			end:    undefined
+		};
+	}
+
+	return data;
 } );
 
 export const Route = createFileRoute( '/_authenticated/dashboard' )(
