@@ -226,9 +226,12 @@ async def verify_email_token( db: AsyncSession, redis: Redis, raw_token: str, ty
         existing = result.scalar_one_or_none( )
         if existing:
             raise HTTPException( detail="Email is already taken.", status_code=status.HTTP_400_BAD_REQUEST )
+        old_email      = user_row.email
         user_row.email = cached_email
 
-        await send_email_changed_email( to=user_row.email, display_name=user_row.display_name, email=user_row.email )
+        await send_email_changed_email( to=old_email, display_name=user_row.display_name, email=user_row.email )
+
+        await db.flush( )
 
     return user_row
 
