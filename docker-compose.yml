@@ -3,7 +3,6 @@ services:
   frontend:
     build: ./frontend
     profiles: ["dev"]
-    container_name: NetLogAnalyser-Frontend
     env_file:
       - .env
     ports:
@@ -23,7 +22,6 @@ services:
 
   backend:
     build: ./backend
-    container_name: NetLogAnalyser-Backend
     env_file:
       - .env
     environment:
@@ -43,7 +41,6 @@ services:
 
   export-worker:
     build: ./backend
-    container_name: NetLogAnalyser-EW
     env_file:
       - .env
     environment:
@@ -66,7 +63,6 @@ services:
   db:
     image: postgres:18-alpine
     profiles: ["dev"]
-    container_name: NetLogAnalyser-DB
     env_file:
       - .env
     ports:
@@ -84,7 +80,6 @@ services:
   test-db:
     image: postgres:18-alpine
     profiles: ["dev"]
-    container_name: NetLogAnalyser-TestDB
     environment:
       - POSTGRES_USER=NetlogAnalyserUserTest
       - POSTGRES_PASSWORD=TestPass
@@ -101,7 +96,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: NetLogAnalyser-Redis
     ports:
       - "6379:6379"
     volumes:
