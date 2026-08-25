@@ -10,7 +10,7 @@ env:
 
 permissions:
   contents: write
-  actions: read
+  deployments: read
 
 concurrency:
   group: release-${{ github.ref }}
