@@ -1,23 +1,23 @@
+FROM ghcr.io/astral-sh/uv:latest AS uv
+
 FROM python:3.13-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-ENV PATH="/root/.local/bin/:$PATH"
+COPY --from=uv /uv /uvx /bin/
 
-ENV UV_PROJECT_ENVIRONMENT=/opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH="/opt/venv/bin:$PATH" \
+    RUNNING_IN_CONTAINER=true
 
 WORKDIR /app
-COPY pyproject.toml uv.lock ./
-RUN uv sync
-COPY . .
 
-EXPOSE 8000
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen
+
+COPY . .
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ENV RUNNING_IN_CONTAINER=true
+EXPOSE 8000
 
 CMD ["/entrypoint.sh"]

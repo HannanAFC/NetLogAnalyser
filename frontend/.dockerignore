@@ -1,5 +1,11 @@
-**/node_modules/
-docs/
 .env
-.dockerignore
-README.md
+.env.*
+!.env.example
+
+.git
+.gitignore
+
+node_modules
+dist
+public/config.js
+*.log

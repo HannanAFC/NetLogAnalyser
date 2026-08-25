@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { describe, expect, it } from 'vitest';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000';
 
 const client = axios.create(
 	{

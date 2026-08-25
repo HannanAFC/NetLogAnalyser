@@ -1,4 +1,12 @@
 .env
-.dockerignore
+.env.*
+!.env.example
+
+.git
+.gitignore
+
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
 .venv
-README.md

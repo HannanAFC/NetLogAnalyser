@@ -10,6 +10,7 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
 import { z } from 'zod';
 import { Input, Label } from '../components/ui/input';
+import { configQueryOptions } from '#/features/config/queries';
 
 const resetSearchSchema = z.object(
 	{
@@ -22,7 +23,9 @@ export const Route = createFileRoute( '/reset-password' )(
 	beforeLoad: async( { context } ) =>
 	{
 		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		const config  = await context.queryClient.ensureQueryData( configQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
+		if ( config?.email_verification_enabled === false ) throw redirect( { to: '/' } );
 	},
 	component: ResetPasswordPage,
 	head: ( ) => (

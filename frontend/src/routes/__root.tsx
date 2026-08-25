@@ -15,6 +15,7 @@ import { Menu } from 'lucide-react';
 import '../styles.css';
 import { OverlayProvider } from '#/lib/overlay/overlay-context';
 import { ErrorComponent } from '#/components/error-component';
+import { useAppVersion } from '#/features/health/hooks';
 
 export const Route = createRootRoute(
 {
@@ -137,6 +138,7 @@ function RootComponent( )
 function RootLayout( { session }: { session: unknown } )
 {
 	const { toggle, open, close } = useSidebar( );
+	const appVersion = useAppVersion( );
 
 	return (
 		<>
@@ -189,7 +191,7 @@ function RootLayout( { session }: { session: unknown } )
 				<footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-border px-4 py-5 sm:px-6 lg:px-8">
 					<div className='flex flex-col gap-2'>
 						<span className="text-xs text-text-tertiary">
-							NetLogAnalyser · v{ env.appVersion }
+							NetLogAnalyser · v{ appVersion }
 						</span>
 						<Link to='/legal' className='text-xs text-text-tertiary'>
 							Legal

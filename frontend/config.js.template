@@ -1,0 +1,4 @@
+
+window.__ENV__ = {
+    BACKEND_PORT: "${BACKEND_PORT}"
+};

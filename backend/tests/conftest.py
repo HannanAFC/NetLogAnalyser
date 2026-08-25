@@ -12,15 +12,9 @@ from auth.security import (
 )
 from models.models import APIKey, User
 
-os.environ.setdefault(
-    "DATABASE_URL",
-    "postgresql+psycopg://NetlogAnalyserUserTest:TestPass@test-db/NetLogAnalyserDBTest"
-)
-
-os.environ.setdefault(
-    "REDIS_URL",
-    "redis://localhost/15"
-)
+os.environ.setdefault( "DATABASE_URL", "postgresql+psycopg://NetlogAnalyserUserTest:TestPass@test-db/NetLogAnalyserDBTest" )
+os.environ.setdefault( "REDIS_URL", "redis://redis" )
+os.environ.setdefault( "EMAIL_VERIFICATION_ENABLED", "true" )
 
 import pytest
 from cache import get_redis

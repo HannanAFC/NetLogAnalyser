@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { describe, expect, it } from 'vitest';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000';
 
 const client = axios.create(
 {
@@ -28,7 +28,7 @@ async function getLatestTestToken(
 	const response = await client.get( '/test-only/last-token',
     {
         params: { email: email, token_type: tokenType },
-        headers: { 'X-Test-Endpoint-Key': process.env.TEST_ENDPOINT_KEY ?? '' }
+        headers: { 'X-Test-Endpoint-Key': process.env.TEST_ENDPOINT_KEY ?? 'A-TESTING-KEY' }
     } );
 
 	if ( response.status !== 200 )

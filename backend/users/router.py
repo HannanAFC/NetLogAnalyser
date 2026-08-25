@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from auth.dependencies import get_current_user
+from auth.dependencies import get_current_user, get_frontend_url
 from auth.schemas import UserPublic
 from auth.security import verify_password
 from cache import get_redis
@@ -35,9 +35,10 @@ async def update_user(
     payload: UpdateUserRequest,
     user:    Annotated[ User, Depends( get_current_user ) ],
     db:      Annotated[ AsyncSession, Depends( get_db ) ],
-    redis:   Annotated[ Redis, Depends( get_redis ) ]
+    redis:   Annotated[ Redis, Depends( get_redis ) ],
+    frontend_url: Annotated[ str, Depends( get_frontend_url ) ]
 ) -> UserPublic:
-    response = await update_user_details( payload, user, db, redis )
+    response = await update_user_details( payload, user, db, redis, frontend_url )
     return response
 
 @router.patch( "/me/change-password" )

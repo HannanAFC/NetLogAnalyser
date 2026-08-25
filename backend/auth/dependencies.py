@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 from auth.security import decode_access_token, generate_url_safe_token, hash_token
-from config import settings
+from config import resolve_frontend_url, settings
 from database import get_db
 from fastapi import Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -119,3 +119,7 @@ def get_client_ip( request: Request ) -> str | None:
     return request.client.host if request.client else None
 
 CurrentUser = Annotated[ User, Depends( get_current_user ) ] 
+
+
+def get_frontend_url( request: Request ) -> str:
+    return resolve_frontend_url( request.headers.get( "origin" ) )

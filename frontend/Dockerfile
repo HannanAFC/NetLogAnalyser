@@ -1,6 +1,6 @@
-FROM node:25-slim
+FROM node:24-slim
 
-RUN npm install -g pnpm@11
+RUN corepack enable
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*

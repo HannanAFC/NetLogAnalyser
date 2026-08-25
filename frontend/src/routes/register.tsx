@@ -16,6 +16,8 @@ import { Button } from '#/components/ui/button';
 import { useOverlay } from '#/lib/overlay/overlay-context';
 import { PrivacyOverlay } from '#/components/register/privacy-overlay';
 import { TermsOverlay } from '#/components/register/terms-overlay';
+import { useEmailVerificationEnabled } from '#/features/config/hooks';
+import { User2 } from 'lucide-react';
 
 export const Route = createFileRoute( '/register' )(
 {
@@ -76,6 +78,7 @@ function RegisterPage( )
 	const register = useRegister( );
 	const [ registeredEmail, setRegisteredEmail ] = useState< string | null >( null );
 	const { open, close } = useOverlay( );
+	const emailVerificationEnabled = useEmailVerificationEnabled( );
 
 	const form = useForm(
 		{
@@ -111,7 +114,7 @@ function RegisterPage( )
 		);
 	}
 
-	if ( registeredEmail )
+	if ( registeredEmail && emailVerificationEnabled )
 	{
 		return (
 			<PageWrapper maxWidth="md" className="py-16 gap-6">
@@ -144,6 +147,31 @@ function RegisterPage( )
 							className="block text-sm font-medium text-accent-strong hover:underline"
 						>
 							Resend verification email
+						</Link>
+					</div>
+				</Card>
+			</PageWrapper>
+		);
+	}
+	else if ( registeredEmail )
+	{
+		return (
+			<PageWrapper maxWidth="md" className="py-16 gap-6">
+				<Card className="p-8 text-center">
+					<div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
+						<User2 width={ 56 } height={ 56 } stroke='var(--color-accent-strong)' className='h-full w-full' />
+					</div>
+					<Heading level="h1" className="mb-2">Account created</Heading>
+					<BodyText>
+						Your account was created successfully.
+					</BodyText>
+
+					<div className="mt-6 space-y-3">
+						<Link
+							to="/login"
+							className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90"
+						>
+							Continue to sign in
 						</Link>
 					</div>
 				</Card>

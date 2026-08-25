@@ -1,0 +1,48 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ inputs.environment == 'Staging' && vars.STAGING_URL || vars.PRODUCTION_URL }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Deploy Backend (Dokploy)
+        run: |
+          if [ "${{ inputs.environment }}" = "Staging" ]; then
+            APP_ID="${{ secrets.DOKPLOY_STAGING_APP_ID }}"
+          else
+            APP_ID="${{ secrets.DOKPLOY_PROD_APP_ID }}"
+          fi
+
+          curl --fail --silent --show-error \
+            --request POST \
+            "${{ secrets.DOKPLOY_DEPLOY_API }}" \
+            --header "Content-Type: application/json" \
+            --header "CF-Access-Client-Id: ${{ secrets.CF_CLIENT_ID }}" \
+            --header "CF-Access-Client-Secret: ${{ secrets.CF_CLIENT_SECRET }}" \
+            --header "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            --data "{\"composeId\": \"$APP_ID\"}"
+
+      - name: Deploy Frontend (Render)
+        run: |
+          if [ "${{ inputs.environment }}" = "Staging" ]; then
+            DEPLOY_URL="${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_STAGING }}"
+          else
+            DEPLOY_URL="${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_PROD }}"
+          fi
+
+          curl --fail --silent --show-error -X POST "$DEPLOY_URL"
