@@ -8,10 +8,6 @@ on:
 env:
   REGISTRY: ghcr.io
 
-permissions:
-  contents: write
-  deployments: read
-
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
@@ -21,7 +17,9 @@ jobs:
     name: Verify tagged commit
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
+    permissions:
+      contents: read
+      deployments: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -86,6 +84,9 @@ jobs:
   backend:
     needs: verify
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -106,7 +107,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/netloganalyser-backend
           tags: |
             type=semver,pattern={{version}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -122,6 +123,9 @@ jobs:
   frontend-selfhost:
     needs: verify
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -142,7 +146,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/netloganalyser-frontend-selfhost
           tags: |
             type=semver,pattern={{version}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
       - name: Build and push
         uses: docker/build-push-action@v6
