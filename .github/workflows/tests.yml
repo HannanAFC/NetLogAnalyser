@@ -102,6 +102,8 @@ jobs:
           --health-retries 5
 
     env:
+      API_BASE_URL: http://localhost:8000
+      WS_BASE_URL: ws://localhost:8000/ws
       SECRET_KEY: TESTING_KEY
       DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
       EMAIL_VERIFICATION_ENABLED: true
@@ -144,8 +146,14 @@ jobs:
 
       - name: Start Backend
         run: |
-          uv run fastapi dev main.py --host 0.0.0.0 --port 8000 &
-          echo $! > $GITHUB_WORKSPACE/backend.pid
+          uv run fastapi dev main.py \
+            --host 0.0.0.0 \
+            --port 8000 \
+            --log-level debug \
+            > fastapi.log 2>&1 &
+
+          echo $! > fastapi.pid
+
         working-directory: backend
 
       - name: Wait for Backend
@@ -165,10 +173,12 @@ jobs:
       - name: Run Tests
         run: pnpm run test:all
         working-directory: frontend
-        env:
-          API_BASE_URL: http://localhost:8000
-          WS_BASE_URL: ws://localhost:8000/ws
-          APP_VERSION: testing
+
+      - name: Show server logs
+        if: always()
+        run: |
+          echo "===== FastAPI logs ====="
+          cat fastapi.log || true
 
       - name: Run ESLint
         run: pnpm run lint --max-warnings=0
