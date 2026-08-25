@@ -1,18 +1,10 @@
 #!/bin/sh
 set -e
 
-if [ "$BUILD_MODE" = "production" ]; then
-  echo "Running production environment..."
-  pnpm run build
-  pnpm run preview
-else
-  echo "Running development environment..."
-  # Check if node_modules exists and was created with a different lockfile
-  if [ -f /node_modules/.pnpm-lock.yaml ] && ! cmp -s /pnpm-lock.yaml /node_modules/.pnpm-lock.yaml 2>/dev/null; then
-    echo "Lockfile mismatch, reinstalling dependencies..."
-    rm -rf /node_modules
-    pnpm install --no-frozen-lockfile
-  fi
-  # Run dev with no TTY issues
-  pnpm run dev
+if [ -f /app/node_modules/.pnpm-lock.yaml ] && ! cmp -s /app/pnpm-lock.yaml /app/node_modules/.pnpm-lock.yaml 2>/dev/null; then
+  echo "Lockfile mismatch, reinstalling dependencies..."
+  rm -rf /app/node_modules
+  pnpm install --no-frozen-lockfile
 fi
+
+exec pnpm run dev

@@ -26,7 +26,7 @@ from testing.token_capture import record_token
 TokenModel = TypeVar( "TokenModel" )
 
 
-async def register_user( db: AsyncSession, payload: RegisterRequest ) -> User:
+async def register_user( db: AsyncSession, payload: RegisterRequest, frontend_url: str ) -> User:
     """
     Creates a new user. Raises 409 if the email is already registered.
     Parameters:
@@ -54,7 +54,12 @@ async def register_user( db: AsyncSession, payload: RegisterRequest ) -> User:
     db.add( user )
     await db.flush( )
 
-    await issue_verification_token( db=db, user_row=user )
+    if settings.email_verification_enabled == True:
+        await issue_verification_token( db=db, user_row=user, frontend_url=frontend_url )
+    else:
+        user.email_verified_at = datetime.now( timezone.utc )
+        await db.flush( )
+        await db.refresh( user )
 
     return user
 
@@ -126,7 +131,7 @@ async def find_valid_token(
  
     return token_row
 
-async def issue_password_reset_token( db: AsyncSession, user_row: User ) -> None:
+async def issue_password_reset_token( db: AsyncSession, user_row: User, frontend_url: str ) -> None:
     raw_token = generate_url_safe_token( 32 )
     token_row = PasswordResetToken(
         user_id=user_row.id,
@@ -144,10 +149,11 @@ async def issue_password_reset_token( db: AsyncSession, user_row: User ) -> None
     await send_password_reset_email(
         to=user_row.email,
         display_name=user_row.display_name,
-        raw_token=raw_token
+        raw_token=raw_token,
+        frontend_url=frontend_url
     )
 
-async def issue_verification_token( db: AsyncSession, user_row: User, type: Literal[ "register", "change" ] = "register" ) -> None:
+async def issue_verification_token( db: AsyncSession, user_row: User, frontend_url: str, type: Literal[ "register", "change" ] = "register" ) -> None:
     """
     Send an email verification email to a user.
     Parameters:
@@ -172,16 +178,18 @@ async def issue_verification_token( db: AsyncSession, user_row: User, type: Lite
         await send_verification_email(
             to=user_row.email,
             display_name=user_row.display_name,
-            raw_token=raw_token
+            raw_token=raw_token,
+            frontend_url=frontend_url
         )
     elif type == "change":
         await send_change_email_verification_email(
             to=user_row.email,
             display_name=user_row.display_name,
-            raw_token=raw_token
+            raw_token=raw_token,
+            frontend_url=frontend_url
         )
 
-async def verify_email_token( db: AsyncSession, redis: Redis, raw_token: str, type: Literal[ "register", "change" ] = "register" ) -> User:
+async def verify_email_token( db: AsyncSession, redis: Redis, raw_token: str, frontend_url: str, type: Literal[ "register", "change" ] = "register") -> User:
     """
     Verify an email verification token received from a user, raises HTTP error 400 if invalid token.
     Parameters:
@@ -216,7 +224,7 @@ async def verify_email_token( db: AsyncSession, redis: Redis, raw_token: str, ty
     cached = await redis.get( f"useremail:{ user_row.id }" )
 
     if cached is None:
-        await send_welcome_email( to=user_row.email, display_name=user_row.display_name )
+        await send_welcome_email( to=user_row.email, display_name=user_row.display_name, frontend_url=frontend_url )
     elif cached:
         cached_email = str( cached )
         result = await db.execute(
@@ -226,13 +234,16 @@ async def verify_email_token( db: AsyncSession, redis: Redis, raw_token: str, ty
         existing = result.scalar_one_or_none( )
         if existing:
             raise HTTPException( detail="Email is already taken.", status_code=status.HTTP_400_BAD_REQUEST )
+        old_email      = user_row.email
         user_row.email = cached_email
 
-        await send_email_changed_email( to=user_row.email, display_name=user_row.display_name, email=user_row.email )
+        await send_email_changed_email( to=old_email, display_name=user_row.display_name, email=user_row.email )
+
+        await db.flush( )
 
     return user_row
 
-async def resend_verification_email( db: AsyncSession, email: str ) -> None:
+async def resend_verification_email( db: AsyncSession, email: str, frontend_url: str ) -> None:
     """
     Resend an email verification token to a user.
     Parameters:
@@ -255,4 +266,4 @@ async def resend_verification_email( db: AsyncSession, email: str ) -> None:
         .values( used_at=datetime.now( timezone.utc ) )
     )
 
-    await issue_verification_token( db, user_row )
+    await issue_verification_token( db, user_row, frontend_url=frontend_url )

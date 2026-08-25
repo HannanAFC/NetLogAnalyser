@@ -12,7 +12,7 @@ from email_service.templates import (
 )
 
 
-async def send_verification_email( *, to: str, display_name: str, raw_token: str ) -> None:
+async def send_verification_email( *, to: str, display_name: str, raw_token: str, frontend_url: str ) -> None:
     """
     Sends a verification email to a user.
     Parameters:
@@ -20,11 +20,11 @@ async def send_verification_email( *, to: str, display_name: str, raw_token: str
         display_name (str): The display name to use in the email.
         raw_token (str): The unhashed email verification token.
     """
-    subject, html, text = verification_email( display_name=display_name, raw_token=raw_token )
+    subject, html, text = verification_email( display_name=display_name, raw_token=raw_token, frontend_url=frontend_url )
     await send_email( sender=settings.resend_verify_email, to=to, subject=subject, html=html, text=text )
 
 
-async def send_password_reset_email( *, to: str, display_name: str, raw_token: str ) -> None:
+async def send_password_reset_email( *, to: str, display_name: str, raw_token: str, frontend_url: str ) -> None:
     """
     Sends a password reset email to a user.
     Parameters:
@@ -32,18 +32,18 @@ async def send_password_reset_email( *, to: str, display_name: str, raw_token: s
         display_name (str): The display name to use in the email.
         raw_token (str): The unhashed password reset token.
     """
-    subject, html, text = password_reset_email( display_name=display_name, raw_token=raw_token )
+    subject, html, text = password_reset_email( display_name=display_name, raw_token=raw_token, frontend_url=frontend_url )
     await send_email( sender=settings.resend_recovery_email, to=to, subject=subject, html=html, text=text )
 
 
-async def send_welcome_email( *, to: str, display_name: str ) -> None:
+async def send_welcome_email( *, to: str, display_name: str, frontend_url: str ) -> None:
     """
     Sends a welcome email to a newly verified user.
     Parameters:
         to (str): Address to send the email to.
         display_name (str): The display name to use in the email.
     """
-    subject, html, text = welcome_email( display_name=display_name )
+    subject, html, text = welcome_email( display_name=display_name, frontend_url=frontend_url )
     await send_email( sender=settings.resend_onboarding_email, to=to, subject=subject, html=html, text=text )
 
 async def send_retention_warning_email( *, to: str, display_name: str, download_url, deletion_date: str ) -> None:
@@ -57,7 +57,7 @@ async def send_retention_warning_email( *, to: str, display_name: str, download_
     subject, html, text = retention_warning_email( display_name=display_name, download_url=download_url, deletion_date=deletion_date )
     await send_email( sender=settings.resend_general_email, to=to, subject=subject, html=html, text=text )
 
-async def send_change_email_verification_email( *, to: str, display_name: str, raw_token: str ) -> None:
+async def send_change_email_verification_email( *, to: str, display_name: str, raw_token: str, frontend_url: str ) -> None:
     """
     Sends a verification email to a user.
     Parameters:
@@ -65,7 +65,7 @@ async def send_change_email_verification_email( *, to: str, display_name: str, r
         display_name (str): The display name to use in the email.
         raw_token (str): The unhashed email verification token.
     """
-    subject, html, text = change_email_verification_email( display_name=display_name, raw_token=raw_token )
+    subject, html, text = change_email_verification_email( display_name=display_name, raw_token=raw_token, frontend_url=frontend_url )
     await send_email( sender=settings.resend_verify_email, to=to, subject=subject, html=html, text=text )
 
 async def send_email_changed_email( *, to: str, display_name: str, email: str ) -> None:

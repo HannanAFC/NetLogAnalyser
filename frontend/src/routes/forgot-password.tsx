@@ -9,13 +9,16 @@ import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Input, Label } from '../components/ui/input';
+import { configQueryOptions } from '#/features/config/queries';
 
 export const Route = createFileRoute( '/forgot-password' )(
 {
 	beforeLoad: async( { context } ) =>
 	{
 		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		const config  = await context.queryClient.ensureQueryData( configQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
+		if ( config?.email_verification_enabled === false ) throw redirect( { to: '/' } );
 	},
 	component: ForgotPasswordPage,
 	head: ( ) => (

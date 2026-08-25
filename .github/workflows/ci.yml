@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+    paths-ignore:
+      - '**/*.md'
+
+  push:
+    branches:
+      - main
+      - staging
+    paths-ignore:
+      - '**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests
+    uses: ./.github/workflows/tests.yml
+
+  deploy-staging:
+    name: Deploy Staging
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/staging' &&
+      !( contains(github.event.head_commit.message, '[skip-deploy]') ) &&
+      !( contains(github.event.head_commit.message, '[skip-tests]') ) &&
+      !( contains(github.event.head_commit.message, 'docs') )
+    needs: tests
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: Staging
+    secrets: inherit
+
+  deploy-production:
+    name: Deploy Production
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      !( contains(github.event.head_commit.message, '[skip-deploy]') ) &&
+      !( contains(github.event.head_commit.message, '[skip-tests]') ) &&
+      !( contains(github.event.head_commit.message, 'docs') )
+    needs: tests
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: Production
+    secrets: inherit

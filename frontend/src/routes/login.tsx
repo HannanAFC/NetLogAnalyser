@@ -10,6 +10,7 @@ import { useForm } from '@tanstack/react-form';
 import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Input, Label } from '../components/ui/input';
+import { useEmailVerificationEnabled } from '#/features/config/hooks';
 
 const loginSearchSchema = z.object(
 	{
@@ -77,6 +78,7 @@ function LoginPage()
 	const { redirect: redirectTo } = Route.useSearch( );
 	const navigate = useNavigate( );
 	const login = useLogin( );
+	const emailVerificationEnabled = useEmailVerificationEnabled( );
 
 	const form = useForm(
 		{
@@ -172,11 +174,14 @@ function LoginPage()
 						</BodySm>
 					) }
 
-					<div className="flex items-center justify-end">
-						<Link to="/forgot-password" className="text-sm font-medium text-accent-strong hover:underline">
-							Forgot password?
-						</Link>
-					</div>
+					{ emailVerificationEnabled === true &&
+					(
+						<div className="flex items-center justify-end">
+							<Link to="/forgot-password" className="text-sm font-medium text-accent-strong hover:underline">
+								Forgot password?
+							</Link>
+						</div>
+					) }
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) => (

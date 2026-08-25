@@ -5,11 +5,13 @@
   "imports": {
     "#/*": "./src/*"
   },
+  "packageManager": "pnpm@11.23.0",
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "node scripts/generate-config.mjs --out public/config.js && vite",
     "generate-routes": "tsr generate",
     "build": "vite build",
-    "preview": "vite preview --port 3000",
+    "build:render": "vite build && node scripts/generate-config.mjs --out dist/config.js",
+    "preview": "vite preview",
     "test": "vitest run --project unit",
     "test:integration": "RUN_INTEGRATION_TESTS=1 vitest run --project integration",
     "test:all": "vitest run",

@@ -1,0 +1,20 @@
+FROM node:24-slim AS build
+WORKDIR /app
+
+RUN corepack enable
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+RUN pnpm build
+
+FROM nginx:alpine
+RUN apk add --no-cache gettext   # provides envsubst
+
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY config.js.template /usr/share/nginx/html/config.js.template
+COPY nginx.selfhost.conf.template /etc/nginx/templates/nginx.selfhost.conf.template
+COPY entrypoint.selfhost.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

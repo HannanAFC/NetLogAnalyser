@@ -16,9 +16,9 @@ async def send_email( *, sender: str, to: str, subject: str, html: str, text: st
         html (str): The HTML content of the email.
         text (str): Text alternative to the HTML content.
     """
-    if settings.environment == "development" and settings.resend_api_key == "":
+    if not settings.email_verification_enabled or settings.resend_api_key == "" or settings.resend_api_key == "FAKE-KEY":
         print(
-            f"Development Environemnt \nFrom: { sender } \nTo: { to } \nSubject: { subject } \n{ text }",
+            f"Backup email logging: \nFrom: { sender } \nTo: { to } \nSubject: { subject } \n{ text }",
             "HTML:",
             html
         )

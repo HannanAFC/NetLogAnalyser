@@ -7,7 +7,7 @@ services:
     branch: main
     envVars:
       - fromGroup: Production Environment
-    buildCommand: pnpm install && pnpm run build
+    buildCommand: pnpm install && pnpm run build:render
     staticPublishPath: dist
     domains:
       - netloganalyser.com
@@ -51,7 +51,7 @@ services:
     branch: staging
     envVars:
       - fromGroup: Staging Environment
-    buildCommand: pnpm install && pnpm run build
+    buildCommand: pnpm install && pnpm run build:render
     staticPublishPath: dist
     routes:
       - type: rewrite

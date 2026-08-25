@@ -9,6 +9,8 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { Input, Label } from '../components/ui/input';
+import { sessionQueryOptions } from '#/features/auth/queries';
+import { configQueryOptions } from '#/features/config/queries';
 
 const verifySearchSchema = z.object(
 	{
@@ -17,6 +19,13 @@ const verifySearchSchema = z.object(
 
 export const Route = createFileRoute( '/verify-email' )(
 {
+	beforeLoad: async( { context } ) =>
+	{
+		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		const config  = await context.queryClient.ensureQueryData( configQueryOptions );
+		if ( session ) throw redirect( { to: '/dashboard' } );
+		if ( config?.email_verification_enabled === false ) throw redirect( { to: '/' } );
+	},
 	validateSearch: verifySearchSchema,
 	component: VerifyEmailPage,
 	head: ( ) => (

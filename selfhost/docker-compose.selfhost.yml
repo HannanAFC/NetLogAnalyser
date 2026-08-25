@@ -1,0 +1,109 @@
+services:
+
+  frontend:
+    image: ghcr.io/hannanafc/netloganalyser-frontend-selfhost:latest
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT:-8000}
+      - FRONTEND_PORT=${FRONTEND_PORT:-3000}
+    ports:
+      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"
+    depends_on:
+      - backend
+    networks:
+      - NetLogAnalyser-Network
+    restart: unless-stopped
+
+  backend:
+    image: ghcr.io/hannanafc/netloganalyser-backend:latest
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - BACKEND_PORT=${BACKEND_PORT:-8000}
+      - FRONTEND_PORT=${FRONTEND_PORT:-3000}
+    ports:
+      - "${BACKEND_PORT:-8000}:${BACKEND_PORT:-8000}"
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    volumes:
+      - export_data:/app/data/exports
+      - geoip-data:/app/shared/geoip
+    networks:
+      - NetLogAnalyser-Network
+    restart: unless-stopped
+
+  export-worker:
+    image: ghcr.io/hannanafc/netloganalyser-backend:latest
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: arq worker.settings.WorkerSettings
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    volumes:
+      - export_data:/app/data/exports
+    networks:
+      - NetLogAnalyser-Network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "arq --check worker.settings.WorkerSettings"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: postgres:18-alpine
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - NetLogAnalyser-Network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - NetLogAnalyser-Network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  geoipupdate:
+    image: maxmindinc/geoipupdate
+    env_file:
+      - .env
+    volumes:
+      - geoip-data:/usr/share/GeoIP
+    restart: no
+
+volumes:
+  postgres_data:
+  redis_data:
+  export_data:
+  geoip-data:
+
+networks:
+  NetLogAnalyser-Network:
+    driver: bridge

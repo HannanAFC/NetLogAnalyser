@@ -82,9 +82,10 @@ app = FastAPI( lifespan=lifespan )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_allowed_origins,
+    allow_origin_regex=settings.cors_allowed_origin_regex,
     allow_credentials=True,
     allow_methods=[ "GET", "POST", "PATCH", "DELETE", "OPTIONS" ],
-    allow_headers=[ "*" ],
+    allow_headers=[ "*" ]
 )
 
 app.add_middleware( SecurityHeadersMiddleware )
@@ -116,14 +117,16 @@ def root( request: Request ):
     else:
         uptime_seconds = f"{ floor( uptime_exact / 3600 ) }h { floor( ( uptime_exact % 3600 ) / 60 ) }m"
 
+    backend_url = str( request.base_url ).rstrip( "/" )
+
     return templates.TemplateResponse(
         request,
         "index.html",
         {
-            "frontend_url": settings.frontend_url,
-            "backend_url": settings.backend_url,
-            "environment": settings.environment,
-            "version": settings.app_version,
+            "frontend_url":   settings.frontend_url,
+            "backend_url":    backend_url,
+            "environment":    settings.environment,
+            "version":        settings.app_version,
             "uptime_seconds": uptime_seconds
         }
     )
@@ -142,4 +145,11 @@ async def health_check( db: Annotated[ AsyncSession, Depends( get_db ) ] ):
         "version": settings.app_version,
         "uptime_seconds": time.time( ) - startTime,
         "environment": settings.environment
+    }
+
+@app.get( "/config", name="Public config", tags=[ "utilities" ] )
+async def public_config( ):
+    return {
+        "version":                    settings.app_version,
+        "email_verification_enabled": settings.email_verification_enabled
     }

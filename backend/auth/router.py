@@ -6,6 +6,7 @@ from typing import Annotated
 from auth.dependencies import (
     get_client_ip,
     get_current_user,
+    get_frontend_url,
     issue_refresh_token,
     set_refresh_cookie,
 )
@@ -53,9 +54,10 @@ router = APIRouter( dependencies=[ Depends( get_auth_rate_limiter ) ] )
 @router.post( "/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED )
 async def register(
     payload: RegisterRequest,
-    db: Annotated[ AsyncSession, Depends( get_db ) ]
+    db: Annotated[ AsyncSession, Depends( get_db ) ],
+    frontend_url: Annotated[ str, Depends( get_frontend_url ) ]
 ) -> RegisterResponse:
-    user = await register_user( db, payload )
+    user = await register_user( db, payload, frontend_url=frontend_url )
     
     await db.commit( )
     await db.refresh( user )
@@ -167,13 +169,14 @@ async def logout(
 @router.post( "/forgot-password", response_model=ForgotPasswordResponse, dependencies=[ Depends( get_forgot_password_rate_limiter ) ] )
 async def forgot_password(
     payload: ForgotPasswordRequest,
-    db: Annotated[ AsyncSession, Depends( get_db ) ]
+    db: Annotated[ AsyncSession, Depends( get_db ) ],
+    frontend_url: Annotated[ str, Depends( get_frontend_url ) ]
 ) -> ForgotPasswordResponse:
     result = await db.execute( select( User ).where( User.email == payload.email.lower( ) ) )
     user = result.scalar_one_or_none( )
 
     if user is not None:
-        await issue_password_reset_token( db=db, user_row=user )
+        await issue_password_reset_token( db=db, user_row=user, frontend_url=frontend_url )
 
         await db.commit( )       
         
@@ -210,9 +213,10 @@ async def reset_password(
 async def verify_email(
     token: str,
     db: Annotated[ AsyncSession, Depends( get_db ) ],
-    redis:   Annotated[ Redis, Depends( get_redis ) ]
+    redis:   Annotated[ Redis, Depends( get_redis ) ],
+    frontend_url: Annotated[ str, Depends( get_frontend_url ) ]
 ):
-    user = await verify_email_token( db, redis, token )
+    user = await verify_email_token( db, redis, token, frontend_url=frontend_url )
     await db.commit( )
     await db.refresh( user )
     return VerifyEmailResponse( )
@@ -222,7 +226,11 @@ async def verify_email(
     "/resend-verification",
     dependencies=[ Depends( get_forgot_password_rate_limiter ) ]
 )
-async def resend_verification( payload: ResendVerificationRequest, db: Annotated[ AsyncSession, Depends( get_db ) ] ):
-    await resend_verification_email( db, payload.email )
+async def resend_verification(
+    payload: ResendVerificationRequest,
+    db: Annotated[ AsyncSession, Depends( get_db ) ],
+    frontend_url: Annotated[ str, Depends( get_frontend_url ) ]
+):
+    await resend_verification_email( db, payload.email, frontend_url=frontend_url )
     await db.commit()
     return ResendVerificationResponse( )

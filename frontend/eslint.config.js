@@ -1,6 +1,7 @@
 //  @ts-check
 
 import { tanstackConfig } from '@tanstack/eslint-config'
+import stylistic from '@stylistic/eslint-plugin'
 
 export default [
 	...tanstackConfig,
@@ -16,9 +17,13 @@ export default [
 		}
 	},
 	{
-		ignores: [ 'eslint.config.js' ]
+		ignores: [ 'eslint.config.js', 'public/**' ]
 	},
 	{
+		plugins:
+		{
+			'@stylistic': stylistic
+		},
 		rules:
 		{
 			'@stylistic/semi': [ 'error', 'always' ],
