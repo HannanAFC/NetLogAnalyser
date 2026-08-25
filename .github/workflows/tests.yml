@@ -41,11 +41,23 @@ jobs:
           --health-retries 5
 
     env:
+      API_BASE_URL: http://localhost:8000
+      WS_BASE_URL: ws://localhost:8000/ws
       SECRET_KEY: TESTING_KEY
       DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
+      EMAIL_VERIFICATION_ENABLED: True
+      RESEND_API_KEY: FAKE-KEY
       REDIS_URL: redis://localhost:6379
-      EMAIL_VERIFICATION_ENABLED: true
-      RESEND_API_KEY: test
+      APP_VERSION: testing
+      COOKIE_SECURE: false
+      RATELIMIT_AUTH_TIMES: 10000000
+      RATELIMIT_AUTH_SECONDS: 60
+      RATELIMIT_FORGOT_PASSWORD_TIMES: 10000000
+      RATELIMIT_FORGOT_PASSWORD_SECONDS: 60
+      RATELIMIT_GENERAL_TIMES: 10000000
+      RATELIMIT_GENERAL_SECONDS: 60
+      RATELIMIT_INGEST_TIMES: 10000000
+      RATELIMIT_INGEST_SECONDS: 60
 
     steps:
       - name: Checkout Code
