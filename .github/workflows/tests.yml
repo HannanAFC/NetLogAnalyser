@@ -46,6 +46,7 @@ jobs:
       REDIS_URL: redis://localhost:6379
       EMAIL_VERIFICATION_ENABLED: true
       RESEND_API_KEY: test
+      CORS_ALLOWED_ORIGINS: "http://localhost:3000"
 
     steps:
       - name: Checkout Code
@@ -118,6 +119,7 @@ jobs:
       RATELIMIT_GENERAL_SECONDS: 60
       RATELIMIT_INGEST_TIMES: 10000000
       RATELIMIT_INGEST_SECONDS: 60
+      CORS_ALLOWED_ORIGINS: "http://localhost:3000"
 
     steps:
       - name: Checkout Code
