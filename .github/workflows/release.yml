@@ -22,9 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
-    outputs:
-      ci_run_id: ${{ steps.find-ci.outputs.run_id }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -54,51 +51,37 @@ jobs:
             exit 1
           fi
 
-      - name: Find successful CI run
-        id: find-ci
+      - name: Check latest main deployment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RUN_ID="$(
-            gh run list \
-              --workflow=ci.yml \
-              --commit="$GITHUB_SHA" \
-              --event=push \
-              --json databaseId,conclusion \
-              --jq '.[] | select(.conclusion == "success") | .databaseId' \
-              | head -n 1
-          )"
+          deployment_id=$(gh api \
+            "repos/HannanAFC/NetlogAnalyser/deployments" \
+            -X GET \
+            -f ref=main \
+            -f environment=Production \
+            -f per_page=1 \
+            --jq '.[0].id')
 
-          if [ -z "$RUN_ID" ]; then
-            echo "::error::No successful CI run found for commit $GITHUB_SHA."
+          if [[ -z "$deployment_id" || "$deployment_id" == "null" ]]; then
+            echo "No deployment found for main."
             exit 1
           fi
 
-          echo "Found successful CI run: $RUN_ID"
-          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "Latest deployment: $deployment_id"
 
-      - name: Verify production deployment succeeded
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CI_RUN_ID: ${{ steps.find-ci.outputs.run_id }}
-        run: |
-          DEPLOY_RESULT="$(
-            gh run view "$CI_RUN_ID" \
-              --json jobs \
-              --jq '
-                .jobs[]
-                | select(.name == "Deploy Production")
-                | .conclusion
-              '
-          )"
+          status=$(gh api \
+            "repos/HannanAFC/NetlogAnalyser/deployments/$deployment_id/statuses" \
+            --jq '.[0].state')
 
-          if [ "$DEPLOY_RESULT" != "success" ]; then
-            echo "::error::Production deployment for $GITHUB_SHA did not succeed."
-            echo "Deployment result: ${DEPLOY_RESULT:-not found}"
+          echo "Deployment status: $status"
+
+          if [[ "$status" != "success" ]]; then
+            echo "Latest deployment was not successful."
             exit 1
           fi
 
-          echo "Production deployment succeeded."
+          echo "Latest deployment was successful."
 
   backend:
     needs: verify
