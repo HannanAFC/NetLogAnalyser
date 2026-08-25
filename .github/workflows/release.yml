@@ -1,0 +1,174 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  REGISTRY: ghcr.io
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify tagged commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    outputs:
+      ci_run_id: ${{ steps.find-ci.outputs.run_id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag points to main
+        run: |
+          git fetch origin main --quiet
+
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" "origin/main"; then
+            echo "::error::Tag $GITHUB_REF_NAME does not point to a commit on main."
+            exit 1
+          fi
+
+      - name: Reject skipped-test releases
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          if [[ "$COMMIT_MESSAGE" == *"[skip-tests]"* ]]; then
+            echo "::error::Releases cannot be created from a [skip-tests] commit."
+            exit 1
+          fi
+
+          if [[ "$COMMIT_MESSAGE" == *"docs"* ]]; then
+            echo "::error::Releases cannot be created from a docs-only commit."
+            exit 1
+          fi
+
+      - name: Find successful CI run
+        id: find-ci
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID="$(
+            gh run list \
+              --workflow=ci.yml \
+              --commit="$GITHUB_SHA" \
+              --event=push \
+              --json databaseId,conclusion \
+              --jq '.[] | select(.conclusion == "success") | .databaseId' \
+              | head -n 1
+          )"
+
+          if [ -z "$RUN_ID" ]; then
+            echo "::error::No successful CI run found for commit $GITHUB_SHA."
+            exit 1
+          fi
+
+          echo "Found successful CI run: $RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Verify production deployment succeeded
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI_RUN_ID: ${{ steps.find-ci.outputs.run_id }}
+        run: |
+          DEPLOY_RESULT="$(
+            gh run view "$CI_RUN_ID" \
+              --json jobs \
+              --jq '
+                .jobs[]
+                | select(.name == "Deploy Production")
+                | .conclusion
+              '
+          )"
+
+          if [ "$DEPLOY_RESULT" != "success" ]; then
+            echo "::error::Production deployment for $GITHUB_SHA did not succeed."
+            echo "Deployment result: ${DEPLOY_RESULT:-not found}"
+            exit 1
+          fi
+
+          echo "Production deployment succeeded."
+
+  backend:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/netloganalyser-backend
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+  frontend-selfhost:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/netloganalyser-frontend-selfhost
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.selfhost
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=frontend-selfhost
+          cache-to: type=gha,mode=max,scope=frontend-selfhost

@@ -1,20 +1,50 @@
-/**
- * Central, typed access to build-time env vars. Never read
- * `import.meta.env` directly elsewhere - go through this module so a
- * missing var fails loudly at startup instead of silently at request time.
- */
-function required( name: string, value: string | undefined ): string
+declare global
 {
-	if ( !value )
+	interface Window
 	{
-		throw new Error( `Missing required env var: ${ name }` );
+		__ENV__:
+		{
+			BACKEND_PORT?: string
+			API_BASE_URL?: string
+			WS_BASE_URL?:  string
+			APP_VERSION?:  string
+		} | undefined
 	}
-	return value;
+}
+
+function resolveApiBaseUrl( ): string
+{
+	const { BACKEND_PORT, API_BASE_URL } = window.__ENV__ ?? { };
+
+	// Self-host: browser and backend share a host, only the port varies.
+	if ( BACKEND_PORT )
+	{
+		return `${ window.location.protocol }//${ window.location.hostname }:${ BACKEND_PORT }`;
+	}
+
+	// Render / local dev: config.js carries the full URL directly.
+	if ( API_BASE_URL ) return API_BASE_URL;
+
+	throw new Error( 'env.ts: no API base URL available - config.js is missing or malformed' );
+}
+
+function resolveWsBaseUrl( ): string
+{
+	const { BACKEND_PORT, WS_BASE_URL } = window.__ENV__ ?? { };
+
+	if ( BACKEND_PORT )
+		{
+		const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		return `${ wsProtocol }//${ window.location.hostname }:${ BACKEND_PORT }/ws`;
+	}
+
+	if ( WS_BASE_URL ) return WS_BASE_URL;
+
+	throw new Error( 'env.ts: no WS base URL available - config.js is missing or malformed' );
 }
 
 export const env =
 {
-	apiBaseUrl: required( 'VITE_API_BASE_URL', import.meta.env.VITE_API_BASE_URL ),
-	wsBaseUrl:  required( 'VITE_WS_BASE_URL', import.meta.env.VITE_WS_BASE_URL ),
-	appVersion: required( 'VITE_APP_VERSION', import.meta.env.VITE_APP_VERSION )
+	apiBaseUrl: resolveApiBaseUrl( ),
+	wsBaseUrl:  resolveWsBaseUrl( )
 };

@@ -106,16 +106,16 @@ async def _verify_user_email(
     await db_session.commit( )
 
 
-async def _register_and_return_cookie(
+async def _register_and_return_access_token(
     client: AsyncClient, db_session: AsyncSession
 ) -> tuple[ str | None, Response ]:
-    """Helper to register, verify, login and return refresh token"""
+    """Helper to register, verify, login and return access token"""
     response = await _register_and_login( client, db_session )
 
-    if response.cookies.get( "refresh_token" ) is None:
-        raise ValueError( "No refresh token returned." )
+    if response.json( )[ "access_token" ] is None:
+        raise ValueError( "No access token returned." )
     
-    return response.cookies.get( "refresh_token" ), response
+    return response.json( )[ "access_token" ], response
 
 # ═══════════════════════════════════════════════════════════════════
 # Registration
@@ -397,17 +397,19 @@ class TestRefresh:
         self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A valid refresh token cookie should return a new access token."""
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
-        client.cookies.set( "refresh_token", refresh_token )
+        access_token, response = await _register_and_return_access_token( client, db_session )
 
-        response = await client.post( "/auth/refresh" )
+        response = await client.post(
+            "/auth/refresh",
+            headers={ "Authorization": f"Bearer { access_token }"}
+        )
 
         assert response.status_code == 200
         data = response.json( )
         assert "access_token" in data
         assert data[ "user" ][ "email" ] == VALID_EMAIL
         # a new refresh cookie should also be set (rotation)
-        assert refresh_token is not None
+        assert response.cookies.get( "refresh_token" ) is not None
 
     @pytest.mark.anyio
     async def test_refresh_without_cookie_returns_401(
@@ -440,7 +442,8 @@ class TestRefresh:
         token family (token reuse detection)."""
 
         # login and get the raw set-cookie value so we can manually re-send it
-        original_cookie, response = await _register_and_return_cookie( client, db_session )
+        access_token, response = await _register_and_return_access_token( client, db_session )
+        original_cookie = response.cookies.get( "refresh_token" )
         assert original_cookie is not None
 
         # first refresh → rotates token
@@ -471,15 +474,16 @@ class TestRefresh:
         self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """After a logout, the refresh token should be revoked and unusable."""
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
+        access_token, response = await _register_and_return_access_token( client, db_session )
 
         # call logout with the access token
         await client.post(
             "/auth/logout",
-            headers={ "Authorization": f"Bearer { refresh_token }"},
+            headers={ "Authorization": f"Bearer { access_token }"},
         )
 
         # now try to refresh - should fail
+        print( response.json( ) )
         response = await client.post( "/auth/refresh" )
         assert response.status_code == 401
 
@@ -488,8 +492,8 @@ class TestRefresh:
         self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Each refresh call should rotate the cookie value."""
-        first_cookie, response = await _register_and_return_cookie( client, db_session )
-        client.cookies.set( "refresh_token", first_cookie )
+        access_token, response = await _register_and_return_access_token( client, db_session )
+        first_cookie = response.cookies.get( "refresh_cookie" )
 
         for _ in range( 3 ):
             resp = await client.post( "/auth/refresh" )
@@ -516,7 +520,7 @@ class TestLogout:
     ) -> None:
         """After logout, the refresh token must be revoked so it cannot be
         used to get new access tokens."""
-        reset_token, response = await _register_and_return_cookie( client, db_session )
+        reset_token, response = await _register_and_return_access_token( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -536,7 +540,7 @@ class TestLogout:
     ) -> None:
         """The response should include a Set-Cookie header that clears the
         refresh_token cookie."""
-        reset_token, response = await _register_and_return_cookie( client, db_session )
+        reset_token, response = await _register_and_return_access_token( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -573,7 +577,7 @@ class TestLogout:
     ) -> None:
         """If the user has a valid access token but no refresh cookie,
         logout should still succeed (no-op on the cookie side)."""
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
+        refresh_token, response = await _register_and_return_access_token( client, db_session )
 
         # manually remove the cookie
         client.cookies.clear()
@@ -591,7 +595,7 @@ class TestLogout:
     ) -> None:
         """Calling logout twice with the same access token should not
         error on the second call."""
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
+        refresh_token, response = await _register_and_return_access_token( client, db_session )
 
         headers = {"Authorization": f"Bearer { response.json( )[ "access_token" ] }"}
         resp1 = await client.post( "/auth/logout", headers=headers )
@@ -914,7 +918,7 @@ class TestAuthDependency:
         self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """A valid access token must pass the dependency check."""
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
+        refresh_token, response = await _register_and_return_access_token( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -950,7 +954,7 @@ class TestAuthDependency:
     ) -> None:
         """A JWT whose payload has been modified after signing must be
         rejected (signature verification failure)."""
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
+        refresh_token, response = await _register_and_return_access_token( client, db_session )
         # Take the valid token and append garbage to invalidate the signature
         tampered = response.json( )[ "access_token" ] + "tampered"
 
@@ -992,7 +996,7 @@ class TestAuthDependency:
         self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
         """Using 'Basic' instead of 'Bearer' must be rejected."""
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
+        refresh_token, response = await _register_and_return_access_token( client, db_session )
 
         response = await client.post(
             "/auth/logout",
@@ -1073,8 +1077,7 @@ class TestNoSecretsLeaked:
     async def test_refresh_response_has_no_password_hash(
         self, client: AsyncClient, db_session: AsyncSession, mock_email_send: AsyncMock
     ) -> None:
-        refresh_token, response = await _register_and_return_cookie( client, db_session )
-        client.cookies.set( "refresh_token", refresh_token )
+        access_token, response = await _register_and_return_access_token( client, db_session )
         response = await client.post( "/auth/refresh" )
         body = response.text
         assert response.status_code == 200

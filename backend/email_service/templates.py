@@ -138,9 +138,9 @@ def _link( *, text: str, href: str ) -> str:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
-def verification_email( *, display_name: str, raw_token: str ) -> tuple[str, str, str]:
+def verification_email( *, display_name: str, raw_token: str, frontend_url: str ) -> tuple[str, str, str]:
     """Email verification - sent on registration and on resend."""
-    link = f"{settings.frontend_url}/verify-email?token={raw_token}"
+    link = f"{frontend_url}/verify-email?token={raw_token}"
 
     subject = "Confirm your email - NetLogAnalyser"
 
@@ -176,9 +176,9 @@ def verification_email( *, display_name: str, raw_token: str ) -> tuple[str, str
     return subject, html, text
 
 
-def password_reset_email( *, display_name: str, raw_token: str ) -> tuple[str, str, str]:
+def password_reset_email( *, display_name: str, raw_token: str, frontend_url: str ) -> tuple[str, str, str]:
     """Password reset - sent from the forgot-password flow."""
-    link = f"{settings.frontend_url}/reset-password?token={raw_token}"
+    link = f"{frontend_url}/reset-password?token={raw_token}"
 
     subject = "Reset your password - NetLogAnalyser"
 
@@ -214,7 +214,7 @@ def password_reset_email( *, display_name: str, raw_token: str ) -> tuple[str, s
     return subject, html, text
 
 
-def welcome_email( *, display_name: str ) -> tuple[str, str, str]:
+def welcome_email( *, display_name: str, frontend_url: str ) -> tuple[str, str, str]:
     """Welcome email - sent after a user verifies their email address."""
     subject = "Welcome to NetLogAnalyser"
 
@@ -222,7 +222,7 @@ def welcome_email( *, display_name: str ) -> tuple[str, str, str]:
         f"Hi {display_name},\n\n"
         f"Your email has been verified and your NetLogAnalyser account is now active.\n\n"
         f"Start ingesting your network logs by creating an API key in your dashboard:\n"
-        f"{settings.frontend_url}/dashboard\n\n"
+        f"{frontend_url}/dashboard\n\n"
         f"If you need help getting started, check out our documentation or reply to this email.\n\n"
         f"- The NetLogAnalyser team"
     )
@@ -243,7 +243,7 @@ def welcome_email( *, display_name: str ) -> tuple[str, str, str]:
                     f"your dashboard and visit the { _link( text="API documentation", href=settings.backend_url ) }."
                 )
             )
-            + _button(label="Go to dashboard", href=f"{settings.frontend_url}/dashboard")
+            + _button(label="Go to dashboard", href=f"{frontend_url}/dashboard")
             + _muted(
                 text=(
                     "If you have any questions, reply to this email or check "
@@ -291,9 +291,9 @@ def retention_warning_email( *, display_name: str, download_url: str, deletion_d
 
     return subject, html, text
 
-def change_email_verification_email( *, display_name: str, raw_token: str ) -> tuple[str, str, str]:
+def change_email_verification_email( *, display_name: str, raw_token: str, frontend_url: str ) -> tuple[str, str, str]:
     """Email verification - sent on email change request."""
-    link = f"{settings.frontend_url}/verify-email?token={raw_token}"
+    link = f"{frontend_url}/verify-email?token={raw_token}"
 
     subject = "Confirm your email - NetLogAnalyser"
 

@@ -6,6 +6,8 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import tailwindcss from '@tailwindcss/vite';
 import viteReact from '@vitejs/plugin-react';
 
+const FRONTEND_PORT = Number( process.env.FRONTEND_PORT ) || 3000;
+
 export default defineConfig( ( ) =>
 {
 	return {
@@ -20,7 +22,12 @@ export default defineConfig( ( ) =>
 		server:
         {
         	host: true,
-        	port: 3000
-        }
+			port: FRONTEND_PORT,
+    		strictPort: true
+        },
+		hmr:
+		{
+			clientPort: FRONTEND_PORT
+		}
 	};
 } );

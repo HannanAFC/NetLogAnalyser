@@ -7,6 +7,7 @@ from uuid import UUID
 from auth.schemas import UserPublic
 from auth.security import hash_password, verify_password
 from auth.service import issue_verification_token
+from config import settings
 from database import AsyncSessionLocal
 from exports.storage import get_export_storage
 from fastapi import HTTPException, status
@@ -23,10 +24,11 @@ from users.schemas import (
 logger = logging.getLogger( __name__ )
 
 async def update_user_details(
-    payload: UpdateUserRequest,
-    user:    User,
-    db:      AsyncSession,
-    redis:   Redis
+    payload:      UpdateUserRequest,
+    user:         User,
+    db:           AsyncSession,
+    redis:        Redis,
+    frontend_url: str
 ) -> UserPublic:
     if payload.email == user.email:
         raise HTTPException( detail="New email must be different to the old one.", status_code=status.HTTP_422_UNPROCESSABLE_CONTENT )
@@ -41,13 +43,15 @@ async def update_user_details(
 
         if user_row:
             raise HTTPException( detail="Email is already taken.", status_code=status.HTTP_400_BAD_REQUEST )
-        else:
-            await issue_verification_token( db, user, "change" )
+        elif settings.email_verification_enabled == True:
+            await issue_verification_token( db, user, frontend_url, "change" )
             await redis.set(
                 f"useremail:{ user.id }",
                 payload.email,
                 ex=300
             )
+        else:
+            user.email = payload.email
 
     if payload.display_name is not None:
         user.display_name = payload.display_name

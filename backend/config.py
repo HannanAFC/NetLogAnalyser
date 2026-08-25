@@ -1,6 +1,7 @@
+import re
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -19,6 +20,9 @@ class Settings( BaseSettings ):
     frontend_url:                        str = "http://localhost:3000"
     backend_url:                         str = "http://localhost:8000"
 
+    frontend_port:                       int = 3000
+    backend_port:                        int = 8000
+
     # Database
     database_url:                        str
     geoip_db_path:                       str = "shared/geoip/GeoLite2-Country.mmdb"
@@ -30,8 +34,14 @@ class Settings( BaseSettings ):
     jwt_refresh_token_expire_days:       int = 30
     password_reset_token_expire_minutes: int = 5
 
-    # CORS
-    cors_allowed_origins:                list[ str ] = [ "http://localhost:3000" ]
+    cors_allowed_origins:                list[ str ] = [ ]
+
+    @computed_field
+    @property
+    def cors_allowed_origin_regex( self ) -> str | None:
+        if self.cors_allowed_origins:
+            return None
+        return rf"^https?://[^/]+:{self.frontend_port}$"
 
     # API keys
     api_key_prefix_length:               int = 8
@@ -66,6 +76,7 @@ class Settings( BaseSettings ):
     ratelimit_general_seconds:           int = 60
 
     # Email service
+    email_verification_enabled:              bool = False
     resend_api_key:                          str = ""
     resend_onboarding_email:                 str = "NetLogAnalyser <onboarding@netloganalyser.com>"
     resend_verify_email:                     str = "NetLogAnalyser <verify@netloganalyser.com>"
@@ -118,8 +129,44 @@ class Settings( BaseSettings ):
     export_max_per_user_per_day:           int = 3
     export_authenticated_link_ttl_seconds: int = 300
 
+    @model_validator( mode="after" )
+    def _check_email_verification_config( self ) -> "Settings":
+        if self.email_verification_enabled == True and self.resend_api_key == "":
+            raise ValueError(
+                "EMAIL_VERIFICATION_ENABLED=true requires RESEND_API_KEY to be "
+                "set - otherwise verification emails can never be sent and new "
+                "users would be locked out permanently. Set RESEND_API_KEY, or "
+                "set EMAIL_VERIFICATION_ENABLED=false to skip verification."
+            )
+        return self
+
+    @model_validator( mode="after" )
+    def _check_export_s3_config( self ) -> "Settings":
+        if self.export_storage_backend == "s3":
+            missing = [
+                name for name, val in [
+                    ( "EXPORT_S3_BUCKET",           self.export_s3_bucket ),
+                    ( "EXPORT_S3_ACCESS_KEY_ID",     self.export_s3_access_key_id ),
+                    ( "EXPORT_S3_SECRET_ACCESS_KEY", self.export_s3_secret_access_key ),
+                ]
+                if not val
+            ]
+            if missing:
+                raise ValueError(
+                    f"EXPORT_STORAGE_BACKEND=s3 requires: { ', '.join( missing ) }"
+                )
+        return self
 
 settings = Settings( ) # type: ignore[call-arg] # loaded from .env file
+
+
+def resolve_frontend_url( origin: str | None ) -> str:
+    if origin:
+        if settings.cors_allowed_origins and ( origin in settings.cors_allowed_origins or "*" in settings.cors_allowed_origins ):
+            return origin
+        if settings.cors_allowed_origin_regex and re.match( settings.cors_allowed_origin_regex, origin ):
+            return origin
+    return settings.frontend_url
 
 JSON_API_CSP = (
     "default-src 'none'; "
@@ -157,7 +204,7 @@ class SecurityHeadersMiddleware( BaseHTTPMiddleware ):
         response = await call_next (request )
         path = request.url.path
 
-        if path.startswith( "/docs" ) or path.startswith( "/redoc" ):
+        if path.startswith( ("/docs", "/redoc") ):
             csp = DOCS_CSP
         elif path == "/":
             csp = LANDING_CSP

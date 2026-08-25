@@ -16,7 +16,7 @@ async def init_arq_pool( ) -> None:
 async def close_arq_pool( ) -> None:
 	global _pool
 	if _pool is not None:
-		await _pool.close( )
+		await _pool.aclose( )
 		_pool = None
 
 
