@@ -34,7 +34,7 @@ class Settings( BaseSettings ):
     jwt_refresh_token_expire_days:       int = 30
     password_reset_token_expire_minutes: int = 5
 
-    cors_allowed_origins:                list[ str ] = [ ]
+    cors_allowed_origins:                list[ str ] = [ "http://localhost:3000" ]
 
     @computed_field
     @property
