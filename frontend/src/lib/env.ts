@@ -33,7 +33,7 @@ function resolveWsBaseUrl( ): string
 	const { BACKEND_PORT, WS_BASE_URL } = window.__ENV__ ?? { };
 
 	if ( BACKEND_PORT )
-		{
+	{
 		const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 		return `${ wsProtocol }//${ window.location.hostname }:${ BACKEND_PORT }/ws`;
 	}

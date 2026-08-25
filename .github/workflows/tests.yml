@@ -106,12 +106,14 @@ jobs:
       WS_BASE_URL: ws://localhost:8000/ws
       SECRET_KEY: TESTING_KEY
       DATABASE_URL: postgresql+psycopg://NetlogAnalyserUserTest:TestPass@localhost/NetLogAnalyserDBTest
-      EMAIL_VERIFICATION_ENABLED: true
-      RESEND_API_KEY: test
+      EMAIL_VERIFICATION_ENABLED: True
+      RESEND_API_KEY: FAKE-KEY
       REDIS_URL: redis://localhost:6379
       ENABLE_TEST_ENDPOINTS: true
       TEST_ENDPOINT_KEY: A-TESTING-KEY
       RUN_INTEGRATION_TESTS: '1'
+      APP_VERSION: testing
+      COOKIE_SECURE: false
       RATELIMIT_AUTH_TIMES: 10000000
       RATELIMIT_AUTH_SECONDS: 60
       RATELIMIT_FORGOT_PASSWORD_TIMES: 10000000
