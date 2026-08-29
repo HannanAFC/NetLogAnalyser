@@ -8,13 +8,14 @@ import { TimeseriesBucketSelector } from '#/components/analytics/timeseries-buck
 import { TimeseriesChart } from '#/components/analytics/timeseries-chart';
 import { TopTalkersTable } from '#/components/analytics/top-talkers-table';
 import { TimeRangePicker } from '#/components/ui/time-range-picker';
-import { timeRangeSearchSchema } from '#/lib/time-range/schema';
+import { timeRangeSearchSchema, timeRangePresetSchema } from '#/lib/time-range/schema';
 import { timeBucketSchema } from '#/features/analytics/schemas';
 import { resolveBucket } from '#/lib/time-range/timeseries-bucket';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import type { TimeBucket } from '#/features/analytics/schemas';
 import { BodyText, Heading } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
+
 
 const analyticsSearchSchema = timeRangeSearchSchema.extend(
 {
@@ -28,9 +29,10 @@ const analyticsSearchSchema = timeRangeSearchSchema.extend(
 	if ( hasStart !== hasEnd )
 	{
 		return {
-			preset: '24h',
+			preset: timeRangePresetSchema.parse( '24h' ),
 			start:  undefined,
-			end:    undefined
+			end:    undefined,
+			bucket: undefined
 		};
 	}
 
