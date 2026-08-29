@@ -1,0 +1,102 @@
+version: 2
+
+updates:
+  - package-ecosystem: "uv"
+    directory: "/backend"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "backend"
+    groups:
+      backend-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "frontend"
+    groups:
+      frontend-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    groups:
+      backend-docker-images:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/frontend"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    groups:
+      frontend-docker-images:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/selfhost"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+      - "selfhost"
+    groups:
+      selfhost-docker-images:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "ghcr.io/hannanafc/netloganalyser-backend"
+      - dependency-name: "ghcr.io/hannanafc/netloganalyser-frontend-selfhost"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    groups:
+      github-actions:
+        update-types:
+          - "minor"
+          - "patch"

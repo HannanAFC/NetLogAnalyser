@@ -14,8 +14,7 @@ class Settings( BaseSettings ):
 
     # Metadata
     app_name:                            str = "NetLogAnalyser"
-    app_version:                         str = "0.1.0"
-    debug:                               bool = False
+    app_version:                         str = "0.0.0"
     environment:                         str = "development"
     frontend_url:                        str = "http://localhost:3000"
     backend_url:                         str = "http://localhost:8000"
