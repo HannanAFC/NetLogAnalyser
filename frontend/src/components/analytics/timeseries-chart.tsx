@@ -24,8 +24,11 @@ export function TimeseriesChart( { range, bucket }: TimeseriesChartProps )
 		return defineChart(
         {
 			marks: [ lineY( points, { id: 'timeseries', x: 'ts', y: 'count', points: true } ) ],
-			x: { scale: scaleUtc, grid: true },
-			y: { scale: scaleLinear, nice: true, grid: true, axis: { label: 'Packets' } },
+			scales:
+			{
+				x: { scale: scaleUtc, grid: true },
+				y: { scale: scaleLinear, nice: true, grid: true, axis: { label: 'Packets' } }
+			},
 			tooltip
 		} );
 	}, [ data ] );

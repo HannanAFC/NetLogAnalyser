@@ -29,8 +29,11 @@ export function TimeseriesSparkline( { range }: TimeseriesSparklineProps )
 		return defineChart(
         {
 			marks: [ lineY( points, { id: 'sparkline', x: 'ts', y: 'count' } ) ],
-			x: { scale: scaleUtc },
-			y: { scale: scaleLinear }
+			scales:
+			{
+				x: { scale: scaleUtc },
+				y: { scale: scaleLinear }
+			}
 		} );
 	}, [ points ] );
 
