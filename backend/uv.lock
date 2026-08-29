@@ -283,7 +283,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "pyjwt", specifier = ">=2.13.0" },
     { name = "redis", specifier = ">=8.1.0" },
-    { name = "resend", extras = ["async"], specifier = ">=2.33.0" },
+    { name = "resend", extras = ["async"], specifier = ">=2.40.2" },
     { name = "scikit-learn", specifier = ">=1.9.0" },
     { name = "sqlalchemy", specifier = ">=2.0.52" },
 ]
@@ -1662,15 +1662,15 @@ wheels = [
 
 [[package]]
 name = "resend"
-version = "2.33.0"
+version = "2.40.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1d/fd/6833d1146ed294e838fffcc1478f624ccee8ed90bd33ae20dcdaeb8c46b4/resend-2.33.0.tar.gz", hash = "sha256:860619a366a51e556b99c80a4f5d909c798d84968cb895fb569e89b70ebe5a86", size = 49442, upload-time = "2026-07-13T18:44:44.226Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/06/616e0116ef367db3323f1075565ef23a68849da45fa1c82fab347f078525/resend-2.40.2.tar.gz", hash = "sha256:43f821f0935902ea26b1fdc26ebf41696581e31c59f8b29fa9576416c31c662e", size = 59584, upload-time = "2026-08-25T20:58:03.227Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cb/65/7bc28462421359f88d3d58dbdddc70034a6952a9dd0905de906296207b00/resend-2.33.0-py2.py3-none-any.whl", hash = "sha256:c63088e6bfd4a869bff418164dbb73e9fef0d00297db52f9b4a7142173057cc8", size = 79152, upload-time = "2026-07-13T18:44:42.912Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/d7/d9dbeb92c05ed1d963c3df09eaa66410f96c5ea4a098e3d90fa8ecb7710b/resend-2.40.2-py2.py3-none-any.whl", hash = "sha256:6c3a93280fb815850282b2b77ad784e756f8ec6143d9052854ac4ec36145cbe2", size = 91695, upload-time = "2026-08-25T20:58:00.731Z" },
 ]
 
 [package.optional-dependencies]
