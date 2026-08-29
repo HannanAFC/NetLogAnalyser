@@ -65,7 +65,7 @@ updates:
           - "minor"
           - "patch"
 
-  - package-ecosystem: "docker"
+  - package-ecosystem: "docker-compose"
     directory: "/selfhost"
     target-branch: "staging"
     schedule:
