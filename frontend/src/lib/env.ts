@@ -7,7 +7,6 @@ declare global
 			BACKEND_PORT?: string
 			API_BASE_URL?: string
 			WS_BASE_URL?:  string
-			APP_VERSION?:  string
 		} | undefined
 	}
 }

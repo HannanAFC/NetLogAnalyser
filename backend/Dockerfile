@@ -10,6 +10,9 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
 
 WORKDIR /app
 
+ARG APP_VERSION=0.0.0
+ENV APP_VERSION=${APP_VERSION}
+
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen
 
