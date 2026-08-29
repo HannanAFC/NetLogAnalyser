@@ -3,11 +3,11 @@ name = "backend"
 version = "0.0.0"
 description = "Backend for NetLogAnalyser."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "aiosmtplib>=5.1.2",
     "alembic>=1.19.1",
-    "arq>=0.25.0",
+    "arq==0.28.0",
     "boto3>=1.43.80",
     "fakeredis>=2.37.1",
     "fastapi-limiter>=0.2.0",
@@ -31,6 +31,11 @@ dependencies = [
 dev = [
     "httpx>=0.28.0",
     "pytest>=9.1.1",
+]
+
+[tool.uv]
+override-dependencies = [
+    "redis[hiredis]>=8.1.0,<9",
 ]
 
 [tool.pytest.ini_options]
