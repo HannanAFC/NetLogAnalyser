@@ -1,7 +1,7 @@
 services:
 
   frontend:
-    image: ghcr.io/hannanafc/netloganalyser-frontend-selfhost:latest
+    image: ghcr.io/hannanafc/netloganalyser-frontend-selfhost:${IMAGE_TAG:-latest}
     environment:
       - BACKEND_PORT=${BACKEND_PORT:-8000}
       - FRONTEND_PORT=${FRONTEND_PORT:-3000}
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   backend:
-    image: ghcr.io/hannanafc/netloganalyser-backend:latest
+    image: ghcr.io/hannanafc/netloganalyser-backend:${IMAGE_TAG:-latest}
     env_file:
       - .env
     environment:
@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
 
   export-worker:
-    image: ghcr.io/hannanafc/netloganalyser-backend:latest
+    image: ghcr.io/hannanafc/netloganalyser-backend:${IMAGE_TAG:-latest}
     env_file:
       - .env
     environment:
