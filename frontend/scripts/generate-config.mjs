@@ -18,7 +18,7 @@ catch
 const outFlagIndex = process.argv.indexOf( '--out' );
 const outPath = outFlagIndex !== -1 ? process.argv[ outFlagIndex + 1 ] : 'public/config.js';
 
-const required = [ 'API_BASE_URL', 'WS_BASE_URL', 'APP_VERSION' ];
+const required = [ 'API_BASE_URL', 'WS_BASE_URL' ];
 const missing = required.filter( ( key ) => !process.env[ key ] );
 
 if ( missing.length > 0 )
@@ -30,8 +30,7 @@ if ( missing.length > 0 )
 const config =
 {
 	API_BASE_URL: process.env.API_BASE_URL,
-	WS_BASE_URL:  process.env.WS_BASE_URL,
-	APP_VERSION:  process.env.APP_VERSION
+	WS_BASE_URL:  process.env.WS_BASE_URL
 };
 
 mkdirSync( dirname( outPath ), { recursive: true } );

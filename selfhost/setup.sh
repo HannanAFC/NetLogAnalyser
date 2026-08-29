@@ -4,6 +4,11 @@ set -euo pipefail
 ENV_FILE=".env"
 COMPOSE_FILE="docker-compose.selfhost.yml"
 
+# Which image tag to pull. install.sh sets NLA_IMAGE_TAG to the release it
+# just downloaded the compose file for; running this script directly
+# (cloned repo) defaults to "latest".
+IMAGE_TAG="${NLA_IMAGE_TAG:-latest}"
+
 if [ ! -f "$ENV_FILE" ]; then
   echo "No .env found - creating one from .env.example"
   cp .env.example "$ENV_FILE"
@@ -25,8 +30,22 @@ if [ ! -f "$ENV_FILE" ]; then
   echo "own database."
   echo ""
 else
-  echo ".env already exists - no generation needed."
+  echo ".env already exists - no secrets regenerated."
 fi
+
+# Sync IMAGE_TAG independently of the block above, so rerunning this script
+# against a newer release (an existing .env, but a fresh IMAGE_TAG passed in)
+# actually pulls the matching images, without ever touching SECRET_KEY or
+# POSTGRES_PASSWORD.
+if grep -q '^IMAGE_TAG=' "$ENV_FILE"; then
+  sed -i.bak "s|^IMAGE_TAG=.*|IMAGE_TAG=${IMAGE_TAG}|" "$ENV_FILE"
+  rm -f "${ENV_FILE}.bak"
+else
+  echo "IMAGE_TAG=${IMAGE_TAG}" >> "$ENV_FILE"
+fi
+
+echo "Pulling images (${IMAGE_TAG})..."
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" pull
 
 echo "Starting NetLogAnalyser..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d
