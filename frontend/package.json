@@ -5,7 +5,7 @@
   "imports": {
     "#/*": "./src/*"
   },
-  "packageManager": "pnpm@11.23.0",
+  "packageManager": "pnpm@11.24.0",
   "scripts": {
     "dev": "node scripts/generate-config.mjs --out public/config.js && vite",
     "generate-routes": "tsr generate",

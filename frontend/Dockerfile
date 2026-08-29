@@ -1,14 +1,11 @@
-FROM node:24-slim
-
-RUN corepack enable
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
+FROM node:26-slim
 WORKDIR /app
 
+RUN npm install -g corepack
+
+RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
