@@ -72,8 +72,11 @@ export function ProtocolBreakdown( { range }: ProtocolBreakdownProps )
 		return defineChart(
         {
 			marks: [ barY( rows, { id: 'protocols', x: 'protocol', y: 'count' } ) ],
-			x: { scale: scaleBand },
-			y: { scale: scaleLinear, nice: true, grid: true, axis: { label: 'Packets' } }
+			scales:
+			{
+				x: { scale: scaleBand },
+				y: { scale: scaleLinear, nice: true, grid: true, axis: { label: 'Packets' } }
+			}
 		} );
 	}, [ data ] );
 

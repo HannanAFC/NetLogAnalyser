@@ -84,7 +84,17 @@ export function ExportsSection( { className }: SettingsSectionProps )
 				{
 					header: 'Size',
 					meta:   { className: 'text-text-secondary tabular-nums' },
-					cell:   ( info ) => info.getValue( ) ? ( info.getValue( ) / 1000000 ).toFixed( 2 ) + ' MB' : '-'
+					cell:   ( info ) =>
+                    {
+                        if ( info.row.original.file_size_bytes !== null )
+                        {
+                            return ( info.row.original.file_size_bytes / 1000000 ).toFixed( 2 ) + ' MB';
+                        }
+                        else
+                        {
+                            return '-';
+                        }
+                    }
 				}
 			),
             columnHelper.accessor(

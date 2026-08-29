@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { AnomaliesTable } from '#/components/anomalies/anomalies-table';
 import { PageWrapper } from '#/components/ui/page-wrapper';
 import { TimeRangePicker } from '#/components/ui/time-range-picker';
-import { timeRangeSearchSchema } from '#/lib/time-range/schema';
+import { timeRangePresetSchema, timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BodyText, Heading } from '#/components/ui/heading';
@@ -22,7 +22,7 @@ const anomaliesSearchSchema = timeRangeSearchSchema.extend(
 	if ( hasStart !== hasEnd )
 	{
 		return {
-			preset:    '24h',
+			preset:    timeRangePresetSchema.parse( '24h' ),
 			min_score: data.min_score,
 			start:     undefined,
 			end:       undefined
