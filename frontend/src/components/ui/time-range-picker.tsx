@@ -1,19 +1,21 @@
 import { useMemo } from 'react';
 import { CustomDateRangePicker } from '#/components/ui/custom-date-range-picker';
 import type { DateRangeValue } from '#/components/ui/custom-date-range-picker';
-import type { TimeRangeSearch } from '#/lib/time-range/schema';
+import type { TimeRangePreset, TimeRangeSearch } from '#/lib/time-range/schema';
 
 interface TimeRangePickerProps
 {
-	search:    TimeRangeSearch;
-	onChange:  ( start: Date, end: Date ) => void;
-	className?: string;
+	search:         TimeRangeSearch;
+	setPreset:      ( preset: TimeRangePreset ) => void;
+	setCustomRange: ( start: Date, end: Date ) => void;
+	className?:     string;
 }
 
 export function TimeRangePicker(
 {
 	search,
-	onChange,
+	setPreset,
+	setCustomRange,
 	className
 }: TimeRangePickerProps )
 {
@@ -21,17 +23,21 @@ export function TimeRangePicker(
 	{
 		if ( !search.start || !search.end ) return null;
 		return { start: new Date( search.start ), end: new Date( search.end ) };
-	}, [ search.start, search.end ] );
+	}, [ search.start, search.end, search.preset ] );
 
-	function handleChange( range: DateRangeValue )
+	const presetValue = useMemo( ( ): TimeRangePreset | null =>
 	{
-		onChange( range.start, range.end );
-	}
+		if ( !search.preset ) return null;
+		return search.preset;
+	}, [ search.start, search.end, search.preset ] );
+	
 
 	return (
 		<CustomDateRangePicker
+			preset={ presetValue }
 			value={ rangeValue }
-			onChange={ handleChange }
+			setPreset={ setPreset }
+			setCustomRange={ setCustomRange }
 			className={ className }
 		/>
 	);

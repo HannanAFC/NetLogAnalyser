@@ -16,7 +16,7 @@ import { TableLoadingErrorMessage } from '#/components/ui/table-loading-error-me
 
 const dashboardSearchSchema = timeRangeSearchSchema.extend(
 {
-	preset: timeRangePresetSchema.default( '1h' )
+	preset: timeRangePresetSchema.default( '1h' ).catch( '1h' )
 } )
 .transform( ( data ) =>
 {
@@ -72,7 +72,8 @@ function DashboardPage( )
 
 			<TimeRangePicker
 				search={ search }
-				onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+				setCustomRange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+				setPreset={ ( preset ) => setRange( { preset: preset } ) }
 			/>
 			<Heading level='h2'>Summary</Heading>
 			<SummaryStatCards range={ range } />

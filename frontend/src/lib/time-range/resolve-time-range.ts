@@ -7,10 +7,14 @@ const DAY  = 24 * HOUR;
 
 const PRESET_DURATION_MS: Record< Exclude< TimeRangePreset, 'custom' >, number > =
 {
+	'15m': 15 * 60 * 1000,
 	'1h':  HOUR,
+	'6h': HOUR * 6,
+	'12h': HOUR * 12,
 	'24h': DAY,
 	'7d':  7 * DAY,
-	'30d': 30 * DAY
+	'15d': 15 * DAY,
+	'30d': 30 * DAY,
 };
 
 // Same as backend to prevent an invalide range from being pickable from the frontend

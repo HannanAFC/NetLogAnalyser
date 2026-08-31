@@ -96,7 +96,8 @@ function AnomaliesPage( )
 			<div className="flex flex-row gap-4 flex-wrap">
 				<TimeRangePicker
 					search={ search }
-					onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+					setCustomRange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+					setPreset={ ( preset ) => setRange( { preset: preset } ) }
 				/>
 				<label className="flex items-center gap-2 text-sm text-nowrap">
 					Min score

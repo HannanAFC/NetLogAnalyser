@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
+import type { TimeRangePreset } from '#/lib/time-range/schema';
 
 const MONTH_NAMES =
 [
@@ -63,52 +64,54 @@ function formatTimeDisplay( date: Date ): string
 
 export interface DateRangeValue
 {
-	start: Date;
-	end:   Date;
+	start:  Date;
+	end:    Date;
 }
 
 interface CustomDateRangePickerProps
 {
 	value:     DateRangeValue | null;
-	onChange:  ( range: DateRangeValue ) => void;
+	preset:    TimeRangePreset | null;
+	setPreset:      ( preset: TimeRangePreset ) => void;
+	setCustomRange: ( start: Date, end: Date ) => void;
 	className?: string;
 }
 
-type QuickPreset = { label: string; getRange: ( now: Date ) => DateRangeValue };
+type QuickPreset = { label: string; value: TimeRangePreset };
 
 const QUICK_PRESETS: QuickPreset[ ] =
 [
 	{
 		label: 'Last 15 min',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 15 * 60 * 1000 ), end: now } )
+		value: '15m'
 	},
 	{
 		label: 'Last hour',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 60 * 60 * 1000 ), end: now } )
+		value: '1h'
 	},
 	{
 		label: 'Last 6 hours',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 6 * 60 * 60 * 1000 ), end: now } )
+		value: '6h'
 	},
 	{
 		label: 'Last 12 hours',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 12 * 60 * 60 * 1000 ), end: now } )
+		value: '12h'
 	},
 	{
 		label: 'Last 24 hours',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 24 * 60 * 60 * 1000 ), end: now } )
+		value: '24h'
 	},
 	{
 		label: 'Last 7 days',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 7 * 24 * 60 * 60 * 1000 ), end: now } )
+		value: '7d'
+	},
+	{
+		label: 'Last 15 days',
+		value: '15d'
 	},
 	{
 		label: 'Last 30 days',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 30 * 24 * 60 * 60 * 1000 ), end: now } )
-	},
-	{
-		label: 'Last 90 days',
-		getRange: ( now ) => ( { start: new Date( now.getTime( ) - 90 * 24 * 60 * 60 * 1000 ), end: now } )
+		value: '30d'
 	}
 ];
 
@@ -261,7 +264,9 @@ function CalendarMonth(
 export function CustomDateRangePicker(
 {
 	value,
-	onChange,
+	preset,
+	setPreset,
+	setCustomRange,
 	className
 }: CustomDateRangePickerProps )
 {
@@ -400,7 +405,7 @@ export function CustomDateRangePicker(
 			end   = tmp;
 		}
 
-		onChange( { start, end } );
+		setCustomRange( start, end );
 		setOpen( false );
 	}
 
@@ -416,10 +421,9 @@ export function CustomDateRangePicker(
 		setOpen( false );
 	}
 
-	function handleQuickPreset( getRange: ( now: Date ) => DateRangeValue )
+	function handleQuickPreset( value: TimeRangePreset )
 	{
-		const range = getRange( new Date( ) );
-		onChange( range );
+		setPreset( value );
 		setOpen( false );
 	}
 
@@ -434,7 +438,7 @@ export function CustomDateRangePicker(
 
 	const displayText = value
 		? `${ formatDateDisplay( value.start ) } ${ formatTimeDisplay( value.start ) }  —  ${ formatDateDisplay( value.end ) } ${ formatTimeDisplay( value.end ) }`
-		: 'Select date range...';
+		:  ( preset ? `(${ preset }) Select date range...` : 'Select date range...' );
 
 	const visualStart = pickingStart;
 	const visualEnd   = pickingEnd ?? hoverDate;
@@ -485,7 +489,7 @@ export function CustomDateRangePicker(
 						<Button
 							key={ preset.label }
 							type="button"
-							onClick={ ( ) => handleQuickPreset( preset.getRange ) }
+							onClick={ ( ) => handleQuickPreset( preset.value ) }
 							variant='ghost'
 						>
 							{ preset.label }
