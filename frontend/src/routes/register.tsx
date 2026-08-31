@@ -181,7 +181,7 @@ function RegisterPage( )
 
 	return (
 		<PageWrapper maxWidth="md" className="py-16 gap-6">
-			<PageHeading eyebrow="Create your workspace" title="Register" description="Set up your account to start streaming ingest and live observability." />
+			<PageHeading title="Register" description="Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes." />
 
 			<Card>
 				<form
@@ -321,7 +321,7 @@ function RegisterPage( )
 							<Button
 								type="submit"
 								disabled={ !canSubmit || isPristine || register.isPending }
-								className=" w-full "
+								className=" w-full items-center justify-center"
 							>
 								{ register.isPending ? 'Creating account…' : 'Create account' }
 							</Button>

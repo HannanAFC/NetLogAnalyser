@@ -10,6 +10,7 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Input, Label } from '../components/ui/input';
 import { configQueryOptions } from '#/features/config/queries';
+import { Button } from '#/components/ui/button';
 
 export const Route = createFileRoute( '/forgot-password' )(
 {
@@ -90,7 +91,6 @@ function ForgotPasswordPage( )
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
-				<Eyebrow>Account recovery</Eyebrow>
 				<Heading level="h1">Forgot password</Heading>
 				<BodyText className="mt-2">Enter your email and we&apos;ll send you a link to reset your password.</BodyText>
 			</div>
@@ -137,13 +137,13 @@ function ForgotPasswordPage( )
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
 							(
-								<button
+								<Button
 									type="submit"
 									disabled={ !canSubmit || isPristine || forgotPassword.isPending }
-									className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+									className='w-full items-center justify-center'
 								>
 									{ forgotPassword.isPending ? 'Sending…' : 'Send reset link' }
-								</button>
+								</Button>
 							)}
 					</form.Subscribe>
 				</form>

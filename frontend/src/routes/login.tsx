@@ -11,6 +11,7 @@ import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-ro
 import { z } from 'zod';
 import { Input, Label } from '../components/ui/input';
 import { useEmailVerificationEnabled } from '#/features/config/hooks';
+import { Button } from '#/components/ui/button';
 
 const loginSearchSchema = z.object(
 	{
@@ -92,7 +93,7 @@ function LoginPage()
 
 	return (
 		<PageWrapper maxWidth="md" className="py-16 gap-6">
-			<PageHeading eyebrow="Secure access" title="Login" description="Enter your credentials to access the live operations view." />
+			<PageHeading title="Login" description="Sign in to your NetLogAnalyser account to access your real-time network monitoring dashboard." />
 
 			<Card>
 				<form
@@ -185,13 +186,13 @@ function LoginPage()
 
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) => (
-							<button
+							<Button
 								type="submit"
 								disabled={ !canSubmit || isPristine || login.isPending }
-								className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+								className="w-full items-center justify-center"
 							>
 								{ login.isPending ? 'Logging in…' : 'Login' }
-							</button>
+							</Button>
 						)}
 					</form.Subscribe>
 				</form>

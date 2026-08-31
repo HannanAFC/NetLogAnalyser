@@ -188,18 +188,20 @@ function RootLayout( { session }: { session: unknown } )
 					<Outlet />
 				</div>
 
-				<footer className="mx-auto flex w-full max-w-6xl items-center justify-between border-t border-border px-4 py-5 sm:px-6 lg:px-8">
-					<div className='flex flex-col gap-2'>
+				<footer className="mx-auto flex flex-col md:flex-row gap-4 w-full max-w-6xl items-center justify-between border-t border-border px-4 py-5 sm:px-6 lg:px-8">
+					<div>
 						<span className="text-xs text-text-tertiary">
 							NetLogAnalyser · v{ appVersion }
 						</span>
-						<Link to='/legal' className='text-xs text-text-tertiary'>
+					</div>
+					<div className='flex gap-4'>
+						<Link to='/legal' className='text-xs font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary'>
 							Legal
 						</Link>
+						<a href={ env.apiBaseUrl } className="text-xs font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary">
+							API docs
+						</a>
 					</div>
-					<a href={ env.apiBaseUrl } className="text-xs font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary">
-						API docs
-					</a>
 				</footer>
 
 				<TanStackDevtools

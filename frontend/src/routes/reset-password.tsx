@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { Input, Label } from '../components/ui/input';
 import { configQueryOptions } from '#/features/config/queries';
+import { Button } from '#/components/ui/button';
 
 const resetSearchSchema = z.object(
 	{
@@ -116,7 +117,6 @@ function ResetPasswordPage( )
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
-				<Eyebrow>Account recovery</Eyebrow>
 				<Heading level="h1">Reset password</Heading>
 				<BodyText className="mt-2">Choose a new password for your account.</BodyText>
 			</div>
@@ -201,13 +201,13 @@ function ResetPasswordPage( )
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
 							(
-								<button
+								<Button
 									type="submit"
 									disabled={ !canSubmit || isPristine || resetPassword.isPending }
-									className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+									className="w-full items-center justify-center"
 								>
 									{ resetPassword.isPending ? 'Resetting…' : 'Reset password' }
-								</button>
+								</Button>
 							)}
 					</form.Subscribe>
 				</form>

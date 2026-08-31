@@ -20,13 +20,13 @@ function IndexPage( )
 
 	return (
 		<PageWrapper className="lg:py-14">
-			<Eyebrow>NetLogAnalyser</Eyebrow>
 			<Heading level="h1" className="max-w-2xl">
-				Every packet,<br />
-				<em>before it turns into noise.</em>
+				Real-time network log
+				<br />
+				<em>ingestion and analysis</em>
 			</Heading>
 			<BodyText className="max-w-xl">
-				Send network packet data via the API, get real-time anomaly detection, geo-mapping, and a live dashboard. NetLogAnalyser turns raw traffic logs into actionable insight.
+				Send network logs via the REST API and receive real-time anomaly-scoring, geo-mapping and clear dashboard data.
 			</BodyText>
 			<div className="flex gap-3">
 				{ session ? (

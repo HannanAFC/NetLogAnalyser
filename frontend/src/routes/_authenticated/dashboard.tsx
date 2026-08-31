@@ -64,7 +64,6 @@ function DashboardPage( )
 
 	return (
 		<PageWrapper>
-			<Eyebrow>Operator dashboard</Eyebrow>
 			<Heading level="h1" className="max-w-2xl">Welcome back, { session?.display_name }.</Heading>
 			<BodyText className='w-max max-w-full'>
 				View everything at a glance, traffic summaries, top anomalies and your live ingest feed.

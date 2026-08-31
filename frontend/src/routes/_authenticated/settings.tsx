@@ -45,7 +45,6 @@ function SettingsPage( )
 	return (
 		<PageWrapper maxWidth="4xl">
 			<div>
-				<Eyebrow>Configuration</Eyebrow>
 				<Heading level="h1" className="mt-1">Settings</Heading>
 				<BodyText className="mt-2">Manage your account, API keys, and preferences.</BodyText>
 			</div>

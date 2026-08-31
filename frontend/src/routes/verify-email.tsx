@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { Input, Label } from '../components/ui/input';
 import { sessionQueryOptions } from '#/features/auth/queries';
 import { configQueryOptions } from '#/features/config/queries';
+import { Button } from '#/components/ui/button';
 
 const verifySearchSchema = z.object(
 	{
@@ -182,7 +183,6 @@ function VerifyEmailPage( )
 	return (
 		<div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
 			<div>
-				<Eyebrow>Account setup</Eyebrow>
 				<Heading level="h1">Verify your email</Heading>
 				<BodyText className="mt-2">Enter the email you registered with to receive a new verification link.</BodyText>
 			</div>
@@ -229,13 +229,13 @@ function VerifyEmailPage( )
 					<form.Subscribe selector={ ( state ) => [ state.canSubmit, state.isPristine ] }>
 						{ ( [ canSubmit, isPristine ] ) =>
 							(
-								<button
+								<Button
 									type="submit"
 									disabled={ !canSubmit || isPristine || resendVerification.isPending }
-									className="inline-flex w-full items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+									className="w-full items-center justify-center"
 								>
 									{ resendVerification.isPending ? 'Sending…' : 'Send verification link' }
-								</button>
+								</Button>
 							)}
 					</form.Subscribe>
 				</form>

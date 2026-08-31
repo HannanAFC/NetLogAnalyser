@@ -41,7 +41,7 @@ function LogHistoryPage( )
 		<PageWrapper>
 			<Heading level='h1'>Log History</Heading>
 			<BodyText className="mt-2">
-				View historical network log data in full detail.
+				Browse through historical log data.
 			</BodyText>
 			<div className='flex flex-col items-center gap-8'>
 				<LogTable
