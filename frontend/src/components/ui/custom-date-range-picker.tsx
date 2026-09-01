@@ -421,9 +421,9 @@ export function CustomDateRangePicker(
 		setOpen( false );
 	}
 
-	function handleQuickPreset( value: TimeRangePreset )
+	function handleQuickPreset( selectedPreset: TimeRangePreset )
 	{
-		setPreset( value );
+		setPreset( selectedPreset );
 		setOpen( false );
 	}
 
@@ -485,14 +485,14 @@ export function CustomDateRangePicker(
 				) }
 			>
 				<div className="grid grid-cols-2 gap-1">
-					{ QUICK_PRESETS.map( ( preset ) => (
+					{ QUICK_PRESETS.map( ( quickPreset ) => (
 						<Button
-							key={ preset.label }
+							key={ quickPreset.label }
 							type="button"
-							onClick={ ( ) => handleQuickPreset( preset.value ) }
+							onClick={ ( ) => handleQuickPreset( quickPreset.value ) }
 							variant='ghost'
 						>
-							{ preset.label }
+							{ quickPreset.label }
 						</Button>
 					) ) }
 				</div>

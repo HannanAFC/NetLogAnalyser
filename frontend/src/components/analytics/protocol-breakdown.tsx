@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { scaleBand, scaleLinear } from 'd3-scale';
-import { barY, defineChart } from '@tanstack/charts';
+import { barY, defineChart, dot } from '@tanstack/charts';
 import { Chart } from '@tanstack/react-charts';
 import { useProtocols } from '#/features/analytics/hooks';
 import type { TimeRangeParams } from '#/features/analytics/schemas';
@@ -71,7 +71,44 @@ export function ProtocolBreakdown( { range }: ProtocolBreakdownProps )
 		const rows = data?.by_protocol ?? [ ];
 		return defineChart(
         {
-			marks: [ barY( rows, { id: 'protocols', x: 'protocol', y: 'count' } ) ],
+			marks:
+			[
+				barY(
+					rows,
+					{
+						id: 'protocols',
+						x: 'protocol',
+						y: 'count',
+						inset: 4
+					}
+				),
+				dot(
+					rows,
+					{
+						id: 'timeseries',
+						x: 'protocol',
+						y: 'count',
+						states:
+						[
+							{
+								when: { focus: 'primary' },
+								style:
+								{
+									r: 7,
+									stroke: 'Canvas',
+									strokeWidth: 2
+								},
+								transition:
+								{
+									type: 'tween',
+									duration: 300,
+									easing: 'ease-out'
+								}
+							}
+						]
+					}
+				)
+			],
 			scales:
 			{
 				x: { scale: scaleBand },

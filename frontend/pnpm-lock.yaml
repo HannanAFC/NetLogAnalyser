@@ -65,6 +65,9 @@ importers:
       d3-scale:
         specifier: ^4.0.2
         version: 4.0.2
+      decorative:
+        specifier: link:@tanstack/charts/mark/decorative
+        version: link:@tanstack/charts/mark/decorative
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0

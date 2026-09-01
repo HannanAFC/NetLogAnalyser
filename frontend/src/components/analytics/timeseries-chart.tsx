@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
 import { scaleLinear, scaleUtc } from 'd3-scale';
-import { defineChart, lineY } from '@tanstack/charts';
+import { defineChart, dot, lineY } from '@tanstack/charts';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { Chart } from '@tanstack/react-charts';
 
 import { useTimeseries } from '#/features/analytics/hooks';
 import type { TimeBucket, TimeRangeParams } from '#/features/analytics/schemas';
 import { Card, CardDescription } from '../ui/card';
+import { decorative } from '@tanstack/charts/mark/decorative';
+import { formatApiKeyDate } from '#/lib/utils';
 
 interface TimeseriesChartProps
 {
@@ -23,13 +25,68 @@ export function TimeseriesChart( { range, bucket }: TimeseriesChartProps )
     {
 		return defineChart(
         {
-			marks: [ lineY( points, { id: 'timeseries', x: 'ts', y: 'count', points: true } ) ],
+			marks:
+			[
+				decorative(
+					lineY(
+						points,
+						{
+							x: 'ts',
+							y: 'count'
+						}
+					)
+				),
+				dot(
+					points,
+					{
+						id: 'timeseries',
+						x: 'ts',
+						y: 'count',
+						states:
+						[
+							{
+								when: { focus: 'primary' },
+								style:
+								{
+									r: 7,
+									stroke: 'Canvas',
+									strokeWidth: 2
+								},
+								transition:
+								{
+									type: 'tween',
+									duration: 300,
+									easing: 'ease-out'
+								}
+							}
+						]
+					}
+				)
+			],
 			scales:
 			{
 				x: { scale: scaleUtc, grid: true },
 				y: { scale: scaleLinear, nice: true, grid: true, axis: { label: 'Packets' } }
 			},
-			tooltip
+			tooltip:
+			{
+				anchor: 'point',
+				placement: [ 'top', 'right', 'left', 'bottom' ],
+				use: tooltip,
+				items:
+				[
+					{
+						channel: 'y',
+						label: 'Packet count:',
+						text: ( point ) => point.datum.count
+					},
+					{
+						channel: 'x',
+						label: 'Time:',
+						text: ( point ) => formatApiKeyDate( point.datum.ts.toISOString( ) )
+					}
+				]
+			}
 		} );
 	}, [ data ] );
 

@@ -27,10 +27,8 @@ export function TimeRangePicker(
 
 	const presetValue = useMemo( ( ): TimeRangePreset | null =>
 	{
-		if ( !search.preset ) return null;
 		return search.preset;
 	}, [ search.start, search.end, search.preset ] );
-	
 
 	return (
 		<CustomDateRangePicker

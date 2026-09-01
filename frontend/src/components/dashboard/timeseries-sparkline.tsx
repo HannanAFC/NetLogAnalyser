@@ -2,13 +2,16 @@
 import { useMemo } from 'react';
 import { isAxiosError } from 'axios';
 import { scaleLinear, scaleUtc } from 'd3-scale';
-import { defineChart, lineY } from '@tanstack/charts';
+import { defineChart, dot, lineY } from '@tanstack/charts';
 import { Chart } from '@tanstack/react-charts';
 
 import { useTimeseries } from '#/features/analytics/hooks';
 import { resolveBucket } from '#/lib/time-range/timeseries-bucket';
 import type { TimeRangeParams } from '#/features/analytics/schemas';
 import { Card, CardDescription } from '../ui/card';
+import { tooltip } from '@tanstack/charts/tooltip';
+import { decorative } from '@tanstack/charts/mark/decorative';
+import { formatApiKeyDate } from '#/lib/utils';
 
 interface TimeseriesSparklineProps
 {
@@ -27,12 +30,68 @@ export function TimeseriesSparkline( { range }: TimeseriesSparklineProps )
 	const definition = useMemo( ( ) =>
     {
 		return defineChart(
-        {
-			marks: [ lineY( points, { id: 'sparkline', x: 'ts', y: 'count' } ) ],
+		{
+			marks:
+			[
+				decorative(
+					lineY(
+						points,
+						{
+							x: 'ts',
+							y: 'count'
+						}
+					)
+				),
+				dot(
+					points,
+					{
+						id: 'sparkline',
+						x: 'ts',
+						y: 'count',
+						states:
+						[
+							{
+								when: { focus: 'primary' },
+								style:
+								{
+									r: 7,
+									stroke: 'Canvas',
+									strokeWidth: 2
+								},
+								transition:
+								{
+									type: 'tween',
+									duration: 300,
+									easing: 'ease-out'
+								}
+							}
+						]
+					}
+				)
+			],
 			scales:
 			{
-				x: { scale: scaleUtc },
-				y: { scale: scaleLinear }
+				x: { scale: scaleUtc, grid: true },
+				y: { scale: scaleLinear, nice: true, grid: true, axis: { label: 'Packets' } }
+			},
+			tooltip:
+			{
+				anchor: 'point',
+				placement: [ 'top', 'right', 'left', 'bottom' ],
+				use: tooltip,
+				items:
+				[
+					{
+						channel: 'y',
+						label: 'Packet count:',
+						text: ( point ) => point.datum.count
+					},
+					{
+						channel: 'x',
+						label: 'Time:',
+						text: ( point ) => formatApiKeyDate( point.datum.ts.toISOString( ) )
+					}
+				]
 			}
 		} );
 	}, [ points ] );
