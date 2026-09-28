@@ -54,7 +54,7 @@ export function WorldChoropleth( { rows }: WorldChoroplethProps )
 						const row         = alpha2 ? byCountry.get( alpha2 ) : null;
 						const bucket      = row ? bucketOf( row.packet_percentage ) : null;
 						const fill        = bucket === null
-							? `choropleth-empty`
+							? 'choropleth-empty'
 							: `choropleth-${ bucket }`;
 
 						const extendedCountry: ExtendedCountryInfo | null =
