@@ -9,9 +9,6 @@ import { useState } from 'react';
 import { MapPopup } from './map-popup';
 import { useDebounce } from '#/lib/utils';
 
-const FILL_FALLBACKS = [ 'oklch( 0.86 0.04 250 )', 'oklch( 0.74 0.09 250 )', 'oklch( 0.62 0.14 250 )', 'oklch( 0.52 0.17 250 )', 'oklch( 0.42 0.16 252 )' ];
-const EMPTY_FALLBACK = 'oklch( 0.94 0.008 252 )';
-
 interface WorldChoroplethProps
 {
 	rows: GeoEntry[ ];
@@ -57,8 +54,8 @@ export function WorldChoropleth( { rows }: WorldChoroplethProps )
 						const row         = alpha2 ? byCountry.get( alpha2 ) : null;
 						const bucket      = row ? bucketOf( row.packet_percentage ) : null;
 						const fill        = bucket === null
-							? `var(--map-fill-empty, ${ EMPTY_FALLBACK })`
-							: `var(--map-fill-${ bucket }, ${ FILL_FALLBACKS[ bucket ] })`;
+							? 'choropleth-empty'
+							: `choropleth-${ bucket }`;
 
 						const extendedCountry: ExtendedCountryInfo | null =
 						row && countryName ?
@@ -71,11 +68,7 @@ export function WorldChoropleth( { rows }: WorldChoroplethProps )
 							<Geography
 								key={ geo.rsmKey }
 								geography={ geo }
-								style={ {
-									default: { transition: 'all 150ms', fill, stroke: 'var(--color-border)', outline: 'none' },
-									hover:   { fill, outline: 'none', opacity: 0.8 },
-									pressed: { outline: 'none' }
-								} }
+								className={ `choropleth ${ fill }` }
 								onMouseEnter={ ( event ) =>
 								{
 									setHoveredCountry( extendedCountry );
