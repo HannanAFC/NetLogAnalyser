@@ -22,7 +22,7 @@ dependencies = [
     "pydantic-settings>=2.15.0",
     "pyjwt>=2.15.0",
     "redis>=8.1.0",
-    "resend[async]>=2.42.0",
+    "resend[async]>=2.47.0",
     "scikit-learn>=1.9.1",
     "sqlalchemy>=2.1.1",
 ]
