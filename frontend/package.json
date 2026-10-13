@@ -22,7 +22,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/charts": "^0.18.0",
-    "@tanstack/charts-scales": "^0.18.0",
+    "@tanstack/charts-scales": "^1.1.0",
     "@tanstack/react-charts": "^0.18.0",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-form": "^1.33.5",
