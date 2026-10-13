@@ -15,8 +15,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(solid-js@1.9.15)
       '@tanstack/charts-scales':
-        specifier: ^0.18.0
-        version: 0.18.0
+        specifier: ^1.1.0
+        version: 1.1.0
       '@tanstack/react-charts':
         specifier: ^1.1.0
         version: 1.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(solid-js@1.9.15)
@@ -911,8 +911,8 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
 
-  '@tanstack/charts-scales@0.18.0':
-    resolution: {integrity: sha512-bg1gND8Chqo0cm1B9crmVHZiG7wLKy2mQZy6Ws4H70vaANjimwuq6sQG6Nt+nOh6U5CnqA4KdSoJEWKUtu4FDg==}
+  '@tanstack/charts-scales@1.1.0':
+    resolution: {integrity: sha512-V3ysaajScH3hXxCoj0IevwX6sg/puCIl+iwFtLnvMqM2HXb+5+qTpBnoFsg4FuqV89+icAij8XKPG7j7CxhBLA==}
 
   '@tanstack/charts@0.18.0':
     resolution: {integrity: sha512-JzJ0nkdpZWPla1FPEo6YY6spMRkkVxvtpAF+zvwATV1DpwHegvW7N55Pyts6Gu+do+RmnCAtnOWIcQAwtNAOaw==}
@@ -3829,7 +3829,7 @@ snapshots:
       tailwindcss: 4.3.3
       vite: 8.3.4(@types/node@26.6.5)(jiti@2.7.0)
 
-  '@tanstack/charts-scales@0.18.0': {}
+  '@tanstack/charts-scales@1.1.0': {}
 
   '@tanstack/charts@0.18.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(solid-js@1.9.15)':
     dependencies:
