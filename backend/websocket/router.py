@@ -7,6 +7,7 @@ from cache import get_redis
 from config import settings
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from models.models import User
+from rate_limiter import get_ws_rate_limiter
 from redis.asyncio import Redis
 from websocket.manager import manager
 from websocket.schemas import CreateTicketResponse
@@ -29,7 +30,7 @@ async def create_ws_ticket(
     ticket = await mint_ws_ticket( redis, str( current_user.id ) )
     return CreateTicketResponse( ticket=ticket, expires_in=settings.ws_ticket_ttl_seconds )
 
-@router.websocket( "/live" )
+@router.websocket( "/live", dependencies=[ Depends( get_ws_rate_limiter ) ] )
 async def live_feed(
     websocket: WebSocket,
     redis: Annotated[ Redis, Depends( get_redis ) ]

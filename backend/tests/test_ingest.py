@@ -6,26 +6,19 @@ from unittest.mock import AsyncMock
 
 import pytest
 from config import settings
-from fastapi import Request as FastAPIRequest
-from fastapi import Response as FastAPIResponse
-from fastapi_limiter.depends import RateLimiter
 from httpx import AsyncClient, Response
 from main import app
 from models.models import EmailVerificationToken, LogEntry, User
-from pyrate_limiter import Duration, Limiter, Rate
 from rate_limiter import get_ingest_rate_limiter
 from redis.asyncio import Redis
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from tests.conftest import build_strict_limiter
 
 VALID_EMAIL = "ingest-tester@example.com"
 VALID_PASSWORD = "Str0ng!Pass"
 VALID_DISPLAY_NAME = "Ingest Tester"
 VALID_KEY_LABEL = "Ingest Test Key"
-
-def _build_strict_limiter( times: int, seconds: int ) -> RateLimiter:
-    """Return an in-memory RateLimiter that allows only *times* requests."""
-    return RateLimiter( Limiter( Rate( limit=times, interval=seconds * Duration.SECOND ) ) )
 
 # ═══════════════════════════════════════════════════════════════════
 # Helpers — auth / api key setup
@@ -563,12 +556,7 @@ class TestIngestRateLimiting:
     ) -> None:
         _, _, api_key = await _setup_authenticated_key( client, db_session )
 
-        strict = _build_strict_limiter( 500, 60 )  # accounts for register call above
-
-        async def _strict_auth( request: FastAPIRequest, response: FastAPIResponse ) -> None:
-            await strict( request, response )
-
-        app.dependency_overrides[ get_ingest_rate_limiter ] = _strict_auth
+        app.dependency_overrides[ get_ingest_rate_limiter ] = build_strict_limiter( 500, 60 )
 
         statuses = [ ]
         for _ in range( 501 ):

@@ -64,10 +64,14 @@ async def get_summary(
     Returns:
         response (SummaryResponse): A response containing the summary.
     """
-    cache_key = _cache_key( user_id, "summary", time_range.start.isoformat( ), time_range.end.isoformat( ) )
-    cached = await redis.get( cache_key )
+    stripped_start = time_range.start.replace( second=0, microsecond=0 )
+    stripped_end   = time_range.end.replace( second=0, microsecond=0 )
+    cache_key      = _cache_key( user_id, "summary", stripped_start.isoformat( ), stripped_end.isoformat( ) )
+    cached         = await redis.get( cache_key )
+
     if cached:
         summary = SummaryResponse.model_validate_json( cached )
+        print( "found summary in cache" )
         return summary
 
     stmt = (

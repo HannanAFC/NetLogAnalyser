@@ -18,9 +18,7 @@ async def send_email( *, sender: str, to: str, subject: str, html: str, text: st
     """
     if not settings.email_verification_enabled or settings.resend_api_key == "" or settings.resend_api_key == "FAKE-KEY":
         print(
-            f"Backup email logging: \nFrom: { sender } \nTo: { to } \nSubject: { subject } \n{ text }",
-            "HTML:",
-            html
+            f"Backup email logging: \nFrom: { sender } \nTo: { to } \nSubject: { subject } \n{ text }"
         )
         return
 
