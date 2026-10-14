@@ -19,18 +19,17 @@ os.environ.setdefault( "EMAIL_VERIFICATION_ENABLED", "true" )
 import pytest
 from cache import get_redis
 from database import Base, get_db
-from fastapi import Request, Response
-from fastapi_limiter.depends import RateLimiter
 from httpx import ASGITransport, AsyncClient
 from main import app
-from pyrate_limiter import Duration, Limiter, Rate
 from rate_limiter import (
+    _cloudflare_identifier,
     get_auth_rate_limiter,
     get_forgot_password_rate_limiter,
     get_general_rate_limiter,
     get_ingest_rate_limiter,
 )
 from redis.asyncio import Redis
+from redis_fastapi import RateLimitBackend, get_rate_limit_backend, rate_limit
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -107,6 +106,21 @@ async def redis_client( ) -> AsyncGenerator[ Redis ]:
         await client.flushdb( )
         await client.aclose( )
 
+def build_strict_limiter( times: int, seconds: int = 60 ):
+    """
+    Return a real SDK ``rate_limit`` dependency allowing only *times* requests.
+
+    Each call gets its own scope so limiters never share a counter. Use it as
+    a ``dependency_overrides`` replacement for one of the ``get_*_rate_limiter``
+    tiers; the ``client`` fixture points it at the test Redis.
+    """
+    return rate_limit(
+        limit=times,
+        window=seconds,
+        scope=f"test-{ uuid.uuid4( ).hex }",
+        identifier=_cloudflare_identifier,
+    )
+
 @pytest.fixture
 async def client(
     db_session: AsyncSession,
@@ -119,17 +133,20 @@ async def client(
     async def override_get_redis( ):
         yield redis_client
 
-    app.dependency_overrides[ get_db ]    = override_get_db
-    app.dependency_overrides[ get_redis ] = override_get_redis
+    app.dependency_overrides[ get_db ]           = override_get_db
+    app.dependency_overrides[ get_redis ]        = override_get_redis
 
-    # Override rate limiter with a permissive in-memory instance so tests
-    # never hit real rate limits and don't require a running Redis.
-    _test_rate_limiter = RateLimiter(
-        Limiter(Rate(limit=10000, interval=60 * Duration.SECOND))
-    )
+    # ASGITransport doesn't run the lifespan, so the SDK's own pool never
+    # exists - point rate_limit() at the test Redis instead.
+    async def override_rate_limit_backend( ):
+        return RateLimitBackend( redis_client )
 
-    async def _permissive_rate_limit( request: Request, response: Response ) -> None:
-        await _test_rate_limiter( request, response )
+    app.dependency_overrides[ get_rate_limit_backend ] = override_rate_limit_backend
+
+    # Override every rate-limit tier with a no-op so tests never hit real
+    # limits. Enforcement tests swap in build_strict_limiter() themselves.
+    async def _permissive_rate_limit( ) -> None:
+        return None
 
     app.dependency_overrides[ get_auth_rate_limiter ]            = _permissive_rate_limit
     app.dependency_overrides[ get_forgot_password_rate_limiter ] = _permissive_rate_limit
