@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from math import floor
 from typing import Annotated
 
-import rate_limiter as _rl  # access to the module for rebinding globals
 from analytics import router as analytics_router
 from api_keys import router as api_keys_router
 from auth import router as auth_router
@@ -21,9 +20,7 @@ from geoip import close_geoip, init_geoip
 from ingest import router as ingest_router
 from logging_config import configure_logging
 from logs import router as logs_router
-from rate_limiter import (
-    create_rate_limiter,
-)
+from redis_fastapi import FastAPIRedis
 from schemas import HealthResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,28 +40,6 @@ async def lifespan( _app: FastAPI ):
     await init_arq_pool( )
     configure_logging( )
 
-    # Replace default rate limits with ones built from env variables
-    _rl.auth_rate_limiter = await create_rate_limiter(
-        settings.ratelimit_auth_times,
-        settings.ratelimit_auth_seconds,
-        "auth",
-    )
-    _rl.forgot_password_rate_limiter = await create_rate_limiter(
-        settings.ratelimit_forgot_password_times,
-        settings.ratelimit_forgot_password_seconds,
-        "forgot-password",
-    )
-    _rl.ingest_rate_limiter = await create_rate_limiter(
-        settings.ratelimit_ingest_times,
-        settings.ratelimit_ingest_seconds,
-        "ingest",
-    )
-    _rl.general_rate_limiter = await create_rate_limiter(
-        settings.ratelimit_general_times,
-        settings.ratelimit_general_seconds,
-        "gener al",
-    )
-
     yield
 
     # shutdown
@@ -78,6 +53,8 @@ async def lifespan( _app: FastAPI ):
 startTime = time.time( )
 
 app = FastAPI( lifespan=lifespan )
+
+FastAPIRedis( app ).lifespan( ).rate_limiting( )
 
 app.add_middleware(
     CORSMiddleware,

@@ -11,11 +11,9 @@ Covers:
 from __future__ import annotations
 
 import pytest
-from fastapi import Request, Response
-from fastapi_limiter.depends import RateLimiter
+from fastapi import Request
 from httpx import AsyncClient
 from main import app
-from pyrate_limiter import Duration, Limiter, Rate
 from rate_limiter import (
     _cloudflare_identifier,
     get_auth_rate_limiter,
@@ -23,18 +21,17 @@ from rate_limiter import (
     get_ingest_rate_limiter,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from tests.conftest import build_strict_limiter
 from tests.test_auth import _register_and_login, _register_user, _verify_user_email
 
 pytestmark = pytest.mark.anyio
 
 
 # ═══════════════════════════════════════════════════════════════════
-# Helpers - build a strict in-memory limiter for enforcement tests
+# Helpers - build a strict limiter (real SDK dependency, test Redis)
 # ═══════════════════════════════════════════════════════════════════
 
-def _build_strict_limiter( times: int, seconds: int ) -> RateLimiter:
-    """Return an in-memory RateLimiter that allows only *times* requests."""
-    return RateLimiter( Limiter( Rate( limit=times, interval=seconds * Duration.SECOND ) ) )
+_build_strict_limiter = build_strict_limiter
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -99,10 +96,7 @@ class TestRateLimitEnforcement:
         """After 3 requests (register + 2 logins) the 4th should be 429."""
         strict = _build_strict_limiter( 3, 60 )  # accounts for register call above
 
-        async def _strict_auth( request: Request, response: Response ) -> None:
-            await strict( request, response )
-
-        app.dependency_overrides[ get_auth_rate_limiter ] = _strict_auth
+        app.dependency_overrides[ get_auth_rate_limiter ] = strict
 
         # Register a user first so login can succeed
         await _register_and_login(
@@ -131,10 +125,7 @@ class TestRateLimitEnforcement:
         """Registration should also be rate-limited under the auth tier."""
         strict = _build_strict_limiter( 2, 60 )
 
-        async def _strict_auth( request: Request, response: Response ) -> None:
-            await strict( request, response )
-
-        app.dependency_overrides[ get_auth_rate_limiter ] = _strict_auth
+        app.dependency_overrides[ get_auth_rate_limiter ] = strict
 
         base = {
             "password": "Str0ng!Pass",
@@ -174,14 +165,8 @@ class TestStricterForgotPasswordLimit:
         strict_forgot = _build_strict_limiter( 2, 60 )
         lenient_auth = _build_strict_limiter( 10, 60 )
 
-        async def _strict_forgot( request: Request, response: Response ) -> None:
-            await strict_forgot( request, response )
-
-        async def _lenient_auth( request: Request, response: Response ) -> None:
-            await lenient_auth( request, response )
-
-        app.dependency_overrides[ get_forgot_password_rate_limiter ] = _strict_forgot
-        app.dependency_overrides[ get_auth_rate_limiter ] = _lenient_auth
+        app.dependency_overrides[ get_forgot_password_rate_limiter ] = strict_forgot
+        app.dependency_overrides[ get_auth_rate_limiter ] = lenient_auth
 
         fp_payload = { "email": "exists@example.com" }  # TestStricterForgotPasswordLimit
 
@@ -205,10 +190,7 @@ class TestBucketIsolation:
         """The ingest route should respect a dependency override for its rate limiter."""
         strict = _build_strict_limiter( 1, 60 )
 
-        async def _strict_ingest( request: Request, response: Response ) -> None:
-            await strict( request, response )
-
-        app.dependency_overrides[ get_ingest_rate_limiter ] = _strict_ingest
+        app.dependency_overrides[ get_ingest_rate_limiter ] = strict
 
         payload = {
             "entries": [
@@ -237,14 +219,8 @@ class TestBucketIsolation:
         strict_forgot = _build_strict_limiter( 1, 60 )
         lenient_auth = _build_strict_limiter( 10, 60 )
 
-        async def _strict_forgot( request: Request, response: Response ) -> None:
-            await strict_forgot( request, response )
-
-        async def _lenient_auth( request: Request, response: Response ) -> None:
-            await lenient_auth( request, response )
-
-        app.dependency_overrides[ get_forgot_password_rate_limiter ] = _strict_forgot
-        app.dependency_overrides[ get_auth_rate_limiter ] = _lenient_auth
+        app.dependency_overrides[ get_forgot_password_rate_limiter ] = strict_forgot
+        app.dependency_overrides[ get_auth_rate_limiter ] = lenient_auth
 
         # Register user for login test  # TestBucketIsolation
         await _register_user(
