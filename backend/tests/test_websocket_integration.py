@@ -10,13 +10,10 @@ import pytest
 from cache import get_redis
 from config import settings
 from database import get_db
-from fastapi import Request, Response
 from fastapi.testclient import TestClient
-from fastapi_limiter.depends import RateLimiter
 from httpx import AsyncClient
 from main import app
 from models.models import EmailVerificationToken, User
-from pyrate_limiter import Duration, Limiter, Rate
 from rate_limiter import (
     get_auth_rate_limiter,
     get_forgot_password_rate_limiter,
@@ -138,12 +135,8 @@ def ws_test_client( db_session: AsyncSession ):
     app.dependency_overrides[ get_db ]    = _get_db
     app.dependency_overrides[ get_redis ] = _get_redis
 
-    _test_limiter = RateLimiter(
-        Limiter( Rate( limit=10000, interval=60 * Duration.SECOND ) )
-    )
-
-    async def _permissive( request: Request, response: Response ):
-        await _test_limiter( request, response )
+    async def _permissive( ) -> None:
+        return None
 
     app.dependency_overrides[ get_auth_rate_limiter ]            = _permissive
     app.dependency_overrides[ get_forgot_password_rate_limiter ] = _permissive

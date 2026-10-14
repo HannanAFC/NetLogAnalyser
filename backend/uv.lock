@@ -218,7 +218,7 @@ dependencies = [
     { name = "boto3" },
     { name = "fakeredis" },
     { name = "fastapi", extra = ["standard"] },
-    { name = "fastapi-limiter" },
+    { name = "fastapi-redis-sdk" },
     { name = "geoip2" },
     { name = "greenlet" },
     { name = "numpy" },
@@ -248,7 +248,7 @@ requires-dist = [
     { name = "boto3", specifier = ">=1.43.111" },
     { name = "fakeredis", specifier = ">=2.39.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.136.3" },
-    { name = "fastapi-limiter", specifier = ">=0.2.0" },
+    { name = "fastapi-redis-sdk", specifier = ">=0.8.1" },
     { name = "geoip2", specifier = ">=5.3.0" },
     { name = "greenlet", specifier = ">=3.5.6" },
     { name = "numpy", specifier = ">=2.5.3" },
@@ -510,16 +510,19 @@ wheels = [
 ]
 
 [[package]]
-name = "fastapi-limiter"
-version = "0.2.0"
+name = "fastapi-redis-sdk"
+version = "0.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "anyio" },
     { name = "fastapi" },
-    { name = "pyrate-limiter" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "redis", extra = ["hiredis"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b7/32/81f64b69a79345caca0a90d1601ae7c84c39438145793514ee82daac4fc6/fastapi_limiter-0.2.0.tar.gz", hash = "sha256:b042259f6280056b5b2b3f506edd76c8e0648d7a5ce86c3485216a4a0fd0ec14", size = 7401, upload-time = "2026-02-06T07:00:09.831Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1f/ff/a1891337482e0b4caf90b5bb3b5fe3cc031f05c4dc628e85441dc2618d8e/fastapi_redis_sdk-0.8.1.tar.gz", hash = "sha256:98cf2e2d476cf98e66ffd5df8ce3374b5d702b6fe4f7f2369c43fd0fe4cd7631", size = 40767, upload-time = "2026-09-25T09:14:41.152Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c4/9b/35278a18254f187d55bb450ded6bc9a59c7b3010d164e1796f3dfb7aa73d/fastapi_limiter-0.2.0-py3-none-any.whl", hash = "sha256:e576ebb29cc9614c2f38471c60ed0e849024e9a1b7a2aeb4c2a31a6d708b4aea", size = 5219, upload-time = "2026-02-06T07:00:07.824Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/0f/22eca03926218343602a26620ebd092043783b9edc00d0c5f9b6f92c830c/fastapi_redis_sdk-0.8.1-py3-none-any.whl", hash = "sha256:c0ed749839ce621de89cc8f54bb330bf8a4918af24572c639480c5d2d4627c9e", size = 46325, upload-time = "2026-09-25T09:14:39.083Z" },
 ]
 
 [[package]]
@@ -1317,15 +1320,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/43/ea/5194e52748b0da83d71e082d75496eaec6e58f419f5e184786ded517e6a9/pyjwt-2.15.1.tar.gz", hash = "sha256:4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8", size = 121252, upload-time = "2026-09-28T18:40:42.598Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/50/ca/44de4e75f8aadc457f0634be3b542815078ded46dca30efb960edeecad6e/pyjwt-2.15.1-py3-none-any.whl", hash = "sha256:42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193", size = 33860, upload-time = "2026-09-28T18:40:41.429Z" },
-]
-
-[[package]]
-name = "pyrate-limiter"
-version = "4.4.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/19/27/e564f33ea085c63d5540f707b31aeb50a4992eac2da655dc02435a760a07/pyrate_limiter-4.4.0.tar.gz", hash = "sha256:2c0c720c4fa16c5d8199e4821bf34507fb49c007a25b786cec6fb94ffd0844aa", size = 90955, upload-time = "2026-06-14T10:52:03.021Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2b/77/2b5ea2e5e343fd7f74ba9c50a282d7cb66d1be3d12bd647510338d78fcf1/pyrate_limiter-4.4.0-py3-none-any.whl", hash = "sha256:f738dfa3c7ac1222a5ea3d31e00cfd31b5592b13ade4077afe9e8ac6293381f5", size = 43102, upload-time = "2026-06-14T10:52:01.334Z" },
 ]
 
 [[package]]
