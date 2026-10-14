@@ -19,6 +19,7 @@ from rate_limiter import (
     get_forgot_password_rate_limiter,
     get_general_rate_limiter,
     get_ingest_rate_limiter,
+    get_ws_rate_limiter,
 )
 from redis.asyncio import Redis
 from sqlalchemy import select, update
@@ -142,6 +143,7 @@ def ws_test_client( db_session: AsyncSession ):
     app.dependency_overrides[ get_forgot_password_rate_limiter ] = _permissive
     app.dependency_overrides[ get_general_rate_limiter ]         = _permissive
     app.dependency_overrides[ get_ingest_rate_limiter ]          = _permissive
+    app.dependency_overrides[ get_ws_rate_limiter ]              = _permissive
 
     with TestClient( app ) as tc:
         yield tc
@@ -330,6 +332,50 @@ async def test_connect_exceeds_connection_limit_closes_4409(
     for ctx, ws in sessions:
         await asyncio.to_thread( ws.close )
         await ctx.__aexit__( None, None, None )
+
+
+@pytest.mark.anyio
+async def test_handshake_rate_limited_closes_4429(
+    client:         AsyncClient,
+    db_session:     AsyncSession,
+    redis_client:   Redis,
+    ws_test_client: TestClient,
+    monkeypatch:    pytest.MonkeyPatch,
+):
+    """Exceeding ratelimit_ws_times handshakes per IP → 4429, before any ticket check."""
+    from auth.security import hash_token
+    import uuid
+
+    # Use the real limiter (the fixture swaps in a no-op) with a limit of 1,
+    # keyed on a unique client IP so reruns never share a counter.
+    app.dependency_overrides.pop( get_ws_rate_limiter )
+    monkeypatch.setattr( settings, "ratelimit_ws_times", 1 )
+    headers = {
+        "Origin":          "http://localhost:3000",
+        "X-Forwarded-For": f"198.51.100.{ uuid.uuid4( ).int % 250 + 1 }-{ uuid.uuid4( ).hex }",
+    }
+
+    # First handshake is allowed through the limiter, then fails the ticket gate.
+    with pytest.raises( _WS_CLOSE_EXCEPTIONS ):
+        async with ws_connect( ws_test_client, "/ws/live", headers=headers ):
+            pass
+
+    # Second handshake carries a *valid* ticket but must be rejected by the
+    # limiter first - proven by the ticket still being unconsumed afterwards.
+    access_token, _ = await _register_and_get_token( client, db_session )
+    ticket = await _get_ws_ticket( client, access_token )
+
+    with pytest.raises( _WS_CLOSE_EXCEPTIONS ) as exc_info:
+        async with ws_connect(
+            ws_test_client,
+            f"/ws/live?ticket={ ticket }",
+            headers=headers,
+        ):
+            pass
+
+    if isinstance( exc_info.value, WebSocketDisconnect ):
+        assert exc_info.value.code == 4429
+    assert await redis_client.exists( f"ws_ticket:{ hash_token( ticket ) }" ) == 1
 
 
 @pytest.mark.skip(

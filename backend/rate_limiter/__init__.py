@@ -15,7 +15,8 @@ single per-client counter (e.g. all ``/auth/*`` routes draw from ``auth``).
 from __future__ import annotations
 
 from config import settings
-from redis_fastapi import rate_limit
+from fastapi import WebSocket, WebSocketException
+from redis_fastapi import get_rate_limit_backend, rate_limit
 from starlette.requests import HTTPConnection
 
 
@@ -80,3 +81,31 @@ get_general_rate_limiter = rate_limit(
     identifier=_cloudflare_identifier
 )
 """Fallback for any endpoint that doesn't have a dedicated tier."""
+
+WS_CLOSE_RATE_LIMITED = 4429
+"""Close code sent when a client exceeds the handshake limit."""
+
+
+async def get_ws_rate_limiter( websocket: WebSocket ) -> None:
+    """
+    Rate-limit WebSocket handshakes per client IP (``ratelimit_ws_*``).
+
+    Runs before the origin / ticket / slot gates so a flood of bad tickets is
+    rejected cheaply. Fails closed: the handshake needs Redis for the ticket
+    lookup anyway, so there is nothing to protect by failing open.
+    """
+    # get_rate_limit_backend only reads ``.app`` from its argument, which
+    # every HTTPConnection (Request and WebSocket alike) provides.
+    backend = await get_rate_limit_backend( websocket )  # type: ignore[arg-type]
+    result  = await backend.hit(
+        await _cloudflare_identifier( websocket ),
+        limit=settings.ratelimit_ws_times,
+        window=settings.ratelimit_ws_seconds,
+        scope="ws",
+        fail_closed=True
+    )
+    if not result.allowed:
+        raise WebSocketException(
+            code=WS_CLOSE_RATE_LIMITED,
+            reason="Too many connection attempts"
+        )
