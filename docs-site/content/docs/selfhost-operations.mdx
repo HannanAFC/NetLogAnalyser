@@ -1,0 +1,122 @@
+---
+title: Operating Your Instance
+description: Upgrades, backups, scheduled jobs and day-to-day maintenance.
+icon: Wrench
+---
+
+All commands below are run from the install directory (the one containing `docker-compose.selfhost.yml`). To keep
+them short, define:
+
+```bash
+alias nla='docker compose -f docker-compose.selfhost.yml --env-file .env'
+```
+
+## Start, stop, logs
+
+```bash
+nla up -d              # start (or apply .env changes)
+nla stop               # stop, keep data
+nla ps                 # status and health
+nla logs -f backend    # follow a service's logs
+nla down               # remove containers (volumes and data are kept)
+```
+
+<Callout type="warn">
+  `nla down -v` deletes the volumes, including your database. Do not add `-v` unless you intend to erase
+  everything.
+</Callout>
+
+## Upgrading
+
+Re-run the installer with the release you want (or `latest`). It keeps your `.env` and secrets, updates
+`IMAGE_TAG`, pulls the new images and restarts:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/HannanAFC/NetLogAnalyser/main/selfhost/install.sh | bash -s -- v1.1.0
+```
+
+Database migrations are applied automatically when the new backend starts. Take a [backup](#backups) first for
+major upgrades.
+
+To pull newer images for your current tag by hand:
+
+```bash
+nla pull && nla up -d
+```
+
+## Backups
+
+You need two things: the database and your `.env`.
+
+```bash
+# Database dump
+nla exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > netloganalyser-$(date +%F).sql
+
+# Restore into an empty database
+nla exec -T db sh -c 'psql -U "$POSTGRES_USER" "$POSTGRES_DB"' < netloganalyser-2026-01-01.sql
+```
+
+Keep `.env` alongside the dump, a database backup is useless without the matching `SECRET_KEY` and credentials.
+The `export_data` volume holds generated export files, which are temporary and don't need backing up.
+
+## Scheduling retention
+
+Retention runs out-of-band, so you must schedule it. The three modes are:
+
+| Mode | What it does | Suggested schedule |
+|---|---|---|
+| `warn` | Generates an export for users with soon-to-expire logs and emails them | daily |
+| `delete` | Deletes expired logs for users who were warned | daily (the grace period gives the delay) |
+| `purge-exports` | Deletes expired export files | daily |
+
+Example crontab (adjust the path):
+
+```bash
+0 2 * * * cd /opt/netloganalyser && docker compose -f docker-compose.selfhost.yml --env-file .env exec -T backend python -m retention.job --mode warn
+0 3 * * * cd /opt/netloganalyser && docker compose -f docker-compose.selfhost.yml --env-file .env exec -T backend python -m retention.job --mode delete
+0 4 * * * cd /opt/netloganalyser && docker compose -f docker-compose.selfhost.yml --env-file .env exec -T backend python -m retention.job --mode purge-exports
+```
+
+Each mode takes a Redis lock so two runs of the same mode never overlap. Set `RETENTION_ENABLED=false` to turn
+retention off entirely and keep logs forever.
+
+<Callout>
+  The `warn` phase emails users, so it needs [email configured](/docs/selfhost-configuration#email). Deletion only
+  affects users with a confirmed warning export, so check the `warn` job succeeds before relying on `delete`.
+</Callout>
+
+## Refreshing GeoIP data
+
+```bash
+nla run --rm geoipupdate && nla restart backend
+```
+
+Schedule it weekly if you want fresh country data.
+
+## Health checks and monitoring
+
+- `GET /health` on the backend returns `200` with `"database": "ok"`, or `503` if Postgres is unreachable. It also
+  reports version, uptime and environment. Point your uptime monitor at it.
+- `nla ps` shows container health. The `db`, `redis` and `export-worker` services have built-in health checks.
+
+## Troubleshooting
+
+**Can't log in / "Network error" in the browser.** The web app talks to the backend at the *same hostname* on
+`BACKEND_PORT`. Make sure that port is reachable from the browser, not just from the server.
+
+**Login works but you are signed out on refresh.** Cookies marked `Secure` are dropped over plain HTTP. Either use
+HTTPS or keep `COOKIE_SECURE=false`.
+
+**CORS errors.** If you serve the frontend from a custom domain, set `CORS_ALLOWED_ORIGINS` to a JSON list that
+includes it, e.g. `["https://nla.example.com"]`.
+
+**Backend can't connect to the database after reinstall.** The `postgres_data` volume still holds the *old*
+password. Restore the original `.env`, or remove the volume (this erases data).
+
+**Exports stay pending.** Check the worker is healthy and logging: `nla logs -f export-worker`.
+
+**No countries on the map.** The GeoIP database hasn't been downloaded. See
+[Country lookup](/docs/selfhost-install#country-lookup-geoip).
+
+**Live feed won't connect.** You may have reached the per-user connection limit (5 by default), or a reverse proxy
+isn't passing WebSocket upgrades. See [Production deployment](/docs/advanced-production).

@@ -34,7 +34,7 @@ export function useChangeUserPassword( )
     } );
 }
 
-export function useDeleteUser( )
+export function useDeleteUser( callback?: ( ) => void )
 {
     const queryClient = useQueryClient( );
     return useMutation(
@@ -44,6 +44,10 @@ export function useDeleteUser( )
         {
             setTimeout( ( ) =>
             {
+                if ( callback )
+                {
+                    callback( );
+                }
                 tokenStore.set( null );
                 queryClient.setQueryData( sessionQueryKey, null );
             }, 5000 );

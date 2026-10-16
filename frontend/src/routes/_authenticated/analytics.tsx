@@ -86,7 +86,8 @@ function AnalyticsPage( )
 
 			<TimeRangePicker
 				search={ search }
-				onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+				setCustomRange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+				setPreset={ ( preset ) => setRange( { preset: preset } ) }
 			/>
 
 			<Heading level='h2'>Summary</Heading>

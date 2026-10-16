@@ -1,5 +1,12 @@
 services:
 
+  docs-site:
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./docs-site:/app
+      - /app/node_modules
+
   backend:
     ports:
       - "8000:8000"

@@ -7,4 +7,4 @@ if [ -f /app/node_modules/.pnpm-lock.yaml ] && ! cmp -s /app/pnpm-lock.yaml /app
   pnpm install --no-frozen-lockfile
 fi
 
-exec pnpm run dev
+exec pnpm run dev --host

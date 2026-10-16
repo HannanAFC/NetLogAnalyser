@@ -70,7 +70,8 @@ function GeomapPage()
 			<div className="flex flex-wrap items-center gap-4">
 				<TimeRangePicker
 					search={ search }
-					onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+					setCustomRange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+					setPreset={ ( preset ) => setRange( { preset: preset } ) }
 				/>
 				<div role="group" aria-label="Direction" className="flex gap-1">
 					<Button type="button" variant={ direction === 'src' ? 'primary' : 'ghost' } onClick={ () => setDirection( 'src' ) }>

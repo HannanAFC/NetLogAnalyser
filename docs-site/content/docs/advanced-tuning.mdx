@@ -1,0 +1,69 @@
+---
+title: Tuning Detection
+description: Adjust anomaly thresholds and weights to fit your network.
+icon: Gauge
+---
+
+The defaults suit general traffic. Every network is different, so the thresholds and weights are all configurable
+through environment variables. Background on the scoring model is in [Anomaly detection](/docs/anomaly-detection).
+
+## Thresholds
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `ANOMALY_PACKET_SIZE_MTU` | `1500` | Packets above this start scoring as "large" |
+| `ANOMALY_PACKET_SIZE_JUMBO_MAX` | `9000` | Packets at or above this score 1.0 |
+| `ANOMALY_PACKET_SIZE_TINY_MAX` | `40` | Packets at or below this are "tiny" |
+| `ANOMALY_PORT_SCAN_LOW` | `5` | Distinct destination ports per source (per batch) where scoring starts |
+| `ANOMALY_PORT_SCAN_HIGH` | `25` | Distinct ports where the score reaches 1.0 |
+| `ANOMALY_HOST_SWEEP_LOW` | `5` | Distinct destination IPs per source (per batch) where scoring starts |
+| `ANOMALY_HOST_SWEEP_HIGH` | `20` | Distinct IPs where the score reaches 1.0 |
+
+Values between the low and high marks ramp linearly from 0 to 1.
+
+## Weights
+
+Each weight is a number between 0.0 and 1.0 that caps how much that heuristic can contribute.
+
+| Variable | Default |
+|---|---|
+| `ANOMALY_WEIGHT_TCP_FLAGS` | `0.9` |
+| `ANOMALY_WEIGHT_PORT_SCAN_SHAPE` | `0.7` |
+| `ANOMALY_WEIGHT_MISMATCH_PORTS` | `0.6` |
+| `ANOMALY_WEIGHT_HOST_SWEEP_SHAPE` | `0.6` |
+| `ANOMALY_WEIGHT_PACKET_SIZE` | `0.5` |
+
+Setting a weight to `0` disables that heuristic's contribution entirely.
+
+## Common adjustments
+
+**Jumbo frames are normal on your network** (e.g. storage or data-centre traffic). Raise
+`ANOMALY_PACKET_SIZE_MTU` to your real MTU, or lower `ANOMALY_WEIGHT_PACKET_SIZE`.
+
+**A vulnerability scanner or monitoring host keeps lighting up the anomalies page.** Scans and sweeps from a known
+host are expected. Raise the `LOW`/`HIGH` thresholds, or lower the `PORT_SCAN_SHAPE` and `HOST_SWEEP_SHAPE`
+weights. Heuristics are global, there is no per-IP allow list.
+
+**You want to be alerted earlier on scans.** Lower `ANOMALY_PORT_SCAN_LOW` so fewer distinct ports are needed to
+start scoring.
+
+## Applying changes
+
+Edit `.env` and recreate the backend:
+
+```bash
+docker compose -f docker-compose.selfhost.yml --env-file .env up -d backend
+```
+
+Changes apply to entries ingested **afterwards**. Stored scores are not recalculated.
+
+## The anomalies view threshold
+
+The anomalies page and its API default to showing entries with a score of at least `0.5`. The `min_score` query
+parameter on `GET /analytics/anomalies` changes this per request, see the API reference.
+
+## Batch-size effect on scan detection
+
+Port-scan and host-sweep scores come from the entries sharing a source IP *within one request*. A sender that
+sends one packet per request will never trigger them, while one that sends 500 at a time will see them fire
+reliably. Keep that in mind when you design your log shipper.

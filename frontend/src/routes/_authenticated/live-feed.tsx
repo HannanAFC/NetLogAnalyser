@@ -36,7 +36,7 @@ function LiveFeedPage( )
 				<ConnectionStatusIndicator status={ connectionStatus } />
 			</div>
 			<BodyText className="mt-2">
-				New log entries appear in real time - newest first.
+				View logs as they arrive in real-time with anomaly-scoring. Newest entries appear first.
 			</BodyText>
 			<LogTable
 				isLoading={isLoadingInitial}

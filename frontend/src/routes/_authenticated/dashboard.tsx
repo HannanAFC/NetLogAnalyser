@@ -16,7 +16,7 @@ import { TableLoadingErrorMessage } from '#/components/ui/table-loading-error-me
 
 const dashboardSearchSchema = timeRangeSearchSchema.extend(
 {
-	preset: timeRangePresetSchema.default( '1h' )
+	preset: timeRangePresetSchema.default( '1h' ).catch( '1h' )
 } )
 .transform( ( data ) =>
 {
@@ -64,7 +64,6 @@ function DashboardPage( )
 
 	return (
 		<PageWrapper>
-			<Eyebrow>Operator dashboard</Eyebrow>
 			<Heading level="h1" className="max-w-2xl">Welcome back, { session?.display_name }.</Heading>
 			<BodyText className='w-max max-w-full'>
 				View everything at a glance, traffic summaries, top anomalies and your live ingest feed.
@@ -72,7 +71,8 @@ function DashboardPage( )
 
 			<TimeRangePicker
 				search={ search }
-				onChange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+				setCustomRange={ ( start, end ) => setCustomRange( setRange, start, end ) }
+				setPreset={ ( preset ) => setRange( { preset: preset } ) }
 			/>
 			<Heading level='h2'>Summary</Heading>
 			<SummaryStatCards range={ range } />
