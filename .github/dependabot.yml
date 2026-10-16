@@ -33,6 +33,22 @@ updates:
           - "minor"
           - "patch"
 
+  - package-ecosystem: "npm"
+    directory: "/docs-site"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docs-site"
+    groups:
+      docs-site-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+
   - package-ecosystem: "docker"
     directory: "/backend"
     target-branch: "staging"
@@ -61,6 +77,22 @@ updates:
       - "docker"
     groups:
       frontend-docker-images:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/docs-site"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    groups:
+      docs-site-docker-images:
         update-types:
           - "minor"
           - "patch"
@@ -97,6 +129,22 @@ updates:
       - "ci"
     groups:
       github-actions:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "uv"
+    directory: "/tools"
+    target-branch: "staging"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "tools"
+    groups:
+      tools-dependencies:
         update-types:
           - "minor"
           - "patch"

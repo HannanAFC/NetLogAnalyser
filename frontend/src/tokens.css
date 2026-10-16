@@ -46,6 +46,7 @@
     --space-12: 3rem;
     --space-16: 4rem;
     --space-20: 5rem;
+    --ts-chart-1: var(--color-accent-strong );
 }
 
 [ data-theme="dark" ]

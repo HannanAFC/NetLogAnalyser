@@ -33,7 +33,7 @@ export function Label( { size = 'sm', className, children, ...props }: LabelProp
 
 export interface InputProps extends InputHTMLAttributes< HTMLInputElement >
 {
-	error?: string;
+	error?: boolean;
 }
 
 export const Input = forwardRef< HTMLInputElement, InputProps > (
@@ -46,7 +46,7 @@ export const Input = forwardRef< HTMLInputElement, InputProps > (
 					id={ id }
 					className={ cn(
 						'mt-1 w-full rounded-md border px-3 py-2.5 text-sm',
-						'bg-card border-border text-text-primary',
+						'bg-paper-2 border-border text-text-primary',
 						'placeholder:text-text-tertiary',
 						'focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/25',
 						'transition-[border-color,box-shadow] duration-150',

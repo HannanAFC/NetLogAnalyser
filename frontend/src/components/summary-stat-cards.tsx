@@ -2,6 +2,7 @@ import { useSummary } from '#/features/analytics/hooks';
 import { Card, CardDescription } from '#/components/ui/card';
 import { BodySm, StatNumber } from '#/components/ui/heading';
 import type { TimeRangeParams } from '#/features/analytics/schemas';
+import { formatLargeNumber } from '#/lib/utils';
 
 interface SummaryStatCardsProps
 {
@@ -37,12 +38,12 @@ export function SummaryStatCards( { range }: SummaryStatCardsProps )
 	}
 
 	const stats = [
-		{ label: 'Total packets',        value: data.total_packets.toLocaleString( ) },
-		{ label: 'Unique sources',       value: data.unique_src_ips.toLocaleString( ) },
-		{ label: 'Unique destinations',  value: data.unique_dst_ips.toLocaleString( ) },
-		{ label: 'Avg anomaly score',    value: data.avg_anomaly_score.toFixed( 2 ) },
-		{ label: 'Total bytes',          value: data.total_bytes.toLocaleString( ) },
-		{ label: 'High level anomalies', value: data.high_anomaly_count.toLocaleString( ) }
+		{ label: 'Total packets',        displayValue: formatLargeNumber( data.total_packets ), value: data.total_packets.toLocaleString( ) },
+		{ label: 'Unique sources',       displayValue: data.unique_src_ips.toLocaleString( ), value: data.unique_src_ips.toLocaleString( ) },
+		{ label: 'Unique destinations',  displayValue: data.unique_dst_ips.toLocaleString( ), value: data.unique_dst_ips.toLocaleString( ) },
+		{ label: 'Avg anomaly score',    displayValue: data.avg_anomaly_score.toFixed( 2 ), value: data.avg_anomaly_score.toFixed( 2 ) },
+		{ label: 'Total bytes',          displayValue: formatLargeNumber( data.total_bytes ), value: data.total_bytes.toLocaleString( ) },
+		{ label: 'High level anomalies', displayValue: formatLargeNumber( data.high_anomaly_count ), value: data.high_anomaly_count.toLocaleString( ) }
 	];
 
 	return (
@@ -50,7 +51,7 @@ export function SummaryStatCards( { range }: SummaryStatCardsProps )
 			{ stats.map( ( stat ) =>
 			(
 				<Card key={ stat.label }>
-					<StatNumber>{ stat.value }</StatNumber>
+					<StatNumber title={ stat.value }>{ stat.displayValue }</StatNumber>
 					<BodySm>{ stat.label }</BodySm>
 				</Card>
 			) ) }

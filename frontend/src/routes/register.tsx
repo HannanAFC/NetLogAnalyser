@@ -79,6 +79,7 @@ function RegisterPage( )
 	const [ registeredEmail, setRegisteredEmail ] = useState< string | null >( null );
 	const { open, close } = useOverlay( );
 	const emailVerificationEnabled = useEmailVerificationEnabled( );
+	const [ consent, setConsent ] = useState< boolean >( false );
 
 	const form = useForm(
 		{
@@ -181,7 +182,7 @@ function RegisterPage( )
 
 	return (
 		<PageWrapper maxWidth="md" className="py-16 gap-6">
-			<PageHeading eyebrow="Create your workspace" title="Register" description="Set up your account to start streaming ingest and live observability." />
+			<PageHeading title="Register" description="Create a NetLogAnalyser account to start monitoring your network traffic in real time. Get your API key and send logs within minutes." />
 
 			<Card>
 				<form
@@ -208,6 +209,7 @@ function RegisterPage( )
 									value={ field.state.value }
 									onBlur={ field.handleBlur }
 									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									error={ field.state.meta.errors.length > 0 }
 								/>
 								{ field.state.meta.errors.length > 0 && (
 									<BodySm className="text-critical">
@@ -233,6 +235,7 @@ function RegisterPage( )
 									value={ field.state.value }
 									onBlur={ field.handleBlur }
 									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									error={ field.state.meta.errors.length > 0 }
 								/>
 								{ field.state.meta.errors.length > 0 && (
 									<BodySm className="text-critical">
@@ -258,6 +261,7 @@ function RegisterPage( )
 									value={ field.state.value }
 									onBlur={ field.handleBlur }
 									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									error={ field.state.meta.errors.length > 0 }
 								/>
 								{ field.state.meta.errors.length > 0 && (
 									<BodySm className="text-critical">
@@ -291,6 +295,7 @@ function RegisterPage( )
 									value={ field.state.value}
 									onBlur={ field.handleBlur }
 									onChange={ ( e ) => field.handleChange( e.target.value ) }
+									error={ field.state.meta.errors.length > 0 }
 								/>
 								{ field.state.meta.errors.length > 0 && (
 									<BodySm className="text-critical">
@@ -309,6 +314,7 @@ function RegisterPage( )
 						<Input
 							id='consent'
 							type='checkbox'
+							onChange={ ( event ) => setConsent( event.target.checked ) }
 						/>
 						<BodySm>
 							You accept the <a role='button' onClick={ handleOpenPrivacy } className='underline'>privacy policy</a> and <a role='button' onClick={ handleOpenTerms } className='underline'> terms of use</a>.
@@ -320,8 +326,8 @@ function RegisterPage( )
 						(
 							<Button
 								type="submit"
-								disabled={ !canSubmit || isPristine || register.isPending }
-								className=" w-full "
+								disabled={ !canSubmit || isPristine || register.isPending || !consent }
+								className=" w-full items-center justify-center"
 							>
 								{ register.isPending ? 'Creating account…' : 'Create account' }
 							</Button>

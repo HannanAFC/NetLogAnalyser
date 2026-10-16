@@ -1,0 +1,52 @@
+---
+title: Exports and Retention
+description: Downloading your data and how old logs are cleaned up.
+icon: Download
+---
+
+## Exporting your data
+
+From **Settings → Exports** you can request a copy of all your logs.
+
+1. Click **Request export**. The request is queued and returns immediately.
+2. A background worker streams your logs, oldest first, into `logs.csv` and `logs.jsonl`, zips them and stores
+   the file.
+3. When the status is complete, click **Download**.
+
+Exports can be large, which is why they run in the background rather than during the request. If the worker is
+restarted mid-job, the job is retried automatically (up to 3 attempts).
+
+### Download links and limits
+
+- Download links are short-lived (5 minutes by default) and require you to be logged in. Files are never served
+  from a permanent public URL.
+- Export files expire after 72 hours by default and are then deleted.
+- Each user can request a limited number of manual exports per day (3 by default).
+
+## Data retention
+
+To keep storage bounded, logs older than the retention period (30 days by default) are deleted. This happens in
+two phases so nobody loses data by surprise:
+
+1. **Warn.** For every user with logs about to expire, the system generates an export and emails them a download
+   link, giving a grace period (7 days by default).
+2. **Delete.** After the grace period, expired logs are deleted, but **only for users who have a confirmed
+   warning export**. If a user's export or email failed, their data is skipped, never silently deleted.
+
+Deletion happens in chunks per user, so it never holds a long database transaction.
+
+## Notes for self-hosters
+
+When self-hosting, it may be worth adjusting export and retention settings, you can adjust where the exports are
+stored e.g. S3 vs local and export and link lifetimes. You can also adjust retention periods or disable retention
+entirely.
+
+<Callout>
+  The retention jobs run on a schedule outside the API process. Self-hosters need to schedule them, see
+  [Operating your instance](/docs/selfhost-operations#scheduling-retention).
+</Callout>
+
+## Deleting your account
+
+**Settings → Account → Delete account** removes your user, API keys and all log entries. Deletion runs in the
+background and cannot be undone.

@@ -18,7 +18,7 @@ interface DeleteUserDialogueProps extends HTMLAttributes< HTMLDivElement >
 
 export function DeleteUserDialogue( { className, onConfirm, onCancel, ...props }: DeleteUserDialogueProps )
 {
-    const deleteUser = useDeleteUser( );
+    const deleteUser = useDeleteUser( onConfirm );
 
     function onDialogueCancel( )
     {
@@ -34,7 +34,6 @@ export function DeleteUserDialogue( { className, onConfirm, onCancel, ...props }
             {
                 const parsed = deleteUserSchema.parse( value );
                 await deleteUser.mutateAsync( parsed );
-                onConfirm( );
             }
             catch
             {
@@ -84,6 +83,7 @@ export function DeleteUserDialogue( { className, onConfirm, onCancel, ...props }
                                     onBlur={ field.handleBlur }
                                     onChange={ ( e ) => field.handleChange( e.target.value ) }
                                     className='focus:border-danger focus:ring-danger/25'
+                                    error={ field.state.meta.errors.length > 0 }
                                 />
                                 { field.state.meta.errors.length > 0 && (
                                     <BodySm className="text-critical">
@@ -118,6 +118,7 @@ export function DeleteUserDialogue( { className, onConfirm, onCancel, ...props }
                                     onBlur={ field.handleBlur }
                                     onChange={ ( e ) => field.handleChange( e.target.value ) }
                                     className='focus:border-danger focus:ring-danger/25'
+                                    error={ field.state.meta.errors.length > 0 }
                                 />
                                 { field.state.meta.errors.length > 0 && (
                                     <BodySm className="text-critical">
@@ -155,10 +156,10 @@ export function DeleteUserDialogue( { className, onConfirm, onCancel, ...props }
             (
                 <Card variant='success'>
                     <CardDescription variant='success'>
-                        You account has been deleted successfully. You will be redirected to the login page soon.
+                        You account has been deleted successfully. You will be redirected to the homepage in 5 seconds.
                     </CardDescription>
                 </Card>
-            ) };
+            ) }
         </Card>
     );
 }

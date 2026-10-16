@@ -20,9 +20,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  gate:
+    name: Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      skip-tests: ${{ steps.check.outputs.skip-tests }}
+      skip-docs-site: ${{ steps.check.outputs.skip-docs-site }}
+    steps:
+      - name: Decide whether to skip tests
+        id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            text="$PR_TITLE"
+          else
+            text="$COMMIT_MESSAGE"
+          fi
+
+          skip=false
+          skip_docs_site=false
+          case "$text" in
+            *"[skip-tests]"*) skip=true; skip_docs_site=true ;;
+            *"docs:"*)        skip=true ;;
+          esac
+
+          echo "skip-tests=$skip" >> "$GITHUB_OUTPUT"
+          echo "skip-docs-site=$skip_docs_site" >> "$GITHUB_OUTPUT"
+          echo "skip-tests=$skip skip-docs-site=$skip_docs_site"
+
   tests:
     name: Tests
+    needs: gate
     uses: ./.github/workflows/tests.yml
+    with:
+      skip-tests: ${{ needs.gate.outputs.skip-tests == 'true' }}
+      skip-docs-site: ${{ needs.gate.outputs.skip-docs-site == 'true' }}
 
   deploy-staging:
     name: Deploy Staging
@@ -30,9 +66,8 @@ jobs:
       github.event_name == 'push' &&
       github.ref == 'refs/heads/staging' &&
       !( contains(github.event.head_commit.message, '[skip-deploy]') ) &&
-      !( contains(github.event.head_commit.message, '[skip-tests]') ) &&
-      !( contains(github.event.head_commit.message, 'docs') )
-    needs: tests
+      needs.gate.outputs.skip-tests != 'true'
+    needs: [ gate, tests ]
     uses: ./.github/workflows/deploy.yml
     with:
       environment: Staging
@@ -44,9 +79,8 @@ jobs:
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
       !( contains(github.event.head_commit.message, '[skip-deploy]') ) &&
-      !( contains(github.event.head_commit.message, '[skip-tests]') ) &&
-      !( contains(github.event.head_commit.message, 'docs') )
-    needs: tests
+      needs.gate.outputs.skip-tests != 'true'
+    needs: [ gate, tests ]
     uses: ./.github/workflows/deploy.yml
     with:
       environment: Production

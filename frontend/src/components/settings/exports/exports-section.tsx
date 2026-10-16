@@ -1,5 +1,6 @@
 import { Button } from '#/components/ui/button';
-import { BodySm } from '#/components/ui/heading';
+import { Card } from '#/components/ui/card';
+import { BodySm, Heading } from '#/components/ui/heading';
 import type { SkeletonColumn } from '#/components/ui/skeleton-table';
 import { TableNoRecentsErrorMessage } from '#/components/ui/table-no-recents-error-message';
 import { TanStackDataTable } from '#/components/ui/tanstack-data-table';
@@ -185,11 +186,11 @@ export function ExportsSection( { className }: SettingsSectionProps )
     }
 
     return (
-        <div className= { cn( 'space-y-6', className ) }>
+        <Card className= { cn( 'space-y-6', className ) }>
             <div className='flex flex-row justify-between items-center gap-4'>
-                <BodySm className="mb-2 font-semibold uppercase tracking-[0.08em] text-text-tertiary">
+                <Heading level='h2'>
                     Exports
-                </BodySm>
+                </Heading>
                 <form
                     onSubmit={ ( e ) =>
                     {
@@ -219,6 +220,7 @@ export function ExportsSection( { className }: SettingsSectionProps )
                 </BodySm>
             ) }
             <TanStackDataTable
+                className='bg-card-2'
                 table={ table }
                 skeletonColumns={ SKELETON_COLUMNS }
                 isLoading={ isLoading }
@@ -236,6 +238,6 @@ export function ExportsSection( { className }: SettingsSectionProps )
                 maxHeight='sm'
                 virtualize={ false }
             />
-        </div>
+        </Card>
     );
 }

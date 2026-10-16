@@ -1,0 +1,80 @@
+---
+title: Architecture and Security
+description: How the pieces fit together and how data and credentials are protected.
+icon: Layers
+---
+
+## Overview
+
+```
+Browser (React SPA)
+    │  access token in memory, refresh token in an httpOnly cookie
+    ▼
+FastAPI backend ────────────────┐
+    │  /ingest  (API key)       │ enqueue jobs
+    │  /logs, /analytics, ...   ▼
+    │  /ws/live            Redis ──► Arq worker (exports, account deletion)
+    ▼                        ▲
+Postgres                     └─ rate limits, pub/sub, locks, download tokens
+```
+
+| Component | Role |
+|---|---|
+| Web app | React single-page app. Reads backend URLs from runtime config, so one image works on any host |
+| Backend | FastAPI, async SQLAlchemy. REST API, WebSocket, ingest |
+| Postgres | Users, keys, tokens, log entries and export records |
+| Redis | Rate limiting, the job queue, WebSocket fan-out between workers, short-lived download tokens, retention locks |
+| Worker | Runs slow jobs outside the request cycle |
+| Retention job | Scheduled CLI that warns users and deletes expired logs |
+
+## Data flow for a log entry
+
+1. A sender posts a batch to `/ingest` with an API key.
+2. The key is checked (by hash), the rate limit applied, and each entry validated.
+3. The backend resolves countries from GeoLite2 and computes an [anomaly score](/docs/anomaly-detection).
+4. Entries are written to Postgres.
+5. The new entries are published to Redis, and every backend process forwards them to that user's connected
+   dashboards over WebSocket.
+
+## Security model
+
+**Passwords** are hashed with Argon2id.
+
+**API keys, refresh tokens and reset tokens** are stored only as SHA-256 hashes. The database never contains a
+usable credential.
+
+**Sessions.** Access tokens are short-lived (30 minutes) JWTs held in memory only, never in local storage.
+Refresh tokens last 30 days, live in an httpOnly cookie scoped to `/auth`, and are rotated on every use. Every
+token from a login belongs to a *family*; reusing an already-rotated token revokes the entire family, which
+limits the damage of a stolen cookie. IP address and user agent are recorded on refresh tokens for auditing.
+
+**WebSocket auth.** Tokens are never put in WebSocket URLs. The app first requests a single-use ticket that
+expires in 30 seconds, then presents it to open the socket. Connection counts per user are enforced in Redis, so
+limits hold across multiple backend processes.
+
+**Ingest hardening.** Entries reject unknown fields, so a sender cannot set scores or country codes. Ports,
+sizes and addresses are validated, and IPs use the native Postgres `INET` type.
+
+**Exports.** Files are only reachable through an authenticated, expiring link, never a permanent URL.
+
+**HTTP headers.** Every response carries a Content-Security-Policy, HSTS, `X-Frame-Options`,
+`X-Content-Type-Options`, a referrer policy and a permissions policy. The CSP is stricter on the API than on
+the interactive API docs pages.
+
+**Rate limiting.** Separate limits cover login/registration, forgot-password, ingest, WebSocket and the general
+API, backed by Redis so they hold across processes.
+
+## Data model
+
+| Table | Purpose |
+|---|---|
+| `users` | Accounts |
+| `api_keys` | Hashed keys, label, last used, revoked at |
+| `refresh_tokens` | Hashed tokens with family tracking |
+| `password_reset_tokens`, `email_verification_tokens` | One-use hashed tokens |
+| `log_entries` | Ingested packets with geo and anomaly data |
+| `data_exports` | Export requests and their status |
+
+`log_entries` has a numeric primary key for insert performance and carries `user_id` directly so dashboard
+queries don't have to join through `api_keys`. It stores both `captured_at` (client-reported) and `inserted_at`
+(server receipt) and the two are never conflated.

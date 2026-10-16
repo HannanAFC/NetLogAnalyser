@@ -7,6 +7,7 @@ declare global
 			BACKEND_PORT?: string
 			API_BASE_URL?: string
 			WS_BASE_URL?:  string
+            DOCS_URL?:     string
 		} | undefined
 	}
 }
@@ -42,8 +43,18 @@ function resolveWsBaseUrl( ): string
 	throw new Error( 'env.ts: no WS base URL available - config.js is missing or malformed' );
 }
 
+function resolveDocsUrl( ): string
+{
+    const { DOCS_URL } = window.__ENV__ ?? { };
+
+    if ( DOCS_URL ) return DOCS_URL;
+
+    return 'https://docs.netloganalyser.com';
+}
+
 export const env =
 {
 	apiBaseUrl: resolveApiBaseUrl( ),
-	wsBaseUrl:  resolveWsBaseUrl( )
+	wsBaseUrl:  resolveWsBaseUrl( ),
+    docsUrl:    resolveDocsUrl( )
 };
