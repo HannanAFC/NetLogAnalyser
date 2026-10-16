@@ -52,12 +52,14 @@ if [ "$REF" = "latest" ]; then
 fi
 
 # Only actual release tags (v1.0.0) have a matching GHCR image tag - the
-# release workflow doesn't push images for arbitrary branches. If someone
+# release workflow doesn't push images for arbitrary branches. The workflow
+# uses docker/metadata-action's semver {{version}} pattern, which strips the
+# leading "v", so the git tag v1.0.0 maps to the image tag 1.0.0. If someone
 # explicitly asks for "main" (or any other non-release ref), still fetch the
 # compose file from that ref, but pull the :latest images rather than a tag
 # that doesn't exist.
 if [[ "$REF" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.]+)?$ ]]; then
-	IMAGE_TAG="$REF"
+	IMAGE_TAG="${REF#v}"
 else
 	echo "Note: '${REF}' has no matching released image - using the :latest image tag."
 	IMAGE_TAG="latest"
