@@ -160,7 +160,7 @@ export function DeleteUserDialogue( { className, onConfirm, onCancel, ...props }
                         You account has been deleted successfully. You will be redirected to the login page soon.
                     </CardDescription>
                 </Card>
-            ) };
+            ) }
         </Card>
     );
 }
