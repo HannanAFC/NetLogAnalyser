@@ -5,7 +5,7 @@ services:
       - "3001:3000"
     volumes:
       - ./docs-site:/app
-      - /app/node_modules
+      - docs_site_node_modules:/app/node_modules
 
   backend:
     ports:
@@ -20,3 +20,6 @@ services:
   redis:
     ports:
       - "6379:6379"
+
+volumes:
+  docs_site_node_modules:
