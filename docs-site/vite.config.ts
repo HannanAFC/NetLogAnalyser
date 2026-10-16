@@ -28,7 +28,7 @@ export default defineConfig( ( { mode } ) =>
             {
                 host: '127.0.0.1'
             },
-            plugins: 
+            plugins:
             [
                 fumadocsMdx( ),
                 tailwindcss( ),
@@ -43,7 +43,7 @@ export default defineConfig( ( { mode } ) =>
                         {
                             enabled: true,
                             host: process.env.DOCS_URL || 'https://docs.netloganalyser.com'
-                        },
+                        }
                     } ),
                 react(),
                 // please see https://tanstack.com/start/latest/docs/framework/react/guide/hosting#nitro for guides on hosting
