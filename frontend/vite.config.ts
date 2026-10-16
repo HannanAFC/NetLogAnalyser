@@ -21,7 +21,6 @@ export default defineConfig( ( ) =>
         ],
 		server:
         {
-        	host: true,
 			port: FRONTEND_PORT,
     		strictPort: true
         },

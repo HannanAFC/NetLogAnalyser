@@ -102,6 +102,7 @@ def root( request: Request ):
         {
             "frontend_url":   settings.frontend_url,
             "backend_url":    backend_url,
+            "docs_url":       settings.docs_url,
             "environment":    settings.environment,
             "version":        settings.app_version,
             "uptime_seconds": uptime_seconds

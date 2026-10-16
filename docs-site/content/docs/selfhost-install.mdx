@@ -1,0 +1,107 @@
+---
+title: Self-hosting
+description: Run the whole NetLogAnalyser stack on your own machine with one command.
+icon: Server
+---
+
+The self-host stack runs everything in Docker from prebuilt images: the API, the web app, Postgres, Redis, the
+background export worker and a GeoIP updater.
+
+## Requirements
+
+- Docker with the Compose plugin (Docker Desktop, or Docker Engine + `docker compose`)
+- `curl` and `openssl` (used by the installer)
+- A free [MaxMind GeoLite2 account](https://www.maxmind.com/en/geolite2/signup) if you want country enrichment
+  (optional, but recommended)
+
+## One-command install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/HannanAFC/NetLogAnalyser/main/selfhost/install.sh | bash
+```
+
+The installer:
+
+1. Finds the latest release tag (falling back to `main`).
+2. Downloads `docker-compose.selfhost.yml`, `.env.example` and `setup.sh` into `./netloganalyser`.
+3. Runs `setup.sh`, which creates `.env`, generates a random `SECRET_KEY` and database password, pulls the images
+   and starts the stack.
+
+When it finishes, open **http://localhost:3000** and register your first account.
+
+### Options
+
+```bash
+# Pin a release
+curl -fsSL https://raw.githubusercontent.com/HannanAFC/NetLogAnalyser/main/selfhost/install.sh | bash -s -- v1.0.0
+
+# Pin a release and choose the install directory
+curl -fsSL https://raw.githubusercontent.com/HannanAFC/NetLogAnalyser/main/selfhost/install.sh | bash -s -- v1.0.0 ~/apps/nla
+```
+
+Passing a non-release ref such as `main` pulls `:latest` images, because images are only published for
+`v*.*.*` release tags.
+
+The installer is safe to re-run. Files are only replaced when their contents changed (the old copy is kept as
+`.bak`), and an existing `.env` is **never** overwritten.
+
+## Manual install
+
+If you have cloned the repository:
+
+```bash
+cd selfhost
+./setup.sh
+```
+
+## Verify it works
+
+```bash
+curl http://localhost:8000/health
+```
+
+You should get `"database": "ok"` in the response. Then open `http://localhost:3000`, register, and you should
+land on the dashboard. Follow [Getting started](/docs/getting-started) to create an API key and send a first log.
+
+## Back up your `.env`
+
+<Callout type="warn">
+  `setup.sh` generates your secrets once. If you lose `.env` while the `postgres_data` volume still exists, the
+  backend can no longer authenticate to its own database. Back the file up somewhere safe, and never commit it.
+</Callout>
+
+## Country lookup (GeoIP)
+
+Country enrichment needs the GeoLite2-Country database. The `geoipupdate` service downloads it into a shared
+volume. Add your MaxMind credentials to `.env`:
+
+```ini
+GEOIPUPDATE_ACCOUNT_ID=123456
+GEOIPUPDATE_LICENSE_KEY=your_license_key
+```
+
+Then run the updater:
+
+```bash
+docker compose -f docker-compose.selfhost.yml --env-file .env run --rm geoipupdate
+docker compose -f docker-compose.selfhost.yml --env-file .env restart backend
+```
+
+The service does not run continuously. To keep the database fresh, run the first command
+periodically, for example weekly from cron. Without the database, logs are still stored, they just have no
+country.
+
+## What is running
+
+| Service | Purpose | Port |
+|---|---|---|
+| `frontend` | nginx serving the web app | `FRONTEND_PORT` (3000) |
+| `backend` | FastAPI API and WebSocket server | `BACKEND_PORT` (8000) |
+| `export-worker` | Arq worker for exports and account deletion | none |
+| `db` | Postgres 18 | internal only |
+| `redis` | Rate limiting, job queue, locks | internal only |
+| `geoipupdate` | GeoLite2 downloader | none |
+
+Database migrations run automatically when the backend starts.
+
+Next: [configuration reference](/docs/selfhost-configuration) and [operating your instance](/docs/selfhost-operations).

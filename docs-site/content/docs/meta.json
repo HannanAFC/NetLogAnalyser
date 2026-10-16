@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "---Introduction---",
+    "index",
+    "getting-started",
+    "---Using NetLogAnalyser---",
+    "sending-logs",
+    "dashboard",
+    "anomaly-detection",
+    "exports-and-retention",
+    "---Self-hosting---",
+    "selfhost-install",
+    "selfhost-configuration",
+    "selfhost-operations",
+    "---Advanced---",
+    "advanced-tuning",
+    "advanced-production",
+    "architecture",
+    "---Reference---",
+    "API"
+  ]
+}

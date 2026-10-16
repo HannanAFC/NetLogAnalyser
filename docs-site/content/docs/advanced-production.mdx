@@ -1,0 +1,115 @@
+---
+title: Production Deployment
+description: HTTPS, reverse proxies, S3 export storage and hardening for internet-facing instances.
+icon: Globe
+---
+
+The default self-host stack is configured for `localhost` over plain HTTP. Before exposing it to the internet or
+a wider network, work through this page.
+
+## 1. Use HTTPS
+
+Put a TLS-terminating reverse proxy (Caddy, nginx, Traefik, a cloud load balancer) in front of the stack, then:
+
+```ini
+COOKIE_SECURE=true
+FRONTEND_URL=https://nla.example.com
+BACKEND_URL=https://nla.example.com:8443
+CORS_ALLOWED_ORIGINS=["https://nla.example.com"]
+```
+
+`COOKIE_SECURE=true` makes the refresh-token cookie HTTPS-only. Without HTTPS it will be rejected by browsers,
+so login will appear to work and then drop you on refresh.
+
+## 2. Understand how the web app finds the API
+
+The self-host web app does not use a configured API URL. It calls the backend on the **same hostname and
+protocol as the page, on `BACKEND_PORT`**, and opens the live feed WebSocket the same way (`wss://` when the page
+is HTTPS).
+
+So if the app is at `https://nla.example.com`, it will call `https://nla.example.com:<BACKEND_PORT>`. In
+practice this means:
+
+- Both ports must be reachable from users' browsers.
+- Both ports must speak the same protocol (both HTTPS), or browsers will block mixed content.
+
+This might not be viable in some cases, such as when you need the web app and backend to live on separate
+hostnames. Currently, there is no solution for this other than cloning the repo and modifying the backend
+setup. However, this feature will be implemented in the future.
+
+## 3. Allow WebSockets
+
+The live feed uses a WebSocket on `/ws/live`. Your proxy must forward upgrade requests. Caddy does this
+automatically. For nginx:
+
+```nginx
+location /ws/ {
+    proxy_pass http://127.0.0.1:8000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_read_timeout 3600s;
+}
+```
+
+The server sends keepalives every `WS_HEARTBEAT_INTERVAL` seconds, so keep the proxy's idle timeout longer than
+that.
+
+## 4. Don't expose what you don't need
+
+Only the frontend and backend ports need to be reachable. Postgres and Redis are on an internal Docker network and
+publish no ports, keep it that way.
+
+Consider restricting who can reach the ingest endpoint. Ingest is protected by API keys, but if your senders are
+at known addresses you can add a firewall or proxy allow-list on top. A private VPN overlay (such as Tailscale or
+WireGuard) is a good way to keep the whole backend off the public internet while still letting the dashboard and
+senders reach it.
+
+## 5. Email
+
+For a multi-user instance, configure Resend, set `EMAIL_VERIFICATION_ENABLED=true`, and change all `RESEND_*`
+from-addresses to a domain you have verified. Password recovery and retention warnings both depend on email.
+See [Configuration](/docs/selfhost-configuration#email).
+
+## 6. Store exports in S3
+
+The default `local` backend keeps export files on a Docker volume shared by the API and worker. For larger
+installs or multiple hosts, use any S3-compatible store:
+
+```ini
+EXPORT_STORAGE_BACKEND=s3
+EXPORT_S3_BUCKET=nla-exports
+EXPORT_S3_REGION=eu-west-2
+EXPORT_S3_ACCESS_KEY_ID=...
+EXPORT_S3_SECRET_ACCESS_KEY=...
+# For MinIO, Cloudflare R2, etc.:
+EXPORT_S3_ENDPOINT_URL=https://....r2.cloudflarestorage.com
+```
+
+Downloads then use short-lived presigned URLs. Give the credentials only the permissions they need on that one
+bucket, and consider a bucket lifecycle rule as a backstop for deleting old objects.
+
+## 7. Use an external database
+
+The bundled Postgres is fine for most installs. To use a managed database such as Neon or RDS, set `DATABASE_URL`
+to its connection string (`postgresql+psycopg://…`, with `sslmode=require` if needed) and remove the `db` service
+and the `depends_on` references to it from your compose file. Remember to take your own backups.
+
+## 8. Sizing
+
+`log_entries` is the table that grows. Ingest cost is dominated by batch size, not request count, so larger
+batches go a long way. If storage grows too fast, lower `RETENTION_DAYS`. The Redis instance only holds
+ephemeral data (rate limits, queue, caches) and does not need much memory.
+
+## Production checklist
+
+- [ ] HTTPS on both frontend and backend ports
+- [ ] `COOKIE_SECURE=true`
+- [ ] `FRONTEND_URL`, `BACKEND_URL`, `CORS_ALLOWED_ORIGINS` set to real URLs
+- [ ] `.env` backed up, **not** in version control
+- [ ] `ENABLE_TEST_ENDPOINTS=false`
+- [ ] Postgres and Redis not published to the host
+- [ ] Email configured, with verified sender domain
+- [ ] Retention jobs scheduled
+- [ ] Database backups scheduled and restore tested
+- [ ] `/health` monitored

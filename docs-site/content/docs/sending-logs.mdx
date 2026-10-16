@@ -1,0 +1,121 @@
+---
+title: Sending Logs
+description: The ingest API, field reference, batching, limits and error handling.
+icon: Send
+---
+
+All data enters NetLogAnalyser through one endpoint: `POST /ingest`. It accepts a batch of packets,
+enriches each with geo information and an anomaly score, stores them, and pushes them to connected dashboards.
+
+## Authentication
+
+Send your API key in the `X-API-Key` header. See [Getting started](/docs/getting-started) for how to create one.
+Requests with a missing, unknown or revoked key are rejected.
+
+## Request body
+
+```json
+{ "entries": [ { ... }, { ... } ] }
+```
+
+`entries` must contain between 1 and 500 items, if self-hosting, the maximum can be changed by adjusting the
+`INGEST_MAX_BATCH_SIZE` environment variable.
+
+## Entry fields
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `src_ip` | string | yes | IPv4 or IPv6 address |
+| `dst_ip` | string | yes | IPv4 or IPv6 address |
+| `src_port` | integer | yes | 0–65535 |
+| `dst_port` | integer | yes | 0–65535 |
+| `protocol` | string | yes | One of `TCP`, `UDP`, `ICMP`, `OTHER` |
+| `packet_size_bytes` | integer | yes | 0 or greater |
+| `flags` | string | no | Comma-separated TCP flags, e.g. `"SYN,ACK"`. Max 20 characters |
+| `raw_payload` | object | yes | Any JSON object you want to keep alongside the entry. Use `{}` if you have nothing |
+| `captured_at` | string | yes | ISO 8601 timestamp of when the packet was **captured** |
+
+<Callout type="warn">
+  Unknown fields are rejected. You cannot supply `anomaly_score`, country codes or any other server-side field.
+  This stops clients from spoofing results.
+</Callout>
+
+### `captured_at` vs `inserted_at`
+
+`captured_at` is the time you say the packet was seen. The server separately records when it received the entry.
+Charts and time ranges use `captured_at`, so set it accurately, especially if you buffer and send logs late.
+
+## Response
+
+```json
+{
+  "accepted": 498,
+  "rejected": 2,
+  "errors": [
+    { "index": 7,  "detail": "..." },
+    { "index": 41, "detail": "..." }
+  ]
+}
+```
+
+Entries are validated one by one. An invalid entry does not block the rest of the batch, `index` is the position
+of the failed entry in your `entries` array so you can fix and resend just those.
+
+## Limits
+
+| Limit | Default | Setting |
+|---|---|---|
+| Entries per request | 500 | `INGEST_MAX_BATCH_SIZE` |
+| Requests per window | 1000 per 60 s | `RATELIMIT_INGEST_TIMES` / `RATELIMIT_INGEST_SECONDS` |
+| Active keys per user | 10 | `API_KEY_MAX_PER_USER` |
+
+If you hit the rate limit you will receive an HTTP 429 response. Back off and retry, or send larger batches less
+often.
+
+## Batching advice
+
+- **Send batches, not single packets.** One request with 500 entries is far more efficient than 500 requests.
+- **Keep related traffic in the same batch.** Port-scan and host-sweep detection looks at the entries *within a
+  single batch*, see [Anomaly detection](/docs/anomaly-detection).
+- **Send on a timer as well as on size**, e.g. every 1–2 seconds or 500 entries, whichever comes first, so the
+  live feed stays responsive.
+
+## Example: Python sender
+
+```python
+import datetime as dt
+import requests
+
+API = "https://YOUR_BACKEND/ingest"
+KEY = "key_your_key_here"
+
+def send(entries: list[dict]) -> None:
+    resp = requests.post(
+        API,
+        json={"entries": entries},
+        headers={"X-API-Key": KEY},
+        timeout=10,
+    )
+    resp.raise_for_status()
+    body = resp.json()
+    for err in body["errors"]:
+        print("rejected", entries[err["index"]], err["detail"])
+
+send([{
+    "src_ip": "198.51.100.4",
+    "dst_ip": "10.0.0.5",
+    "src_port": 40000,
+    "dst_port": 22,
+    "protocol": "TCP",
+    "packet_size_bytes": 64,
+    "flags": "SYN",
+    "raw_payload": {},
+    "captured_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+}])
+```
+
+## Geo enrichment
+
+Each entry's source and destination IPs are resolved to a country using the MaxMind GeoLite2-Country database.
+Private, loopback, link-local and reserved addresses have no country, and if the database is not loaded at all
+the lookup is reported as unavailable. Neither case prevents the entry from being stored.

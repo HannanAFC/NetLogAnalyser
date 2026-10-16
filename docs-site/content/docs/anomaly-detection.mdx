@@ -1,0 +1,77 @@
+---
+title: Anomaly Detection
+description: How anomaly scores and reasons are calculated for each log entry.
+icon: ShieldAlert
+---
+
+Every ingested entry gets an **anomaly score** between `0.0` (looks normal) and `1.0` (highly suspicious), plus
+a list of **reasons** explaining which checks fired. This is a set of fast heuristics, not machine learning: the
+rules are simple, explainable and tunable.
+
+<Callout>
+  A high score means "worth a look", not "confirmed attack". Heuristics will flag legitimate traffic too, tune
+  them for your network (see [Tuning detection](/docs/advanced-tuning)).
+</Callout>
+
+## The heuristics
+
+Each heuristic produces its own score from 0 to 1.
+
+### Per-packet checks
+
+| Heuristic | Fires when | Example reason |
+|---|---|---|
+| `packet_size` | Packet is larger than the MTU (1500 B), reaching 1.0 at the jumbo limit (9000 B); or tiny, at or under 40 B | "Packet size 9000B is unusually large" |
+| `tcp_flags` | TCP packet has no flags, all of FIN+PSH+URG (an "XMAS" scan), or an invalid pair (SYN+FIN, SYN+RST) | "Packet contains XMAS flags" |
+| `port_protocol_mismatch` | A well-known port is used with the wrong protocol, or ICMP has non-zero ports | "Port 22 is expected to use TCP, not UDP" |
+
+Size scores ramp linearly between the low and high thresholds, so a 5000 B packet scores part way to 1.0.
+
+The port table covers common services such as FTP, SSH, Telnet, SMTP, DNS, HTTP/S, SMB, RDP, databases and
+syslog.
+
+### Batch-level checks
+
+These look at all entries in **one ingest request** that share a source IP:
+
+| Heuristic | Fires when | Example reason |
+|---|---|---|
+| `port_scan_shape` | One source touched many distinct destination ports. Starts at 5, reaches 1.0 at 25 | "10.0.0.9 touched 18 distinct ports in this batch" |
+| `host_sweep_shape` | One source touched many distinct destination IPs. Starts at 5, reaches 1.0 at 20 | "10.0.0.9 touched 12 distinct destinations in this batch" |
+
+<Callout type="warn">
+  Because these are evaluated per request, a scan split across many tiny requests will not be detected. Send
+  traffic in sensible batches, see [Sending logs](/docs/sending-logs).
+</Callout>
+
+## Combining scores
+
+Each heuristic has a weight between 0 and 1. The final score combines them so that independent signals reinforce
+each other without ever exceeding 1.0:
+
+```
+score = 1 − Π ( 1 − min(weight × heuristic_score, 1) )
+```
+
+Default weights:
+
+| Heuristic | Default weight |
+|---|---|
+| `tcp_flags` | 0.9 |
+| `port_scan_shape` | 0.7 |
+| `port_protocol_mismatch` | 0.6 |
+| `host_sweep_shape` | 0.6 |
+| `packet_size` | 0.5 |
+
+A weight of 0.9 means a heuristic that fully fires (score 1.0) on its own produces a final score of 0.9. Two
+heuristics at 0.5 each produce `1 − 0.5 × 0.5 = 0.75`.
+
+## Where scores appear
+
+- The **live feed** and **log history** show the score for each entry.
+- The **anomalies** page lists entries over a threshold (0.5 by default) with their reasons.
+- The dashboard shows a preview of the top anomalies.
+- Exports include the score and reasons.
+
+Scores are calculated at ingest time and stored. Changing weights or thresholds affects new entries only, existing
+entries keep the score they were given.

@@ -1,0 +1,52 @@
+---
+title: Using the Dashboard
+description: A tour of every page in the NetLogAnalyser app.
+icon: LayoutDashboard
+---
+
+Once logs are flowing, everything you need is in the sidebar of the app.
+
+## Dashboard
+
+The landing page after login. It shows headline numbers and sparklines for the selected time range, plus a
+preview of your top anomalies so the most suspicious traffic is visible immediately.
+
+## Live feed
+
+Streams new entries as they are ingested, over a WebSocket. Each row shows the addresses, ports, protocol, size,
+country and anomaly score.
+
+## Log history
+
+A scrollable table of everything stored, newest first. It uses cursor-based pagination, so it stays
+fast and consistent even while new logs are arriving.
+
+## Analytics
+
+Charts for any time range up to the instance limit (30 days by default):
+
+- **Timeseries**: traffic over time. The bucket size (e.g. per minute, per hour) is chosen automatically for the
+  range, and you can override it. Very small buckets over a very long range are refused to keep responses small.
+- **Top talkers**: the busiest sources or destinations, ranked by bytes or packets.
+- **Protocol breakdown**: share of TCP, UDP, ICMP and other, with destination ports.
+
+## Anomalies
+
+Every entry with an anomaly score above a threshold (0.5 by default), highest first, with the **reasons** that
+contributed to the score. See [Anomaly detection](/docs/anomaly-detection) for what each reason means.
+
+## Geo map
+
+A world choropleth of traffic by country, with a sidebar for the selected country.
+
+## Settings
+
+- **Account**: change display name and password, logout or delete your account and all data.
+- **API keys**: create and revoke keys, see when each was last used.
+- **Exports**: request a download of your data, see [Exports and retention](/docs/exports-and-retention).
+
+## Time ranges
+
+Pages that show aggregates share a time range picker. Ranges are limited by `ANALYTICS_MAX_RANGE_DAYS`
+(30 by default). Summary and timeseries responses are cached briefly (30 seconds by default), so a brand-new
+entry can take up to that long to appear, though it shows in the live feed instantly.

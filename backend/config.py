@@ -18,6 +18,7 @@ class Settings( BaseSettings ):
     environment:                         str = "development"
     frontend_url:                        str = "http://localhost:3000"
     backend_url:                         str = "http://localhost:8000"
+    docs_url:                            str = "http://localhost:3001"
 
     frontend_port:                       int = 3000
     backend_port:                        int = 8000

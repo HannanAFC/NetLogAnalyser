@@ -1,0 +1,75 @@
+---
+title: Getting Started
+description: Go from zero to a live dashboard in a few minutes.
+icon: Rocket
+---
+
+This page takes you from nothing to network logs appearing on your dashboard. You can use the hosted
+platform or [self-host](/docs/selfhost-install) your own copy, the steps are the same either way.
+
+## 1. Create an account
+
+Open the app and register with an email address and password. Passwords must meet a complexity policy.
+
+If email verification is enabled on your instance, click the link in the verification email before logging in.
+Self-hosted instances have email verification **off** by default.
+
+## 2. Create an API key
+
+Logs are sent to the platform using an API key, not your login.
+
+1. Go to **Settings → API keys**.
+2. Click **Create key** and give it a label, e.g. `office-firewall`.
+3. Copy the key straight away.
+
+<Callout type="warn">
+  The full key is only shown once. A lost key cannot be recovered. Revoke it and create a new one instead.
+</Callout>
+
+Keys look like `key_` followed by 64 hex characters. Each account can have a limited number of active keys
+(10 by default).
+
+## 3. Send your first log
+
+Send a batch of entries to `POST /ingest` with your key in the `X-API-Key` header:
+
+```bash
+curl -X POST https://YOUR_BACKEND/ingest \
+  -H "X-API-Key: key_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "entries": [
+      {
+        "src_ip": "203.0.113.7",
+        "dst_ip": "192.168.1.20",
+        "src_port": 51234,
+        "dst_port": 443,
+        "protocol": "TCP",
+        "packet_size_bytes": 512,
+        "flags": "SYN,ACK",
+        "raw_payload": {},
+        "captured_at": "2026-01-01T12:00:00Z"
+      }
+    ]
+  }'
+```
+
+A successful response tells you how many entries were accepted and rejected:
+
+```json
+{ "accepted": 1, "rejected": 0, "errors": [] }
+```
+
+See [Sending logs](/docs/sending-logs) for the full field reference and tips for automating this.
+
+## 4. Watch it arrive
+
+Open **Live feed** in the dashboard. New entries stream in as they are ingested, each with its country and
+anomaly score. The other pages (**Dashboard**, **Analytics**, **Anomalies**, **Geo map**, **Log history**)
+update from the same data, see the [dashboard guide](/docs/dashboard).
+
+## Next steps
+
+- [Sending logs](/docs/sending-logs): field reference, batching and error handling.
+- [Anomaly detection](/docs/anomaly-detection): how scores are calculated.
+- [Self-hosting](/docs/selfhost-install): run the whole stack yourself with one command.

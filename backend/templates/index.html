@@ -116,181 +116,44 @@
         <div class="section">
             <p class="section-title">Documentation</p>
             <div class="docs-grid">
+                <a class="docs-card" href="{{ docs_url }}">
+                    <span class="docs-card-label">Documentation Site</span>
+                    <span class="docs-card-title">Self-host + usage Docs</span>
+                    <span class="docs-card-desc">
+                        Learn how to get setup on NetLogAnalyser, whether you're using the hosted version or self-hosting.
+                        With detailed documentation on how every works.
+                    </span>
+                    <span class="docs-card-url">{{ docs_url }}</span>
+                </a>
                 <a class="docs-card" href="/docs">
                     <span class="docs-card-label">Swagger UI</span>
                     <span class="docs-card-title">Interactive docs</span>
-                    <span class="docs-card-desc">Browse every endpoint, inspect schemas, and send test requests directly
-                        from your browser.</span>
+                    <span class="docs-card-desc">
+                        Browse every endpoint, inspect schemas, and send test requests directly from your browser.
+                    </span>
                     <span class="docs-card-url">/docs</span>
                 </a>
                 <a class="docs-card" href="/redoc">
                     <span class="docs-card-label">ReDoc</span>
                     <span class="docs-card-title">Full reference</span>
-                    <span class="docs-card-desc">Clean three-panel reference layout. Better for reading the full schema
-                        without sending requests.</span>
+                    <span class="docs-card-desc">
+                        Clean three-panel reference layout. Better for reading the full schema without sending requests.
+                    </span>
                     <span class="docs-card-url">/redoc</span>
                 </a>
             </div>
         </div>
 
-        <!-- Authentication -->
-        <div class="section">
-            <p class="section-title">Authentication</p>
-            <div class="auth-grid">
-                <div class="auth-card">
-                    <div class="auth-card-header">
-                        <span class="auth-card-title">Dashboard users</span>
-                        <span class="auth-badge badge-jwt">JWT</span>
-                    </div>
-                    <p>
-                        Log in at <code>POST /auth/login</code> to receive a short-lived
-                        access token. Pass it as <code>Authorization: Bearer &lt;token&gt;</code>
-                        on every dashboard request. Tokens refresh automatically via an
-                        httpOnly cookie.
-                    </p>
-                </div>
-                <div class="auth-card">
-                    <div class="auth-card-header">
-                        <span class="auth-card-title">Log ingestion clients</span>
-                        <span class="auth-badge badge-key">API key</span>
-                    </div>
-                    <p>
-                        Generate an API key from your dashboard. Pass it as
-                        <code>X-API-Key: &lt;key&gt;</code> on every call to
-                        <code>POST /ingest</code>. Keys can be labelled, rotated,
-                        and revoked at any time.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick start -->
-        <div class="section">
-            <p class="section-title">Quick start</p>
-            <div class="code-wrap">
-                <div class="code-header">
-                    <div class="code-tabs">
-                        <button class="code-tab active" data-type="python">Python</button>
-                        <button class="code-tab" data-type="curl">curl</button>
-                        <button class="code-tab" data-type="node">Node.js</button>
-                    </div>
-                    <button class="code-copy" id="copyCodeBtn">copy</button>
-                </div>
-                <pre id="codeBlock">
-<span class="c-kw">import</span> requests
-<span class="c-kw">from</span> datetime <span class="c-kw">import</span> datetime, timezone
-
-url     = <span class="c-str">"http://localhost:8000/ingest"</span>
-headers = {<span class="c-str">"X-API-Key"</span>: <span class="c-str">"nw_live_your_key_here"</span>}
-
-<span class="c-cm"># Send a batch of log entries - always batch, never one at a time.</span>
-payload = [
-    {
-        <span class="c-key">"src_ip"</span>:           <span class="c-str">"192.168.1.1"</span>,
-        <span class="c-key">"dst_ip"</span>:           <span class="c-str">"10.0.0.1"</span>,
-        <span class="c-key">"src_port"</span>:         <span class="c-num">52341</span>,
-        <span class="c-key">"dst_port"</span>:         <span class="c-num">443</span>,
-        <span class="c-key">"protocol"</span>:         <span class="c-str">"TCP"</span>,
-        <span class="c-key">"packet_size_bytes"</span>: <span class="c-num">128</span>,
-        <span class="c-key">"captured_at"</span>:      datetime.now(timezone.utc).isoformat(),
-    }
-]
-
-response = requests.<span class="c-fn">post</span>(url, json=payload, headers=headers)
-<span class="c-fn">print</span>(response.json())  <span class="c-cm"># {"ingested": 1, "anomalies_detected": 0}</span>
-                </pre>
-            </div>
-        </div>
-
-        <!-- Endpoints -->
-        <div class="section">
-            <p class="section-title">Endpoints</p>
-            <div class="endpoint-list">
-                <div class="endpoint-row">
-                    <span class="method m-post">POST</span>
-                    <span class="ep-path">/auth/register</span>
-                    <span class="ep-desc">Create an account</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-post">POST</span>
-                    <span class="ep-path">/auth/login</span>
-                    <span class="ep-desc">Obtain access + refresh tokens</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-post">POST</span>
-                    <span class="ep-path">/ingest</span>
-                    <span class="ep-desc">Submit a batch of log entries - requires API key</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/logs</span>
-                    <span class="ep-desc">Paginated log history with filters</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/logs/<span class="ep-param">{id}</span></span>
-                    <span class="ep-desc">Single entry with raw payload</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/analytics/traffic</span>
-                    <span class="ep-desc">Time-bucketed packet counts</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/analytics/protocols</span>
-                    <span class="ep-desc">Protocol breakdown</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/analytics/geo</span>
-                    <span class="ep-desc">Source counts by country</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/analytics/top-talkers</span>
-                    <span class="ep-desc">Most active source IPs</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/analytics/anomalies</span>
-                    <span class="ep-desc">Recent high-score entries</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-get">GET</span>
-                    <span class="ep-path">/api-keys</span>
-                    <span class="ep-desc">List your API keys</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-post">POST</span>
-                    <span class="ep-path">/api-keys</span>
-                    <span class="ep-desc">Generate a new key</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-del">DEL</span>
-                    <span class="ep-path">/api-keys/<span class="ep-param">{id}</span></span>
-                    <span class="ep-desc">Revoke a key</span>
-                </div>
-                <div class="endpoint-row">
-                    <span class="method m-ws">WS</span>
-                    <span class="ep-path">/ws/live</span>
-                    <span class="ep-desc">Real-time log stream - requires JWT as ?token=</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer>
-            <span class="footer-left">NetLogAnalyser API &nbsp;·&nbsp; v{{ version }}</span>
-            <div class="footer-right">
-                <a class="footer-link" href="/docs">Swagger</a>
-                <a class="footer-link" href="/redoc">ReDoc</a>
-                <a class="footer-link" href="/health">Health</a>
-                <a class="footer-link" href="{{ frontend_url }}">Dashboard</a>
-            </div>
-        </footer>
-
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <span class="footer-left">NetLogAnalyser API &nbsp;·&nbsp; v{{ version }}</span>
+        <div class="footer-right">
+            <a class="footer-link" href="{{ docs_url }}">Documentation</a>
+            <a class="footer-link" href="{{ frontend_url }}">Dashboard</a>
+        </div>
+    </footer>
 
     <script src="/static/js/index.js" defer></script>
 </body>

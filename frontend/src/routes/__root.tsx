@@ -198,8 +198,8 @@ function RootLayout( { session }: { session: unknown } )
 						<Link to='/legal' className='text-xs font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary'>
 							Legal
 						</Link>
-						<a href={ env.apiBaseUrl } className="text-xs font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary">
-							API docs
+						<a href={ env.docsUrl } className="text-xs font-medium text-text-tertiary no-underline transition-colors hover:text-text-secondary">
+							Documentation
 						</a>
 					</div>
 				</footer>

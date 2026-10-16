@@ -127,6 +127,7 @@ html {
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    height: 100%;
 }
 
 [data-theme="dark"] {
@@ -134,7 +135,9 @@ html {
 }
 
 body {
-    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 /* ── Layout ─────────────────────────────────────────────────────────── */
@@ -412,7 +415,7 @@ header {
 /* ── Docs cards ─────────────────────────────────────────────────────── */
 .docs-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 6px;
 }
 
@@ -745,14 +748,17 @@ pre {
 
 /* ── Footer ─────────────────────────────────────────────────────────── */
 footer {
-    margin-top: 56px;
+    margin-top: auto;
     padding-top: 20px;
     border-top: 1px solid var(--color-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-inline: 16px;
     padding-block: 20px;
+    max-width: 72rem;
+    width: 100%;
+    padding-inline: 16px;
+    margin-inline: auto;
 }
 
 .footer-left {

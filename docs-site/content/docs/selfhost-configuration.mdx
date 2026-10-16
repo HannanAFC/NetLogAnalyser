@@ -1,0 +1,130 @@
+---
+title: Configuration Reference
+description: Every setting in the self-host .env file.
+icon: Settings
+---
+
+All configuration lives in the `.env` file next to `docker-compose.selfhost.yml`. After editing it, apply changes
+with:
+
+```bash
+docker compose -f docker-compose.selfhost.yml --env-file .env up -d
+```
+
+<Callout>
+  Treat `.env` as a secret. It holds your JWT signing key and database password. It is gitignored in the
+  repository, keep it that way.
+</Callout>
+
+## Core
+
+| Variable | Default | Description |
+|---|---|---|
+| `IMAGE_TAG` | `latest` | Image version to run. Managed by `setup.sh` |
+| `FRONTEND_PORT` | `3000` | Port the web app is served on |
+| `BACKEND_PORT` | `8000` | Port the API is served on |
+| `FRONTEND_URL` / `BACKEND_URL` | `http://localhost:…` | Public URLs, used in emails and links. Change these when not on localhost |
+| `ENVIRONMENT` | `production` | `development` or `production` |
+| `DATABASE_URL` | generated | `postgresql+psycopg://user:pass@db:5432/dbname` |
+| `REDIS_URL` | `redis://redis:6379` | Redis connection |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | generated | Credentials for the bundled Postgres |
+
+## Authentication and cookies
+
+| Variable | Default | Description |
+|---|---|---|
+| `SECRET_KEY` | generated | JWT signing key. Changing it logs everyone out |
+| `ALGORITHM` | `HS256` | JWT algorithm |
+| `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
+| `JWT_REFRESH_TOKEN_EXPIRE_DAYS` | `30` | Refresh token lifetime |
+| `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES` | `5` | Password reset link lifetime |
+| `COOKIE_SECURE` | `false` (self-host) | Send the refresh cookie only over HTTPS. **Set to `true` when serving over HTTPS** |
+| `COOKIE_SAMESITE` | `lax` | Cookie SameSite policy |
+| `CORS_ALLOWED_ORIGINS` | `[]` | JSON list of allowed origins. When empty, an origin pattern derived from `FRONTEND_PORT` is used |
+
+## API keys, ingest and WebSocket
+
+| Variable | Default | Description |
+|---|---|---|
+| `API_KEY_PREFIX_LENGTH` | `8` | Characters of each key stored for display |
+| `API_KEY_MAX_PER_USER` | `10` | Active keys per user |
+| `INGEST_MAX_BATCH_SIZE` | `500` | Entries per ingest request |
+| `WS_HEARTBEAT_INTERVAL` | `30` | Keepalive interval in seconds |
+| `WS_MAX_CONNECTIONS_PER_USER` | `5` | Simultaneous live feeds per user |
+| `WS_TICKET_TTL_SECONDS` | `30` | Lifetime of the one-time WebSocket ticket |
+| `WS_STALE_CONNECTION_SECONDS` | `90` | Connections not refreshed within this window are pruned |
+
+## Rate limits
+
+Each limit is "N requests per window of S seconds", per client.
+
+| Category | Times | Seconds |
+|---|---|---|
+| Auth (`RATELIMIT_AUTH_*`) | 10 | 60 |
+| Forgot password (`RATELIMIT_FORGOT_PASSWORD_*`) | 3 | 60 |
+| Ingest (`RATELIMIT_INGEST_*`) | 1000 | 60 |
+| WebSocket (`RATELIMIT_WS_*`) | 50 | 60 |
+| General API (`RATELIMIT_GENERAL_*`) | 100 | 60 |
+
+## Email
+
+Email is optional. With it off, registration works without verification and no emails are sent.
+
+| Variable | Default | Description |
+|---|---|---|
+| `EMAIL_VERIFICATION_ENABLED` | `false` | Require users to verify their email. Requires `RESEND_API_KEY` |
+| `RESEND_API_KEY` | empty | API key from [Resend](https://resend.com) |
+| `RESEND_ONBOARDING_EMAIL` / `RESEND_VERIFY_EMAIL` / `RESEND_RECOVERY_EMAIL` / `RESEND_GENERAL_EMAIL` | `…@netloganalyser.com` | From-addresses. **Change these to a domain you have verified with Resend** |
+| `SUPPORT_EMAIL` | `support@netloganalyser.com` | Contact shown in account-security emails |
+| `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES` | `60` | Verification link lifetime |
+
+## Analytics
+
+| Variable | Default | Description |
+|---|---|---|
+| `ANALYTICS_MAX_RANGE_DAYS` | `30` | Longest time range that can be queried |
+| `ANALYTICS_SUMMARY_EXPIRE_SECONDS` | `30` | Cache TTL for summary |
+| `ANALYTICS_TIMESERIES_EXPIRE_SECONDS` | `30` | Cache TTL for timeseries |
+
+Anomaly settings are covered in [Tuning detection](/docs/advanced-tuning).
+
+## Retention
+
+| Variable | Default | Description |
+|---|---|---|
+| `RETENTION_ENABLED` | `true` | Master switch for the warn/delete jobs |
+| `RETENTION_DAYS` | `30` | Logs older than this are eligible for deletion |
+| `RETENTION_GRACE_PERIOD_DAYS` | `7` | Warning window before deletion |
+| `RETENTION_EXPORT_EMAIL_ENABLED` | `true` | Email users their export link in the warning phase |
+| `RETENTION_DELETE_CHUNK_SIZE` | `5000` | Rows deleted per chunk, per user |
+| `RETENTION_JOB_LOCK_TTL_SECONDS` | `30` | Lock preventing two runs of the same mode overlapping |
+
+## Export storage
+
+| Variable | Default | Description |
+|---|---|---|
+| `EXPORT_STORAGE_BACKEND` | `local` | `local` or `s3` |
+| `EXPORT_LOCAL_PATH` | `data/exports` | Path inside the container. Backed by the shared `export_data` volume |
+| `EXPORT_S3_BUCKET` | empty | Bucket name (required for `s3`) |
+| `EXPORT_S3_ENDPOINT_URL` | empty | Custom endpoint for S3-compatible stores (MinIO, R2, …) |
+| `EXPORT_S3_REGION` | empty | Region |
+| `EXPORT_S3_ACCESS_KEY_ID` / `EXPORT_S3_SECRET_ACCESS_KEY` | empty | Credentials |
+| `EXPORT_LINK_TTL_HOURS` | `72` | Export file expiry and retention download-link lifetime |
+| `EXPORT_MAX_PER_USER_PER_DAY` | `3` | Manual exports per user per day |
+| `EXPORT_AUTHENTICATED_LINK_TTL_SECONDS` | `300` | Signed download-link lifetime |
+
+With the `local` backend, the API and the worker must see the **same files**. The compose file mounts the
+`export_data` volume into both. If you change the layout, keep that true.
+
+## GeoIP
+
+| Variable | Default | Description |
+|---|---|---|
+| `GEOIP_DB_PATH` | `shared/geoip/GeoLite2-Country.mmdb` | Where the backend reads the database |
+| `GEOIPUPDATE_ACCOUNT_ID` / `GEOIPUPDATE_LICENSE_KEY` | empty | MaxMind credentials |
+| `GEOIPUPDATE_EDITION_IDS` | `GeoLite2-ASN GeoLite2-City GeoLite2-Country` | Editions to download. Only Country is used, you can trim this to `GeoLite2-Country` to save bandwidth |
+
+## Testing endpoints
+
+`ENABLE_TEST_ENDPOINTS`, `TEST_ENDPOINT_KEY` and `TEST_EMAIL_DOMAIN` expose endpoints used by the project's
+integration tests. **Leave them disabled** on any real instance.
