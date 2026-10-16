@@ -15,9 +15,9 @@
     "lint:fix": "oxlint --fix"
   },
   "dependencies": {
-    "@tanstack/react-router": "1.170.41",
+    "@tanstack/react-router": "1.170.44",
     "@tanstack/react-router-devtools": "1.167.2",
-    "@tanstack/react-start": "1.168.60",
+    "@tanstack/react-start": "1.169.1",
     "cn": "^0.4.0",
     "fumadocs-core": "16.17.3",
     "fumadocs-mdx": "15.4.7",
