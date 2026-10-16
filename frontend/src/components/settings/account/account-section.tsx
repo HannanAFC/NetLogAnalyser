@@ -12,6 +12,7 @@ import type { SettingsSectionProps } from '#/routes/_authenticated/settings';
 import { useForm } from '@tanstack/react-form';
 import { useOverlay } from '#/lib/overlay/overlay-context';
 import { DeleteUserDialogue } from './delete-user-dialogue';
+import { useNavigate } from '@tanstack/react-router';
 
 export function AccountSection( { className }: SettingsSectionProps )
 {
@@ -20,6 +21,7 @@ export function AccountSection( { className }: SettingsSectionProps )
     const changeUserPassword = useChangeUserPassword( );
     const logout             = useLogout( );
     const { open, close }    = useOverlay( );
+    const navigate = useNavigate( { from: '/settings' } );
 
     const form = useForm(
     {
@@ -74,12 +76,21 @@ export function AccountSection( { className }: SettingsSectionProps )
         }
     } );
 
+    function handleConfirmDelete( id: string )
+    {
+        navigate( { from: '/settings', to: '/' } );
+        close( id );
+    }
+
     function handleOpenDeleteMenu( )
     {
         const id = open
         (
             <DeleteUserDialogue
-                onConfirm={ ( ) => undefined }
+                onConfirm={ ( ) =>
+                {
+                    handleConfirmDelete( id );
+                } }
                 onCancel={ ( ) => close( id ) }
             />
 		);
