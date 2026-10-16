@@ -2,16 +2,19 @@ name: Tests
 
 on:
   workflow_call:
+    inputs:
+      skip-tests:
+        description: Set by the gate job in ci.yml. When true every job here is skipped.
+        type: boolean
+        default: false
+      skip-docs-site:
+        description: Set by the gate job in ci.yml. Skips only the docs site lint job.
+        type: boolean
+        default: false
 
 jobs:
   docs-site-lint:
-    if: |
-      !(
-        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'docs:')) ||
-        (github.event_name == 'push' && contains(github.event.head_commit.message, 'docs:')) ||
-        (github.event_name == 'pull_request' && contains(github.event.head_commit.message, '[skip-tests]')) ||
-        (github.event_name == 'push' && contains(github.event.head_commit.message, '[skip-tests]'))
-      )
+    if: ${{ !inputs.skip-docs-site }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -40,13 +43,7 @@ jobs:
         working-directory: docs-site
 
   backend-tests:
-    if: |
-      !(
-        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'docs')) ||
-        (github.event_name == 'push' && contains(github.event.head_commit.message, 'docs')) ||
-        (github.event_name == 'pull_request' && contains(github.event.head_commit.message, '[skip-tests]')) ||
-        (github.event_name == 'push' && contains(github.event.head_commit.message, '[skip-tests]'))
-      )
+    if: ${{ !inputs.skip-tests }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -113,13 +110,7 @@ jobs:
         working-directory: backend
 
   frontend-tests:
-    if: |
-      !(
-        (github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'docs')) ||
-        (github.event_name == 'push' && contains(github.event.head_commit.message, 'docs')) ||
-        (github.event_name == 'pull_request' && contains(github.event.head_commit.message, '[skip-tests]')) ||
-        (github.event_name == 'push' && contains(github.event.head_commit.message, '[skip-tests]'))
-      )
+    if: ${{ !inputs.skip-tests }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
