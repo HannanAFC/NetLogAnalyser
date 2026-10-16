@@ -17,7 +17,7 @@ done
 if [ "$ENVIRONMENT" = "production" ]; then
   echo "Starting documentation site (production)..."
   pnpm run build
-  pnpm run start --host
+  pnpm run start
 else
   echo "Starting documentation site (development)..."
   pnpm run dev --host

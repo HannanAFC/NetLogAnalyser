@@ -21,6 +21,9 @@ export default defineConfig( ( { mode } ) =>
   server: {
     port: 3000
   },
+  preview: {
+    host: '127.0.0.1'
+  },
   plugins: [
     fumadocsMdx(),
     tailwindcss(),
@@ -31,9 +34,7 @@ export default defineConfig( ( { mode } ) =>
     } ),
     react(),
     // please see https://tanstack.com/start/latest/docs/framework/react/guide/hosting#nitro for guides on hosting
-    nitro( {
-      preset: 'vercel'
-    } )
+    nitro( )
   ],
   resolve: {
     tsconfigPaths: true,
