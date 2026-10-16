@@ -116,6 +116,7 @@ export function AccountSection( { className }: SettingsSectionProps )
                                     onBlur={ field.handleBlur }
                                     onChange={ ( e ) => field.handleChange( e.target.value ) }
                                     className='bg-paper-2'
+                                    error={ field.state.meta.errors.length > 0 }
                                 />
                                 { field.state.meta.errors.length > 0 && (
                                     <BodySm className="text-critical">
@@ -142,6 +143,7 @@ export function AccountSection( { className }: SettingsSectionProps )
                                     onBlur={ field.handleBlur }
                                     onChange={ ( e ) => field.handleChange( e.target.value ) }
                                     className='bg-paper-2'
+                                    error={ field.state.meta.errors.length > 0 }
                                 />
                                 { field.state.meta.errors.length > 0 && (
                                     <BodySm className="text-critical">
@@ -217,6 +219,7 @@ export function AccountSection( { className }: SettingsSectionProps )
                                     onBlur={ field.handleBlur }
                                     onChange={ ( e ) => field.handleChange( e.target.value ) }
                                     className='bg-paper-2'
+                                    error={ field.state.meta.errors.length > 0 }
                                 />
                                 { field.state.meta.errors.length > 0 && (
                                     <BodySm className="text-critical">
@@ -243,6 +246,7 @@ export function AccountSection( { className }: SettingsSectionProps )
                                     onBlur={ field.handleBlur }
                                     onChange={ ( e ) => field.handleChange( e.target.value ) }
                                     className='bg-paper-2'
+                                    error={ field.state.meta.errors.length > 0 }
                                 />
                                 { field.state.meta.errors.length > 0 && (
                                     <BodySm className="text-critical">
@@ -277,6 +281,7 @@ export function AccountSection( { className }: SettingsSectionProps )
                                     onBlur={ field.handleBlur }
                                     onChange={ ( e ) => field.handleChange( e.target.value ) }
                                     className='bg-paper-2'
+                                    error={ field.state.meta.errors.length > 0 }
                                 />
                                 { field.state.meta.errors.length > 0 && (
                                     <BodySm className="text-critical">

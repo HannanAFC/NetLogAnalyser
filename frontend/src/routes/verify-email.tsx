@@ -212,6 +212,7 @@ function VerifyEmailPage( )
 										value={ field.state.value }
 										onBlur={ field.handleBlur }
 										onChange={ ( e ) => field.handleChange( e.target.value ) }
+										error={ field.state.meta.errors.length > 0 }
 									/>
 									{ field.state.meta.errors.length > 0 && (
 										<BodySm className="text-critical">

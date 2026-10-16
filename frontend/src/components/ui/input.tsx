@@ -33,7 +33,7 @@ export function Label( { size = 'sm', className, children, ...props }: LabelProp
 
 export interface InputProps extends InputHTMLAttributes< HTMLInputElement >
 {
-	error?: string;
+	error?: boolean;
 }
 
 export const Input = forwardRef< HTMLInputElement, InputProps > (
