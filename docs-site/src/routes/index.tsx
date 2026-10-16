@@ -147,6 +147,8 @@ function Home( )
                                 width={ 1920 }
                                 height={ 1080 }
                                 className="block h-auto w-full"
+                                fetchPriority='high'
+                                loading='eager'
                             />
                         </div>
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 rounded-b-xl bg-linear-to-t from-fd-background to-transparent" />
