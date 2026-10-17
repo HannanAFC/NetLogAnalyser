@@ -70,7 +70,7 @@ curl -fsSL https://raw.githubusercontent.com/HannanAFC/NetLogAnalyser/main/selfh
 
 For more advanced setup instructions, please review the [full documentation](https://docs.netloganalyser.com/docs/selfhost-install).
 
-The documentation includes details about fine tuning the anomaly detection which may be desired as all networks are different and anomaly detection requires context about the network, the default settings are generalised in order to be effective across a large range of networks. Additionally, the [log_sender CLI tool](https://github.com/HannanAFC/NetLogAnalyser/tree/main/tools/log_sender) can be used to replay network packet streams, this can be used to fine tune the settings of a self-hosted instance to be more effective at detecting anomalies in specific traffic.
+The documentation includes details about fine tuning the anomaly detection, this may be desired as all networks are different and anomaly detection requires context about the network, the default settings are generalised in order to be effective across a large range of networks - this means it may not perform as good with networks that have unique traffic patterns. The [log_sender CLI tool](https://github.com/HannanAFC/NetLogAnalyser/tree/main/tools/log_sender) can replay network packet streams, this can be used to fine tune the settings of a self-hosted instance to be more effective at detecting anomalies in specific traffic.
 
 ## Architecture
 ```
@@ -93,15 +93,17 @@ Development should be done using Docker to run the application. This way Python 
 git clone https://github.com/HannanAFC/NetLogAnalyser.git
 ```
 
-Then you need to navigate to the directory of the project, and create a `.env` file, you can simply copy the contents of `.env.example`, this should be fine for developemnt, you can also enable the testing endpoints `ENABLE_TEST_ENDPOINTS` as it needed in order to run the frontend integration tests.
+Then you need to navigate to the directory of the project, and create a `.env` file, you can simply copy the contents of `.env.example`, this should be fine for developemnt, you can also enable the testing endpoints `ENABLE_TEST_ENDPOINTS` as they are needed in order to run the frontend integration tests.
 
 After this is done, open a shell inside of the project directory and start the Docker compose stack:
 ```Bash
 docker compose --profile dev up
 ```
 
-**Always run the `dev` profile in development**, otherwise only some of the required containers are started and the application won't work.
+**Always run the `dev` profile in development**, if you don't do this then some of the required containers will not be started.
 
 When writing code, make sure to run the tests to make sure the application still works properly, `/backend`, `/frontend` and `/docs-site` all have their own tests that they need to pass, otherwise a pull-request won't pass it's checks.
 
 When adding new features, **especially** to the backend, make sure to write **new** tests to make sure the feature handles edge cases and errors properly, and is secure.
+
+Each section of the application (`/backend`, `/frontend`, `/docs-site`) includes its own README.md which can be referenced when figuring out how something works, expected coding patterns and formatting as well as how to run tests.
