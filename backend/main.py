@@ -52,7 +52,15 @@ async def lifespan( _app: FastAPI ):
 
 startTime = time.time( )
 
-app = FastAPI( lifespan=lifespan )
+app = FastAPI(
+    lifespan=lifespan,
+    servers=[
+        {
+            "url": settings.backend_url,
+            "description": "API Base URL"
+        }
+    ]
+)
 
 FastAPIRedis( app ).lifespan( ).rate_limiting( )
 
