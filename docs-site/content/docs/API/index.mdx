@@ -1,0 +1,75 @@
+---
+title: API Reference
+description: Overview of the NetLogAnalyser REST API - authentication, conventions and where to find each endpoint.
+icon: Globe
+---
+
+The NetLogAnalyser backend is a JSON REST API. The pages in this section are generated from its OpenAPI schema, so
+they always match the running version. Each page lists the parameters, request body, responses and a ready-to-copy
+example.
+
+## Base URL
+
+Use the URL of your backend: your own instance when [self-hosting](/docs/selfhost-install)
+(`http://localhost:8000` by default), or the hosted API. Examples throughout these docs show `YOUR_BACKEND`.
+
+The backend also serves interactive documentation at `/docs` (Swagger UI) and `/redoc`, and the raw schema at
+`/openapi.json`, which you can import into tools such as Postman or use to generate a client.
+
+## Authentication
+
+Three mechanisms are used, depending on the endpoint:
+
+| Used for | How | Endpoints |
+|---|---|---|
+| Sending logs | `X-API-Key: key_…` header | `POST /ingest` |
+| Everything the dashboard does | `Authorization: Bearer <access token>` | `/users`, `/api-keys`, `/logs`, `/analytics`, `/exports`, `/ws/ticket` |
+| Obtaining a session | Email and password, then a refresh cookie | `/auth/*` |
+
+- **Access tokens** come from `POST /auth/login` and last 30 minutes by default.
+- **Refresh tokens** are set as an httpOnly cookie on login and exchanged for a new access token at
+  `POST /auth/refresh`. They are rotated on every use.
+- **API keys** are created in the dashboard (or via `POST /api-keys`) and are shown once. See
+  [Getting started](/docs/getting-started).
+
+## Endpoint groups
+
+<Cards>
+  <Card title="Authentication" href="/docs/API/register_auth_register_post">
+    Register, log in, refresh and log out, password reset and email verification.
+  </Card>
+  <Card title="Logs" href="/docs/API/ingest_ingest_post">
+    Ingest batches of packets and page through stored history.
+  </Card>
+  <Card title="Analytics" href="/docs/API/summary_analytics_summary_get">
+    Summary, timeseries, top talkers, geo distribution and anomalies.
+  </Card>
+  <Card title="Exports" href="/docs/API/create_export_exports_post">
+    Request a data export and fetch short-lived download links.
+  </Card>
+  <Card title="API keys" href="/docs/API/create_key_api_keys_post">
+    Create, list and revoke ingest keys.
+  </Card>
+  <Card title="WebSocket" href="/docs/API/create_ws_ticket_ws_ticket_post">
+    Get a one-time ticket to open the live feed at `/ws/live`.
+  </Card>
+</Cards>
+
+## Conventions
+
+**Errors.** Failed requests return a non-2xx status and a JSON body with a `detail` field. Invalid request bodies
+or parameters return `422` with the offending fields listed. Authentication failures return `401`.
+
+**Rate limiting.** Limits apply per category (auth, forgot-password, ingest, WebSocket and general API). When you
+exceed one you receive `429`, wait and retry. Defaults are listed in
+[Sending logs](/docs/sending-logs#limits) and can be changed when self-hosting.
+
+**Time ranges.** Analytics endpoints take `start` and `end` as ISO 8601 timestamps. The range cannot exceed
+`ANALYTICS_MAX_RANGE_DAYS` (30 by default). Timestamps are filtered on `captured_at`, the time the packet was
+captured, not when it was received.
+
+**Pagination.** Endpoints that return long lists (`GET /logs`, `GET /analytics/anomalies`) use opaque cursors
+rather than page numbers. Make a first request without a `cursor`, then pass the cursor from each response to get
+the next page. Cursors should be treated as opaque strings and not constructed by hand.
+
+**IP addresses and ports.** IPs may be IPv4 or IPv6 and ports are integers from 0 to 65535.
