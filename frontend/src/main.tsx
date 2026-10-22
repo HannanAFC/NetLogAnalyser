@@ -26,10 +26,25 @@ if ( rootElement.hasChildNodes( ) )
 {
 	router.ssr = { manifest: undefined };
 
+	// /login/ and /login are the same route
+	const normalize = ( path: string ) => path.replace( /\/+$/, '' ) || '/';
+	const prerenderedPath = normalize( window.location.pathname );
+
 	router.load( ).then( ( ) =>
 	{
 		// <HeadContent /> re-creates these tags on hydration
 		document.head.querySelectorAll( '[data-prerender]' ).forEach( ( el ) => el.remove( ) );
+
+		// A route guard can redirect a returning visitor (e.g. /login -> /dashboard)
+		// while loading. The markup then no longer matches the prerendered page,
+		// so discard it and render client-side instead of hydrating.
+		if ( normalize( router.state.location.pathname ) !== prerenderedPath )
+		{
+			rootElement.replaceChildren( );
+			createRoot( rootElement ).render( app );
+			return;
+		}
+
 		hydrateRoot( rootElement, app );
 	} );
 }
