@@ -22,8 +22,8 @@ export const Route = createFileRoute( '/verify-email' )(
 {
 	beforeLoad: async( { context } ) =>
 	{
-		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
-		const config  = await context.queryClient.ensureQueryData( configQueryOptions );
+		const session = await context.queryClient.query( sessionQueryOptions );
+		const config  = await context.queryClient.query( configQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
 		if ( config.email_verification_enabled === false ) throw redirect( { to: '/' } );
 	},

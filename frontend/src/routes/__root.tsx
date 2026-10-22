@@ -6,6 +6,7 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { TableDevtoolsPanel } from '@tanstack/react-table-devtools';
 import { Menu } from 'lucide-react';
 import type { RouterContext } from '#/lib/router-context';
+import type { User } from '#/lib/users/types';
 import { ThemeToggle } from '#/components/ui/theme-toggle';
 import { useSession } from '#/features/auth/hooks';
 import { NotFound } from '#/components/not-found';
@@ -115,18 +116,18 @@ export const Route = createRootRouteWithContext< RouterContext >( )(
 
 function RootComponent( )
 {
-	const { data: session } = useSession( );
+	const { data, isLoading } = useSession( );
 
 	return (
 		<OverlayProvider>
 			<SidebarProvider>
-				<RootLayout session={ session } />
+				<RootLayout session={ data } isLoading={ isLoading } />
 			</SidebarProvider>
 		</OverlayProvider>
 	);
 }
 
-function RootLayout( { session }: { session: unknown } )
+function RootLayout( { session, isLoading }: { session: User | null | undefined, isLoading: boolean } )
 {
 	const { toggle, open, close } = useSidebar( );
 	const appVersion = useAppVersion( );
@@ -153,12 +154,15 @@ function RootLayout( { session }: { session: unknown } )
 							<IndexLink />
 						</>
 						}
-						{ !session && <IndexLink /> }
+                        { isLoading &&
+                            <div className='w-12 h-9' />
+                        }
+						{ !session && !isLoading && <IndexLink /> }
 					</div>
 
 					<nav className="flex items-center gap-4">
 						<ThemeToggle />
-						{ !session &&
+						{ !session && !isLoading &&
 						(
 							<>
 								<Link

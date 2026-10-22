@@ -23,7 +23,7 @@ export const Route = createFileRoute( '/register' )(
 {
 	beforeLoad: async( { context } ) =>
 	{
-		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		const session = await context.queryClient.query( sessionQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
 	component: RegisterPage,
