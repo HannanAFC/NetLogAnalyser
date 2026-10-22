@@ -1,7 +1,7 @@
+import type { TimeRangeParams } from '#/features/analytics/schemas';
 import { useSummary } from '#/features/analytics/hooks';
 import { Card, CardDescription } from '#/components/ui/card';
 import { BodySm, StatNumber } from '#/components/ui/heading';
-import type { TimeRangeParams } from '#/features/analytics/schemas';
 import { formatLargeNumber } from '#/lib/utils';
 
 interface SummaryStatCardsProps

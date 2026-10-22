@@ -8,12 +8,11 @@ export default [
 	{
 		rules:
 		{
-			'import/no-cycle': 'off',
-			'import/order': 'off',
-			'sort-imports': 'off',
+			'sort-imports': 2,
 			'@typescript-eslint/array-type': 'off',
 			'@typescript-eslint/require-await': 'off',
-			'pnpm/json-enforce-catalog': 'off'
+			'pnpm/json-enforce-catalog': 'off',
+            'no-unused-vars': 2
 		}
 	},
 	{

@@ -1,7 +1,7 @@
+import type { LogEntry } from '#/lib/logs/types';
 import { requestWsTicket } from '#/features/live-feed/api';
 import { logEntryBatchMessageSchema } from '#/features/live-feed/schemas';
 import { env } from '#/lib/env';
-import type { LogEntry } from '#/lib/logs/types';
 
 export type ConnectionStatus = 'idle' | 'connecting' | 'open' | 'reconnecting' | 'error' | 'closed';
 

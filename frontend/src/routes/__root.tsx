@@ -1,23 +1,23 @@
-import { ThemeToggle } from '#/components/ui/theme-toggle';
-import { useSession } from '#/features/auth/hooks';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import { createRootRoute, HeadContent, Link, Outlet } from '@tanstack/react-router';
+import { HeadContent, Link, Outlet, createRootRouteWithContext } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { FormDevtoolsPanel } from '@tanstack/react-form-devtools';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { TableDevtoolsPanel } from '@tanstack/react-table-devtools';
+import { Menu } from 'lucide-react';
+import type { RouterContext } from '#/lib/router-context';
+import { ThemeToggle } from '#/components/ui/theme-toggle';
+import { useSession } from '#/features/auth/hooks';
 import { NotFound } from '#/components/not-found';
-import { Sidebar, SidebarProvider, useSidebar } from '#/components/sidebar';
+import { DesktopSidebar, MobileSidebar, SidebarProvider, useSidebar } from '#/components/sidebar';
 import { Button } from '#/components/ui/button';
 import { IndexLink } from '#/components/ui/index-link';
 import { env } from '#/lib/env';
-import { Menu } from 'lucide-react';
 import '../styles.css';
 import { OverlayProvider } from '#/lib/overlay/overlay-context';
-import { ErrorComponent } from '#/components/error-component';
 import { useAppVersion } from '#/features/health/hooks';
 
-export const Route = createRootRoute(
+export const Route = createRootRouteWithContext< RouterContext >( )(
 {
 	component: ( ) =>
 	(
@@ -27,7 +27,6 @@ export const Route = createRootRoute(
 		</>
 	),
 	notFoundComponent: NotFound,
-	errorComponent:    ErrorComponent,
 	head: ( ) => (
 	{
 		links:
@@ -142,7 +141,8 @@ function RootLayout( { session }: { session: unknown } )
 
 	return (
 		<>
-			{ !!session && <Sidebar open={ open } onClose={ close } /> }
+			{ !!session && <DesktopSidebar open={ open } onClose={ close } /> }
+            { !!session && <MobileSidebar open={ open } onToggle={ toggle } onClose={ close } /> }
 			<div className="flex min-h-screen flex-col bg-paper text-text-primary">
 				<header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 					<div className="flex items-center gap-3">
@@ -153,6 +153,8 @@ function RootLayout( { session }: { session: unknown } )
 								onClick={ toggle }
 								aria-label="Toggle navigation"
 								variant='ghost'
+                                className='hidden md:block'
+                                aria-controls='desktop-navigation'
 							>
 								<Menu className="h-5 w-5" />
 							</Button>
@@ -207,7 +209,7 @@ function RootLayout( { session }: { session: unknown } )
 				<TanStackDevtools
 					config={
 					{
-						position: 'bottom-right'
+						position: 'bottom-left'
 					} }
 					plugins={
 					[

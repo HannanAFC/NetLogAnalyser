@@ -1,9 +1,9 @@
 import { getRouteApi } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
+import { resolveTimeRange } from './resolve-time-range';
 import type { TimeRangeParams } from '#/features/analytics/schemas';
 
-import { resolveTimeRange } from './resolve-time-range';
 import type { TimeRangeSearch } from './schema';
 
 type SetTimeRange = ( next: Partial< TimeRangeSearch > ) => void;

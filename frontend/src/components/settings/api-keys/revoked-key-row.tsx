@@ -1,5 +1,5 @@
-import { Card, CardTitle } from '#/components/ui/card';
 import type { ApiKey } from '#/lib/api-keys/types';
+import { Card, CardTitle } from '#/components/ui/card';
 import { formatApiKeyDate } from '#/lib/utils';
 
 export function RevokedKeyRow( { apiKey }: { apiKey: ApiKey } )

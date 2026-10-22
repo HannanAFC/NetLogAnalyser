@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { cn } from '#/lib/utils';
 import type { OverlayItem } from '#/lib/overlay/types';
+import { cn } from '#/lib/utils';
 
 interface OverlayOutletProps
 {

@@ -5,6 +5,7 @@ import { queryClient } from './lib/api/query-client';
 import { ThemeProvider } from './lib/theme';
 import { routeTree } from './routeTree.gen';
 import './styles.css';
+import { ErrorComponent } from './components/error-component';
 
 // Set up a Router instance
 const router = createRouter(
@@ -15,17 +16,9 @@ const router = createRouter(
 	// Since we're using React Query, we don't want loader calls to ever be stale
 	// This will ensure that the loader is always called when the route is preloaded or visited
 	defaultPreloadStaleTime: 0,
-	scrollRestoration: true
+	scrollRestoration: true,
+    defaultErrorComponent: ( { error } ) => <ErrorComponent error={ error } />
 } );
-
-// Register things for typesafety
-declare module '@tanstack/react-router'
-{
-	interface Register
-	{
-		router: typeof router
-	}
-}
 
 const rootElement = document.getElementById( 'app' )!;
 

@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { initialLogsQueryOptions, logsInfiniteQueryOptions } from '#/features/logs/queries';
 import { createTestQueryClient } from '#/../test/test-utils';
-import { describe, expect, it } from 'vitest';
 
 describe( 'initialLogsQueryOptions', ( ) =>
 {

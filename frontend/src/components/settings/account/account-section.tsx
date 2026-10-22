@@ -1,3 +1,8 @@
+import { useForm } from '@tanstack/react-form';
+import { useNavigate } from '@tanstack/react-router';
+import { DeleteUserDialogue } from './delete-user-dialogue';
+import type { ChangeUserDetailsPayload, ChangeUserPasswordPayload } from '#/features/users/schemas';
+import type { SettingsSectionProps } from '#/routes/_authenticated/settings';
 import { Button } from '#/components/ui/button';
 import { Card, CardDescription, CardLabel } from '#/components/ui/card';
 import { BodySm, Heading } from '#/components/ui/heading';
@@ -5,14 +10,9 @@ import { Input, Label } from '#/components/ui/input';
 import { useLogout, useSession } from '#/features/auth/hooks';
 import { useChangeUserDetails, useChangeUserPassword } from '#/features/users/hooks';
 import { changeUserDetailsSchema, changeUserPasswordSchema } from '#/features/users/schemas';
-import type { ChangeUserDetailsPayload, ChangeUserPasswordPayload } from '#/features/users/schemas';
 import { apiError } from '#/lib/api/errors';
 import { cn, fieldError } from '#/lib/utils';
-import type { SettingsSectionProps } from '#/routes/_authenticated/settings';
-import { useForm } from '@tanstack/react-form';
 import { useOverlay } from '#/lib/overlay/overlay-context';
-import { DeleteUserDialogue } from './delete-user-dialogue';
-import { useNavigate } from '@tanstack/react-router';
 
 export function AccountSection( { className }: SettingsSectionProps )
 {

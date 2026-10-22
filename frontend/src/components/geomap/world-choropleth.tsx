@@ -2,11 +2,11 @@ import { scaleQuantize } from 'd3-scale';
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps';
 import worldAtlas from 'world-atlas/countries-110m.json';
 
-import { numericToAlpha2, numericToName } from '#/lib/geomap/country-codes';
-import type { GeoEntry } from '#/lib/analytics/types';
-import { Card } from '../ui/card';
 import { useState } from 'react';
+import { Card } from '../ui/card';
 import { MapPopup } from './map-popup';
+import type { GeoEntry } from '#/lib/analytics/types';
+import { numericToAlpha2, numericToName } from '#/lib/geomap/country-codes';
 import { useDebounce } from '#/lib/utils';
 
 interface WorldChoroplethProps

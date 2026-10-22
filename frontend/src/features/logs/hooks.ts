@@ -1,12 +1,12 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
+import type { LogEntry } from '#/lib/logs/types';
 import {
 	DEFAULT_HISTORY_PAGE_LIMIT,
 	DEFAULT_INITIAL_LOGS_LIMIT,
 	initialLogsQueryOptions,
 	logsInfiniteQueryOptions
 } from '#/features/logs/queries';
-import type { LogEntry } from '#/lib/logs/types';
 
 export function useInitialLogs( limit: number = DEFAULT_INITIAL_LOGS_LIMIT )
 {

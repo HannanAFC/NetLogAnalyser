@@ -1,5 +1,5 @@
-import { logsSearchSchema } from '#/features/logs/schemas';
 import { describe, expect, it } from 'vitest';
+import { logsSearchSchema } from '#/features/logs/schemas';
 
 describe( 'logsSearchSchema', ( ) =>
 {

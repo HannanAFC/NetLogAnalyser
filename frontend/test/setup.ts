@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom/vitest';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 
-import { tokenStore } from '#/lib/auth/token-store';
 
 import { resetAnalyticsCallCounts, resetApiKeysCallCounts, resetGetLogsCallCount, resetRefreshCallCount, setRefreshShouldFail } from './mocks/handlers';
 import { server } from './mocks/server';
+import { tokenStore } from '#/lib/auth/token-store';
 
 
 window.__ENV__ =

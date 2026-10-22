@@ -1,23 +1,23 @@
-import { useAnomalies } from '#/features/analytics/hooks';
-import type { AnomaliesFilterParams } from '#/features/analytics/schemas';
 import {
-	tableFeatures,
-	useTable,
 	createColumnHelper,
-	rowPaginationFeature,
-	rowExpandingFeature,
 	createExpandedRowModel,
-	metaHelper
+	metaHelper,
+	rowExpandingFeature,
+	rowPaginationFeature,
+	tableFeatures,
+	useTable
 } from '@tanstack/react-table';
-import type { PaginationState } from '@tanstack/react-table';
-import type { LogEntry } from '#/lib/logs/types';
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { Button } from '#/components/ui/button';
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
-import { formatApiKeyDate } from '#/lib/utils';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
 import { TanStackDataTable } from '../ui/tanstack-data-table';
+import type { LogEntry } from '#/lib/logs/types';
+import type { PaginationState } from '@tanstack/react-table';
+import type { AnomaliesFilterParams } from '#/features/analytics/schemas';
 import type { SkeletonColumn } from '../ui/skeleton-table';
+import { formatApiKeyDate } from '#/lib/utils';
+import { Button } from '#/components/ui/button';
+import { useAnomalies } from '#/features/analytics/hooks';
 
 interface AnomaliesTableProps
 {

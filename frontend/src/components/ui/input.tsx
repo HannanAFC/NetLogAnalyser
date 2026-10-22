@@ -1,7 +1,7 @@
-import type { InputHTMLAttributes, LabelHTMLAttributes } from 'react';
 import { forwardRef } from 'react';
 import { cn } from '../../lib/utils';
 import { BodySm } from './heading';
+import type { InputHTMLAttributes, LabelHTMLAttributes } from 'react';
 
 /* ── Label ─────────────────────────────────────────────────────────── */
 

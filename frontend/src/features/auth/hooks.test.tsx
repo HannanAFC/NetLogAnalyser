@@ -1,11 +1,11 @@
-import { lastForgotPasswordEmail, lastResendVerificationEmail, refreshCallCount, setRefreshShouldFail, UNVERIFIED_EMAIL, VALID_EMAIL, VALID_PASSWORD, VALID_RESET_TOKEN, VALID_VERIFICATION_TOKEN } from '#/../test/mocks/handlers';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { UNVERIFIED_EMAIL, VALID_EMAIL, VALID_PASSWORD, VALID_RESET_TOKEN, VALID_VERIFICATION_TOKEN, lastForgotPasswordEmail, lastResendVerificationEmail, refreshCallCount, setRefreshShouldFail } from '#/../test/mocks/handlers';
 import { createTestQueryClient } from '#/../test/test-utils';
 import { useForgotPassword, useLogin, useResendVerification, useResetPassword, useVerifyEmail } from '#/features/auth/hooks';
 import { sessionQueryKey, sessionQueryOptions } from '#/features/auth/queries';
 import { wrapperFor } from '#/lib/api/test-utils';
 import { tokenStore } from '#/lib/auth/token-store';
-import { act, renderHook, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 
 describe( 'useLogin', ( ) =>
 {

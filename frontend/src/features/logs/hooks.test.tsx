@@ -1,8 +1,8 @@
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { useInitialLogs, useLogHistory } from '#/features/logs/hooks';
 import { wrapperFor } from '#/lib/api/test-utils';
 import { createTestQueryClient } from '#/../test/test-utils';
-import { act, renderHook, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 
 describe( 'useInitialLogs', ( ) =>
 {

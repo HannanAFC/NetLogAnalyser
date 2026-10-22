@@ -1,14 +1,14 @@
+import { useForm } from '@tanstack/react-form';
+import { Link, createFileRoute, redirect } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
+import { z } from 'zod';
+import { Input, Label } from '../components/ui/input';
 import { Card } from '#/components/ui/card';
-import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { BodySm, BodyText, Heading } from '#/components/ui/heading';
 import { useResendVerification, useSession, useVerifyEmail } from '#/features/auth/hooks';
 import { resendVerificationSchema } from '#/features/auth/schemas';
 import { apiError } from '#/lib/api/errors';
 import { fieldError } from '#/lib/utils';
-import { useForm } from '@tanstack/react-form';
-import { createFileRoute, Link, redirect } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { z } from 'zod';
-import { Input, Label } from '../components/ui/input';
 import { sessionQueryOptions } from '#/features/auth/queries';
 import { configQueryOptions } from '#/features/config/queries';
 import { Button } from '#/components/ui/button';
@@ -25,7 +25,7 @@ export const Route = createFileRoute( '/verify-email' )(
 		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
 		const config  = await context.queryClient.ensureQueryData( configQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
-		if ( config?.email_verification_enabled === false ) throw redirect( { to: '/' } );
+		if ( config.email_verification_enabled === false ) throw redirect( { to: '/' } );
 	},
 	validateSearch: verifySearchSchema,
 	component: VerifyEmailPage,

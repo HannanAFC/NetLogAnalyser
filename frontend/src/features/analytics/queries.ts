@@ -1,12 +1,12 @@
-import { queryOptions, infiniteQueryOptions } from '@tanstack/react-query';
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { analyticsKeys } from './query-key';
 import {
+	getAnomaliesRequest,
+	getGeoRequest,
+	getProtocolsRequest,
 	getSummaryRequest,
 	getTimeseriesRequest,
-	getTopTalkersRequest,
-	getProtocolsRequest,
-	getGeoRequest,
-	getAnomaliesRequest
+	getTopTalkersRequest
 } from './api';
 import type {
 	AnomaliesParams,

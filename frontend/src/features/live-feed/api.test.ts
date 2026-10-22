@@ -1,7 +1,7 @@
+import { HttpResponse, http } from 'msw';
+import { describe, expect, it } from 'vitest';
 import { requestWsTicket } from '#/features/live-feed/api';
 import { server } from '#/../test/mocks/server';
-import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
 
 describe( 'requestWsTicket', ( ) =>
 {

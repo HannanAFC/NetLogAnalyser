@@ -2,19 +2,19 @@ import { useMemo } from 'react';
 import { scaleBand, scaleLinear } from 'd3-scale';
 import { barY, defineChart, dot } from '@tanstack/charts';
 import { Chart } from '@tanstack/react-charts';
-import { useProtocols } from '#/features/analytics/hooks';
-import type { TimeRangeParams } from '#/features/analytics/schemas';
+import {
+	createColumnHelper,
+	tableFeatures,
+	useTable
+} from '@tanstack/react-table';
 import { Card } from '../ui/card';
-import type { PortEntry } from '#/lib/analytics/types';
 import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
 import { TableNoRecentsErrorMessage } from '../ui/table-no-recents-error-message';
-import type { SkeletonColumn } from '../ui/skeleton-table';
 import { TanStackDataTable } from '../ui/tanstack-data-table';
-import {
-	tableFeatures,
-	useTable,
-	createColumnHelper
-} from '@tanstack/react-table';
+import type { SkeletonColumn } from '../ui/skeleton-table';
+import type { PortEntry } from '#/lib/analytics/types';
+import type { TimeRangeParams } from '#/features/analytics/schemas';
+import { useProtocols } from '#/features/analytics/hooks';
 
 interface ProtocolBreakdownProps
 {

@@ -1,5 +1,5 @@
-import { apiClient } from '#/lib/api/client';
 import type { GetLogsResponse } from '#/lib/logs/types';
+import { apiClient } from '#/lib/api/client';
 
 export interface GetLogsParams
 {

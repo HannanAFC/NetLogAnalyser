@@ -1,6 +1,6 @@
-import type { ThemeMode } from '../../lib/theme';
 import { useTheme } from '../../lib/theme';
 import { Button } from './button';
+import type { ThemeMode } from '../../lib/theme';
 
 const nextMode: Record< ThemeMode, ThemeMode > =
 {

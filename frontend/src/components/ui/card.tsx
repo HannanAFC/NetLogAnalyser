@@ -1,6 +1,6 @@
-import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 import { BodySm } from './heading';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 /* ── Card variants ─────────────────────────────────────────────────── */
 

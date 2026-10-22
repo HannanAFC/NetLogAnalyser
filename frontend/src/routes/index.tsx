@@ -1,9 +1,9 @@
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { Card } from '#/components/ui/card';
-import { BodySm, BodyText, Eyebrow, Heading, SectionTitle } from '#/components/ui/heading';
+import { BodySm, BodyText, Heading, SectionTitle } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
 import { useSession } from '#/features/auth/hooks';
 import { sessionQueryOptions } from '#/features/auth/queries';
-import { createFileRoute, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute( '/' )(
 {

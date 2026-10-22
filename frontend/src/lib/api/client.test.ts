@@ -1,10 +1,10 @@
-import { refreshCallCount, setRefreshShouldFail, VALID_EMAIL } from '#/../test/mocks/handlers';
+import { waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { VALID_EMAIL, refreshCallCount, setRefreshShouldFail } from '#/../test/mocks/handlers';
 import { createTestQueryClient } from '#/../test/test-utils';
 import { apiClient } from '#/lib/api/client';
 import { sessionQueryKey } from '#/lib/auth/session-key';
 import { tokenStore } from '#/lib/auth/token-store';
-import { waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 
 describe( '401 -> refresh -> retry interceptor', ( ) =>
 {
