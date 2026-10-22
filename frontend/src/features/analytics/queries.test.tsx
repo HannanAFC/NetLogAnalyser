@@ -31,7 +31,7 @@ describe( 'summaryQueryOptions', ( ) =>
 	it( 'resolves summary data from the mock endpoint', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const data = await queryClient.ensureQueryData( summaryQueryOptions( { start: START, end: END } ) );
+		const data = await queryClient.query( summaryQueryOptions( { start: START, end: END } ) );
 
 		expect( data ).toEqual( FAKE_SUMMARY );
 	} );
@@ -55,7 +55,7 @@ describe( 'timeseriesQueryOptions', ( ) =>
 	it( 'resolves timeseries data from the mock endpoint', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const data = await queryClient.ensureQueryData( timeseriesQueryOptions( { start: START, end: END, bucket: 'hour' } ) );
+		const data = await queryClient.query( timeseriesQueryOptions( { start: START, end: END, bucket: 'hour' } ) );
 
 		expect( data ).toEqual( FAKE_TIMESERIES );
 	} );
@@ -74,7 +74,7 @@ describe( 'topTalkersQueryOptions', ( ) =>
 	it( 'resolves top talkers data from the mock endpoint', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const data = await queryClient.ensureQueryData( topTalkersQueryOptions( { start: START, end: END, direction: 'src', metric: 'packets', limit: 10 } ) );
+		const data = await queryClient.query( topTalkersQueryOptions( { start: START, end: END, direction: 'src', metric: 'packets', limit: 10 } ) );
 
 		expect( data ).toEqual( FAKE_TOP_TALKERS );
 	} );
@@ -93,7 +93,7 @@ describe( 'protocolsQueryOptions', ( ) =>
 	it( 'resolves protocol data from the mock endpoint', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const data = await queryClient.ensureQueryData( protocolsQueryOptions( { start: START, end: END } ) );
+		const data = await queryClient.query( protocolsQueryOptions( { start: START, end: END } ) );
 
 		expect( data ).toEqual( FAKE_PROTOCOLS );
 	} );
@@ -112,7 +112,7 @@ describe( 'geoQueryOptions', ( ) =>
 	it( 'resolves geo data from the mock endpoint', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const data = await queryClient.ensureQueryData( geoQueryOptions( { start: START, end: END, direction: 'src', limit: 25 } ) );
+		const data = await queryClient.query( geoQueryOptions( { start: START, end: END, direction: 'src', limit: 25 } ) );
 
 		expect( data ).toEqual( FAKE_GEO );
 	} );

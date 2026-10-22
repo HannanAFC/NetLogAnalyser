@@ -18,11 +18,7 @@ export default defineConfig( ( { mode } ) =>
             define,
             server:
             {
-                port: 3000,
-                build:
-                {
-                    inlineCss: true
-                }
+                port: 3000
             },
             preview:
             {
@@ -47,7 +43,20 @@ export default defineConfig( ( { mode } ) =>
                     } ),
                 react(),
                 // please see https://tanstack.com/start/latest/docs/framework/react/guide/hosting#nitro for guides on hosting
-                nitro( )
+                nitro(
+                    {
+                        // Precompress static assets (gzip + brotli) at build time; src/server/compress.ts handles HTML at runtime
+                        compressPublicAssets: true,
+                        handlers: [ { route: '/**', middleware: true, handler: './src/server/compress.ts' } ],
+                        routeRules:
+                        {
+                            // Screenshot filenames are not content-hashed, so cache for a week and revalidate in the background
+                            '/screenshots/**': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' } },
+                            '/favicon*': { headers: { 'cache-control': 'public, max-age=604800' } },
+                            '/apple-touch-icon.png': { headers: { 'cache-control': 'public, max-age=604800' } },
+                            '/web-app-manifest-*': { headers: { 'cache-control': 'public, max-age=604800' } }
+                        }
+                    } )
             ],
             resolve:
             {

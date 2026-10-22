@@ -4,6 +4,7 @@ import { ArrowRight, BookOpenText, Code, Rocket, Server, ShieldCheck } from 'luc
 import type { ReactNode } from 'react';
 import { baseOptions } from '@/lib/layout.shared';
 import { env } from '@/lib/env';
+import { ScreenshotPicture, type ScreenshotName } from '@/components/screenshot-picture';
 
 const title       = 'NetLogAnalyser Docs';
 const description = 'Real-time network log analysis. Send packet data to a REST API, watch it stream live, and spot anomalies as they happen. Open source and self-hostable.';
@@ -21,12 +22,12 @@ export const Route = createFileRoute( '/' )(
                 { property: 'og:description', content: description },
                 { property: 'og:type', content: 'website' },
                 { property: 'og:url', content: env.docsUrl },
-                { property: 'og:image', content: `${ env.docsUrl }/dashboard-hero.png` },
+                { property: 'og:image', content: `${ env.docsUrl }/screenshots/dashboard-hero-dark.jpg` },
                 { name: 'twitter:url', content: env.docsUrl },
                 { name: 'twitter:card', content: 'summary_large_image' },
                 { name: 'twitter:title', content: title },
                 { name: 'twitter:description', content: description },
-                { name: 'twitter:image', content: `${ env.docsUrl }/dashboard-hero.png` }
+                { name: 'twitter:image', content: `${ env.docsUrl }/screenshots/dashboard-hero-dark.jpg` }
             ]
         } )
     } );
@@ -44,11 +45,13 @@ const buttonBase = 'inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-s
 const primaryButton   = `${ buttonBase } bg-fd-primary text-fd-primary-foreground hover:opacity-90`;
 const secondaryButton = `${ buttonBase } border border-fd-border bg-fd-card text-fd-foreground hover:bg-fd-accent`;
 
-function Screenshot( { src, alt, width, height, className = '' }: { src: string; alt: string; width: number; height: number; className?: string } )
+const featureSizes = '(min-width: 1024px) 560px, calc(100vw - 2rem)';
+
+function Screenshot( { name, alt, className = '' }: { name: ScreenshotName; alt: string; className?: string } )
 {
     return (
         <div className={ `overflow-hidden rounded-xl border border-fd-border bg-fd-card shadow-lg ${ className }` }>
-            <img src={ src } alt={ alt } width={ width } height={ height } loading="lazy" className="block h-auto w-full" />
+            <ScreenshotPicture name={ name } alt={ alt } sizes={ featureSizes } className="block h-auto w-full" />
         </div>
     );
 }
@@ -60,7 +63,7 @@ interface FeatureProps
     body:     string;
     href:     string;
     linkText: string;
-    image:    { src: string; alt: string; width: number; height: number };
+    image:    { name: ScreenshotName; alt: string };
     flip?:    boolean;
 }
 
@@ -141,14 +144,12 @@ function Home( )
 
                     <div className="relative mt-14 w-full max-w-5xl">
                         <div className="max-h-128 overflow-hidden rounded-xl border border-fd-border bg-fd-card shadow-xl sm:max-h-160">
-                            <img
-                                src="/dashboard-hero.png"
+                            <ScreenshotPicture
+                                name="dashboard-hero"
                                 alt="The NetLogAnalyser dashboard showing summary statistics and a packet volume chart"
-                                width={ 1920 }
-                                height={ 1080 }
+                                sizes="(min-width: 1088px) 1024px, calc(100vw - 2rem)"
                                 className="block h-auto w-full"
-                                fetchPriority='high'
-                                loading='eager'
+                                priority
                             />
                         </div>
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 rounded-b-xl bg-linear-to-t from-fd-background to-transparent" />
@@ -162,7 +163,7 @@ function Home( )
                     body="Entries stream to your browser the moment they are ingested, each with its source and destination, protocol, packet size, country and anomaly score."
                     href="dashboard"
                     linkText="Tour the dashboard"
-                    image={ { src: '/live-feed.png', alt: 'The live feed table showing new log entries with anomaly scores', width: 1045, height: 362 } }
+                    image={ { name: 'live-feed', alt: 'The live feed table showing new log entries with anomaly scores' } }
                 />
 
                 <Feature
@@ -172,7 +173,7 @@ function Home( )
                     body="Every entry gets a score from 0 to 1 and a list of reasons: XMAS scans, invalid flag combinations, port scans, unusual packet sizes and protocol mismatches. Filter by minimum score and expand any row to see the details."
                     href="anomaly-detection"
                     linkText="How scoring works"
-                    image={ { src: '/anomalies.png', alt: 'The anomalies table with expanded rows listing the reasons for each score', width: 1039, height: 390 } }
+                    image={ { name: 'anomalies', alt: 'The anomalies table with expanded rows listing the reasons for each score' } }
                 />
 
                 <Feature
@@ -181,7 +182,7 @@ function Home( )
                     body="Source and destination IPs are resolved to countries with MaxMind GeoLite2 and shown on a world map, alongside a ranked breakdown by location."
                     href="dashboard"
                     linkText="Explore the analytics"
-                    image={ { src: '/geomap.png', alt: 'A world map shaded by packet count with a table of the top countries', width: 2246, height: 1049 } }
+                    image={ { name: 'geomap', alt: 'A world map shaded by packet count with a table of the top countries' } }
                 />
 
                 <Feature
@@ -191,7 +192,7 @@ function Home( )
                     body="Create a key per sender, label it, and revoke it at any time. Keys are stored only as hashes, and each one authenticates a single header on one ingest endpoint."
                     href="sending-logs"
                     linkText="Read the ingest guide"
-                    image={ { src: '/api-keys.png', alt: 'The API keys settings page listing active keys with revoke buttons', width: 832, height: 423 } }
+                    image={ { name: 'api-keys', alt: 'The API keys settings page listing active keys with revoke buttons' } }
                 />
 
                 {/* Self-hosting */}

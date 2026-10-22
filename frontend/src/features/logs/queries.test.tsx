@@ -35,7 +35,7 @@ describe( 'initialLogsQueryOptions', ( ) =>
 	it( 'resolves entries from the mock logs endpoint', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const data = await queryClient.ensureQueryData( initialLogsQueryOptions( 20 ) );
+		const data = await queryClient.query( initialLogsQueryOptions( 20 ) );
 
 		expect( data.entries ).toBeDefined( );
 		expect( data.entries.length ).toBeGreaterThan( 0 );

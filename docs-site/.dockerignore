@@ -1,0 +1,12 @@
+node_modules
+.pnpm-store
+.output
+.nitro
+.tanstack
+.source
+dist
+.env
+.env.*
+!.env.example
+.git
+*.log

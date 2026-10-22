@@ -9,7 +9,7 @@ export const Route = createFileRoute( '/_authenticated' )(
 		{
 			try
 			{
-				const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+				const session = await context.queryClient.query( sessionQueryOptions );
 				if ( !session )
 				{
 					throw redirect( { to: '/login', search: { redirect: location.href } } );

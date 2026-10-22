@@ -59,7 +59,7 @@ describe( 'route guard (ensureQueryData against sessionQueryOptions)', ( ) =>
 		setRefreshShouldFail( true );
 
 		const queryClient = createTestQueryClient( );
-		const session = await queryClient.ensureQueryData( sessionQueryOptions );
+		const session = await queryClient.query( sessionQueryOptions );
 
 		expect( session ).toBeNull( );
 	} );
@@ -70,7 +70,7 @@ describe( 'route guard (ensureQueryData against sessionQueryOptions)', ( ) =>
 		// tokenStore starts empty (page reload); fetchSession should fall
 		// back to /auth/refresh, succeed, then call /users/me.
 		const queryClient = createTestQueryClient( );
-		const session = await queryClient.ensureQueryData( sessionQueryOptions );
+		const session = await queryClient.query( sessionQueryOptions );
 
 		expect( session ).toMatchObject( { email: VALID_EMAIL } );
 		expect( tokenStore.get( ) ).toBe( 'refreshed-access-token' );

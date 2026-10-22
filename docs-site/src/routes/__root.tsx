@@ -1,5 +1,6 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router';
 import appCss from '@/styles/app.css?url';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
 import { RootProvider } from 'fumadocs-ui/provider/tanstack';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
@@ -44,12 +45,11 @@ export const Route = createRootRoute(
                     href: appCss
                 },
                 {
-                    rel: 'preconnect',
-                    href: 'https://fonts.googleapis.com'
-                },
-                {
-                    rel: 'preconnect',
-                    href: 'https://fonts.gstatic.com'
+                    rel: 'preload',
+                    as: 'font',
+                    type: 'font/woff2',
+                    crossOrigin: 'anonymous',
+                    href: interLatin
                 }
             ],
             meta:

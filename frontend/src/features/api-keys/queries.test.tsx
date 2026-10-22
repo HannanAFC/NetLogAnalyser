@@ -10,7 +10,7 @@ describe( 'apiKeysQueryOptions', ( ) =>
 	it( 'resolves to the list of API keys', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const keys = await queryClient.ensureQueryData( apiKeysQueryOptions );
+		const keys = await queryClient.query( apiKeysQueryOptions );
 
 		expect( keys ).toHaveLength( 2 );
 		expect( keys[ 0 ].id ).toBe( FAKE_API_KEY_ID_1 );
@@ -22,7 +22,7 @@ describe( 'apiKeysQueryOptions', ( ) =>
 	it( 'includes both active and revoked keys', async( ) =>
 	{
 		const queryClient = createTestQueryClient( );
-		const keys = await queryClient.ensureQueryData( apiKeysQueryOptions );
+		const keys = await queryClient.query( apiKeysQueryOptions );
 
 		const active  = keys.filter( ( k ) => !k.revoked_at );
 		const revoked = keys.filter( ( k ) => k.revoked_at );

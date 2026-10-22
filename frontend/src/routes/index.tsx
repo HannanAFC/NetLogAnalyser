@@ -21,7 +21,7 @@ export const Route = createFileRoute( '/' )(
 
 function IndexPage( )
 {
-	const { data: session } = useSession( );
+	const { data, isLoading } = useSession( );
 
 	return (
 		<PageWrapper className="lg:py-14">
@@ -34,7 +34,7 @@ function IndexPage( )
 				Send network logs via the REST API and receive real-time anomaly-scoring, geo-mapping and clear dashboard data.
 			</BodyText>
 			<div className="flex gap-3">
-				{ session ? (
+				{ data ? (
 					<Link
 						to="/dashboard"
 						className="rounded-md bg-accent px-4 py-2.5 text-xs font-semibold text-ink no-underline transition-opacity hover:opacity-90"
@@ -43,18 +43,25 @@ function IndexPage( )
 					</Link>
 				) : (
 					<>
-						<Link
-							to="/register"
-							className="rounded-md bg-accent px-4 py-2.5 text-xs font-semibold text-ink no-underline transition-opacity hover:opacity-90"
-						>
-							Get started
-						</Link>
-						<Link
-							to="/login"
-							className="rounded-md border border-border px-4 py-2.5 text-xs font-semibold text-text-secondary no-underline transition-colors hover:text-text-primary"
-						>
-							Login
-						</Link>
+                        { !isLoading &&
+                            <>
+                                <Link
+                                    to="/register"
+                                    className="rounded-md bg-accent px-4 py-2.5 text-xs font-semibold text-ink no-underline transition-opacity hover:opacity-90"
+                                >
+                                    Get started
+                                </Link>
+                                <Link
+                                    to="/login"
+                                    className="rounded-md border border-border px-4 py-2.5 text-xs font-semibold text-text-secondary no-underline transition-colors hover:text-text-primary"
+                                >
+                                    Login
+                                </Link>
+                            </>
+                        }
+                        { isLoading &&
+                            <div className='w-full h-9' />
+                        }
 					</>
 				)}
 			</div>
