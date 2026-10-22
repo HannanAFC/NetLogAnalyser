@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { useLiveFeed } from '#/features/live-feed/hooks';
 import { ConnectionStatusIndicator } from '#/components/live-feed/connection-status';
 import { BodyText, Heading } from '#/components/ui/heading';

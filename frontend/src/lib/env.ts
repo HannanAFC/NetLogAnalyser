@@ -1,6 +1,6 @@
 declare global
 {
-	interface Window
+	interface Window // eslint-disable-line no-unused-vars
 	{
 		__ENV__:
 		{
@@ -14,6 +14,9 @@ declare global
 
 function resolveApiBaseUrl( ): string
 {
+	// Build-time prerender runs in Node with no window; nothing is fetched there.
+	if ( typeof window === 'undefined' ) return '';
+
 	const { BACKEND_PORT, API_BASE_URL } = window.__ENV__ ?? { };
 
 	// Self-host: browser and backend share a host, only the port varies.
@@ -30,6 +33,8 @@ function resolveApiBaseUrl( ): string
 
 function resolveWsBaseUrl( ): string
 {
+	if ( typeof window === 'undefined' ) return '';
+
 	const { BACKEND_PORT, WS_BASE_URL } = window.__ENV__ ?? { };
 
 	if ( BACKEND_PORT )
@@ -45,6 +50,8 @@ function resolveWsBaseUrl( ): string
 
 function resolveDocsUrl( ): string
 {
+    if ( typeof window === 'undefined' ) return 'https://docs.netloganalyser.com';
+
     const { DOCS_URL } = window.__ENV__ ?? { };
 
     if ( DOCS_URL ) return DOCS_URL;

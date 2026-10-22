@@ -1,5 +1,5 @@
-import { logEntryBatchMessageSchema } from '#/features/live-feed/schemas';
 import { describe, expect, it } from 'vitest';
+import { logEntryBatchMessageSchema } from '#/features/live-feed/schemas';
 
 const VALID_BATCH = {
 	type: 'log_entry_batch',
@@ -136,7 +136,8 @@ describe( 'logEntryBatchMessageSchema', ( ) =>
 
 	it( 'rejects an entry missing a required field', ( ) =>
 	{
-		const { src_ip, ...missingSrcIp } = VALID_BATCH.data[ 0 ];
+
+		const { src_ip, ...missingSrcIp } = VALID_BATCH.data[ 0 ]; // eslint-disable-line no-unused-vars
 
 		const result = logEntryBatchMessageSchema.safeParse(
 		{

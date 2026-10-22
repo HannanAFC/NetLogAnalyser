@@ -1,19 +1,19 @@
-import { useAnomalies } from '#/features/analytics/hooks';
+import {
+	createColumnHelper,
+	metaHelper,
+	tableFeatures,
+    useTable
+} from '@tanstack/react-table';
+import { useMemo } from 'react';
+import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
+import { TableNoRecentsErrorMessage } from '../ui/table-no-recents-error-message';
+import { TanStackDataTable } from '../ui/tanstack-data-table';
+import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
 import type { TimeRangeParams } from '#/features/analytics/schemas';
 import type { HTMLAttributes } from 'react';
 import type { LogEntry } from '#/lib/logs/types';
 import type { SkeletonColumn } from '../ui/skeleton-table';
-import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
-import { TableNoRecentsErrorMessage } from '../ui/table-no-recents-error-message';
-import { TanStackDataTable } from '../ui/tanstack-data-table';
-import {
-	tableFeatures,
-	useTable,
-	createColumnHelper,
-    metaHelper
-} from '@tanstack/react-table';
-import { useMemo } from 'react';
-import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
+import { useAnomalies } from '#/features/analytics/hooks';
 
 const PREVIEW_MIN_SCORE = 0.8;
 const PREVIEW_LIMIT     = 5;

@@ -1,6 +1,6 @@
+import type { TimeBucket } from '#/features/analytics/schemas';
 import { Button } from '#/components/ui/button';
 import { isBucketValid, maxSpanForBucket } from '#/lib/time-range/timeseries-bucket';
-import type { TimeBucket } from '#/features/analytics/schemas';
 
 const BUCKET_OPTIONS: { value: TimeBucket; label: string }[ ] =
 [

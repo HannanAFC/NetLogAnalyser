@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { generateOGImage } from 'fumadocs-ui/og/takumi';
 import { source } from '@/lib/source';
-import { appName } from '@/lib/shared';
+import { titleAppName } from '@/lib/shared';
 
 export const Route = createFileRoute( '/og/docs/$' )(
     {
@@ -19,7 +19,7 @@ export const Route = createFileRoute( '/og/docs/$' )(
                         {
                             title:       page.data.title,
                             description: page.data.description,
-                            site:        appName,
+                            site:        titleAppName,
                             format:      'webp'
                         } );
                 }

@@ -1,7 +1,7 @@
-import type { ClassValue } from 'clsx';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useEffect, useState } from 'react';
+import type { ClassValue } from 'clsx';
 
 /** Merge Tailwind classes without style conflicts. */
 export function cn( ...inputs: ClassValue[ ] )

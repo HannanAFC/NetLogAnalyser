@@ -1,5 +1,5 @@
-import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/utils';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 type HeadingLevel = 'h1' | 'h2' | 'h3';
 

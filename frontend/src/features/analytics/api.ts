@@ -1,6 +1,6 @@
+import type { AnomaliesParams, GeoParams, TimeRangeParams, TimeseriesParams, TopTalkersParams } from './schemas';
+import type { AnomaliesResponse, GeoResponse, ProtocolsResponse, SummaryResponse, TimeSeriesResponse, TopTalkersResponse } from '#/lib/analytics/types';
 import { apiClient } from '#/lib/api/client';
-import type { TimeRangeParams, TimeseriesParams, TopTalkersParams, GeoParams, AnomaliesParams } from './schemas';
-import type { SummaryResponse, TimeSeriesResponse, TopTalkersResponse, ProtocolsResponse, GeoResponse, AnomaliesResponse } from '#/lib/analytics/types';
 
 export async function getSummaryRequest( params: TimeRangeParams ): Promise< SummaryResponse >
 {

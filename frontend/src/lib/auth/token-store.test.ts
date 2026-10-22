@@ -1,6 +1,6 @@
 // lib/auth/token-store.test.ts
-import { tokenStore } from '#/lib/auth/token-store';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { tokenStore } from '#/lib/auth/token-store';
 
 describe( 'tokenStore', ( ) =>
 {

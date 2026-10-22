@@ -1,3 +1,4 @@
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { LogTable } from '#/components/network-logs/log-table';
 import { Button } from '#/components/ui/button';
 import { BodyText, Heading } from '#/components/ui/heading';
@@ -5,7 +6,6 @@ import { PageWrapper } from '#/components/ui/page-wrapper';
 import { TableLoadingErrorMessage } from '#/components/ui/table-loading-error-message';
 import { TableNoRecentsErrorMessage } from '#/components/ui/table-no-recents-error-message';
 import { useLogHistory } from '#/features/logs/hooks';
-import { createFileRoute, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute( '/_authenticated/log-history' )(
 {

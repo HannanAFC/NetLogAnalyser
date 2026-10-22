@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { HttpResponse, http } from 'msw';
 
 export const VALID_EMAIL = 'jane@example.com';
 export const VALID_PASSWORD = 'correct-horse-battery-staple';

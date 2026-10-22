@@ -1,14 +1,15 @@
 import { createGetUrl } from 'fumadocs-core/source';
 
-export const appName = 'NetLogAnalyser Docs';
-export const docsRoute = '/docs';
+export const appName        = 'NetLogAnalyser Docs';
+export const titleAppName   = 'NetLogAnalyser / Docs';
+export const docsRoute      = '/docs';
 export const docsImageRoute = '/og/docs';
 
 // fill this with your actual GitHub info, for example:
 export const gitConfig =
 {
     user:   'HannanAFC',
-    repo:   'netloganalyser',
+    repo:   'NetLogAnalyser',
     branch: 'main'
 };
 

@@ -4,10 +4,10 @@ import { defineChart, dot, lineY } from '@tanstack/charts';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { Chart } from '@tanstack/react-charts';
 
-import { useTimeseries } from '#/features/analytics/hooks';
-import type { TimeBucket, TimeRangeParams } from '#/features/analytics/schemas';
-import { Card, CardDescription } from '../ui/card';
 import { decorative } from '@tanstack/charts/mark/decorative';
+import { Card, CardDescription } from '../ui/card';
+import type { TimeBucket, TimeRangeParams } from '#/features/analytics/schemas';
+import { useTimeseries } from '#/features/analytics/hooks';
 import { formatApiKeyDate } from '#/lib/utils';
 
 interface TimeseriesChartProps

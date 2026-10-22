@@ -4,6 +4,8 @@ A real-time network log analysis platform. Users send network packet data to a
 REST API using an API key; the data is stored, enriched with geo and anomaly
 information, and streamed live to a React dashboard.
 
+Want to see the full documentation? Check out [NetLogAnalyser Docs](https://docs.netloganalyser.com).
+
 # Table of Contents
 - [Usage](#usage)
     - [Quick Start](#quick-start)

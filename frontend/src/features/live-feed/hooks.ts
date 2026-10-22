@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { LiveFeedSocket  } from '#/features/live-feed/connection';
 import type { ConnectionStatus } from '#/features/live-feed/connection';
-import { useInitialLogs } from '#/features/logs/hooks';
 import type { LogEntry } from '#/lib/logs/types';
+import { LiveFeedSocket  } from '#/features/live-feed/connection';
+import { useInitialLogs } from '#/features/logs/hooks';
 
 // Bounds memory/render cost for a long-running live feed - old live
 // entries just fall off the end rather than growing this list forever.

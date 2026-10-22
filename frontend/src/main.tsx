@@ -1,42 +1,54 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
-import ReactDOM from 'react-dom/client';
+import { RouterProvider } from '@tanstack/react-router';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import { queryClient } from './lib/api/query-client';
 import { ThemeProvider } from './lib/theme';
-import { routeTree } from './routeTree.gen';
+import { createAppRouter } from './router';
 import './styles.css';
+import '@fontsource-variable/inter';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/700.css';
 
-// Set up a Router instance
-const router = createRouter(
-{
-	routeTree,
-	context: { queryClient },
-	defaultPreload: 'intent',
-	// Since we're using React Query, we don't want loader calls to ever be stale
-	// This will ensure that the loader is always called when the route is preloaded or visited
-	defaultPreloadStaleTime: 0,
-	scrollRestoration: true
-} );
-
-// Register things for typesafety
-declare module '@tanstack/react-router'
-{
-	interface Register
-	{
-		router: typeof router
-	}
-}
+const router = createAppRouter( );
 
 const rootElement = document.getElementById( 'app' )!;
 
-if ( !rootElement.innerHTML )
+const app = (
+	<QueryClientProvider client={ queryClient }>
+		<ThemeProvider>
+			<RouterProvider router={ router } />
+		</ThemeProvider>
+	</QueryClientProvider>
+);
+
+if ( rootElement.hasChildNodes( ) )
 {
-	const root = ReactDOM.createRoot( rootElement );
-	root.render(
-		<QueryClientProvider client={ queryClient }>
-			<ThemeProvider>
-				<RouterProvider router={ router } />
-			</ThemeProvider>
-		</QueryClientProvider>
-	);
+	router.ssr = { manifest: undefined };
+
+	// /login/ and /login are the same route
+	const normalize = ( path: string ) => path.replace( /\/+$/, '' ) || '/';
+	const prerenderedPath = normalize( window.location.pathname );
+
+	router.load( ).then( ( ) =>
+	{
+		// <HeadContent /> re-creates these tags on hydration
+		document.head.querySelectorAll( '[data-prerender]' ).forEach( ( el ) => el.remove( ) );
+
+		// A route guard can redirect a returning visitor (e.g. /login -> /dashboard)
+		// while loading. The markup then no longer matches the prerendered page,
+		// so discard it and render client-side instead of hydrating.
+		if ( normalize( router.state.location.pathname ) !== prerenderedPath )
+		{
+			rootElement.replaceChildren( );
+			createRoot( rootElement ).render( app );
+			return;
+		}
+
+		hydrateRoot( rootElement, app );
+	} );
+}
+else
+{
+	createRoot( rootElement ).render( app );
 }

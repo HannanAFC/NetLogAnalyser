@@ -1,13 +1,13 @@
-import type { LogEntry } from '#/lib/logs/types';
-import { getLogEntryKey } from '#/lib/logs/entry-key';
-import type { HTMLAttributes, ReactNode } from 'react';
-import { formatRelativeTime } from '#/lib/utils';
-import type { SkeletonColumn } from '#/components/ui/skeleton-table';
 import { createColumnHelper, metaHelper, tableFeatures, useTable } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
 import { TanStackDataTable } from '../ui/tanstack-data-table';
+import type { SkeletonColumn } from '#/components/ui/skeleton-table';
+import type { HTMLAttributes, ReactNode } from 'react';
+import type { LogEntry } from '#/lib/logs/types';
 import type { TableHeightVariant } from '../ui/table-frame';
+import { formatRelativeTime } from '#/lib/utils';
+import { getLogEntryKey } from '#/lib/logs/entry-key';
 
 const SKELETON_COLUMNS: SkeletonColumn[ ] =
 [

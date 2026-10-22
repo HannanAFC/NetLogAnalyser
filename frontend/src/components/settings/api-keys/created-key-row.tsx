@@ -1,8 +1,8 @@
-import { Button } from '#/components/ui/button';
-import { Card, CardDescription, CardLabel } from '#/components/ui/card';
-import type { CreatedApiKey } from '#/lib/api-keys/types';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
+import type { CreatedApiKey } from '#/lib/api-keys/types';
+import { Button } from '#/components/ui/button';
+import { Card, CardDescription, CardLabel } from '#/components/ui/card';
 
 interface CreateKeyProps
 {

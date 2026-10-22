@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { ChangeUserDetailsPayload, ChangeUserPasswordPayload, DeleteUserPayload } from './schemas';
 import { changeUserDetailsRequest, changeUserPasswordRequest, deleteUserRequest } from './api';
+import type { ChangeUserDetailsPayload, ChangeUserPasswordPayload, DeleteUserPayload } from './schemas';
 import { sessionQueryKey } from '#/lib/auth/session-key';
 import { tokenStore } from '#/lib/auth/token-store';
 

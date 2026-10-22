@@ -1,6 +1,6 @@
-import { apiClient } from '#/lib/api/client';
 import type { ChangeUserPasswordResponse, User } from '#/lib/users/types';
-import type { ChangeUserPasswordPayload, ChangeUserDetailsPayload, DeleteUserPayload } from './schemas';
+import type { ChangeUserDetailsPayload, ChangeUserPasswordPayload, DeleteUserPayload } from './schemas';
+import { apiClient } from '#/lib/api/client';
 
 export async function getMe( ): Promise< User >
 {

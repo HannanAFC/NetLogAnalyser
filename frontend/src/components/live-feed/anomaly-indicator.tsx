@@ -1,5 +1,5 @@
-import type { AnomalyReason } from '#/lib/logs/types';
 import { Badge  } from '../ui/badge';
+import type { AnomalyReason } from '#/lib/logs/types';
 import type { BadgeVariant } from '../ui/badge';
 
 type Severity = 'none' | 'low' | 'medium' | 'high';

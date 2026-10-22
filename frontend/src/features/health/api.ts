@@ -1,5 +1,5 @@
-import { apiClient } from '#/lib/api/client';
 import type { HealthResponse } from '#/lib/health/types';
+import { apiClient } from '#/lib/api/client';
 
 export async function getHealth( ): Promise< HealthResponse >
 {

@@ -5,12 +5,12 @@ import { scaleLinear, scaleUtc } from 'd3-scale';
 import { defineChart, dot, lineY } from '@tanstack/charts';
 import { Chart } from '@tanstack/react-charts';
 
-import { useTimeseries } from '#/features/analytics/hooks';
-import { resolveBucket } from '#/lib/time-range/timeseries-bucket';
-import type { TimeRangeParams } from '#/features/analytics/schemas';
-import { Card, CardDescription } from '../ui/card';
 import { tooltip } from '@tanstack/charts/tooltip';
 import { decorative } from '@tanstack/charts/mark/decorative';
+import { Card, CardDescription } from '../ui/card';
+import type { TimeRangeParams } from '#/features/analytics/schemas';
+import { useTimeseries } from '#/features/analytics/hooks';
+import { resolveBucket } from '#/lib/time-range/timeseries-bucket';
 import { formatApiKeyDate } from '#/lib/utils';
 
 interface TimeseriesSparklineProps

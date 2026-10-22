@@ -1,7 +1,7 @@
+import { createFileRoute } from '@tanstack/react-router';
 import { TermsContent } from '#/components/legal/terms-content';
 import { Heading } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
-import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute( '/legal/terms' )(
 {

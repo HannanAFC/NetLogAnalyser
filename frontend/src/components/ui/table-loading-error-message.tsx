@@ -1,5 +1,5 @@
-import type { HTMLAttributes, ReactNode } from 'react';
 import { Card, CardDescription } from '../ui/card';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 export interface TableLoadingErrorMessageProps extends HTMLAttributes< HTMLDivElement >
 {

@@ -1,15 +1,15 @@
-import { useState, useMemo } from 'react';
-import { useTopTalkers } from '#/features/analytics/hooks';
-import { Button } from '#/components/ui/button';
-import type { Direction, Metric, TimeRangeParams } from '#/features/analytics/schemas';
+import { useMemo, useState } from 'react';
+import { createColumnHelper, metaHelper, tableFeatures, useTable } from '@tanstack/react-table';
 import { Card } from '../ui/card';
-import type { SkeletonColumn } from '../ui/skeleton-table';
-import type { TopTalkerEntry } from '#/lib/analytics/types';
 import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
 import { TableNoRecentsErrorMessage } from '../ui/table-no-recents-error-message';
 import { TanStackDataTable } from '../ui/tanstack-data-table';
-import { createColumnHelper, tableFeatures, useTable, metaHelper } from '@tanstack/react-table';
 import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
+import type { TopTalkerEntry } from '#/lib/analytics/types';
+import type { SkeletonColumn } from '../ui/skeleton-table';
+import type { Direction, Metric, TimeRangeParams } from '#/features/analytics/schemas';
+import { Button } from '#/components/ui/button';
+import { useTopTalkers } from '#/features/analytics/hooks';
 
 interface TopTalkersTableProps
 {

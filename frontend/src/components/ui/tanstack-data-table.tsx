@@ -1,10 +1,10 @@
 import { Fragment, useRef } from 'react';
-import type { ReactNode } from 'react';
-import type { Row, Table } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { TableFrame } from './table-frame';
-import type { TableHeightVariant } from './table-frame';
 import { SkeletonTableRows } from './skeleton-table';
+import type { ReactNode } from 'react';
+import type { Row, Table } from '@tanstack/react-table';
+import type { TableHeightVariant } from './table-frame';
 import type { SkeletonColumn } from './skeleton-table';
 import { cn } from '#/lib/utils';
 

@@ -1,12 +1,12 @@
+import { Link, createFileRoute } from '@tanstack/react-router';
+import z from 'zod';
+import type { HTMLAttributes } from 'react';
 import { AccountSection } from '#/components/settings/account/account-section';
 import { ApiKeysSection } from '#/components/settings/api-keys/api-keys-section';
 import { ExportsSection } from '#/components/settings/exports/exports-section';
-import { BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { BodyText, Heading } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
 import { cn } from '#/lib/utils';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import type { HTMLAttributes } from 'react';
-import z from 'zod';
 
 const settingsPageSearchSchema = z
 	.object(

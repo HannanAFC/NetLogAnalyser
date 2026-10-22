@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	anomaliesInfiniteQueryOptions,
 	geoQueryOptions,
@@ -8,7 +9,6 @@ import {
 } from '#/features/analytics/queries';
 import { FAKE_GEO, FAKE_PROTOCOLS, FAKE_SUMMARY, FAKE_TIMESERIES, FAKE_TOP_TALKERS } from '#/../test/mocks/handlers';
 import { createTestQueryClient } from '#/../test/test-utils';
-import { describe, expect, it } from 'vitest';
 
 const START = new Date( '2024-01-01T00:00:00Z' );
 const END   = new Date( '2024-01-02T00:00:00Z' );

@@ -6,33 +6,31 @@ async function checkHealth( )
         const res = await fetch( '/health' )
         const data = await res.json( );
 
-        const apiDot    = document.getElementById( 'apiDot' );
-        const dbDot     = document.getElementById( 'dbDot' );
         const apiStatus = document.getElementById( 'apiStatus' );
         const dbStatus  = document.getElementById( 'dbStatus' );
         const tag       = document.getElementById( 'envTag' );
 
         if ( !res.ok && res.status == 503 )
         {
-            apiDot.className = 'status-dot loading';
+            apiStatus.className = 'status-value loading';
             apiStatus.textContent = 'operational';
 
-            dbDot.className = 'status-dot err';
+            dbStatus.className = 'status-value err';
             dbStatus.textContent = 'unreachable';
         }
         else
         {
-            apiDot.className = 'status-dot ok';
+            apiStatus.className = 'status-value ok';
             apiStatus.textContent = 'operational';
 
             if ( data.database === 'ok' )
             {
-                dbDot.className = 'status-dot ok';
+                dbStatus.className = 'status-value ok';
                 dbStatus.textContent = 'connected';
             }
             else
             {
-                dbDot.className = 'status-dot err';
+                dbStatus.className = 'status-value err';
                 dbStatus.textContent = 'unreachable';
             }
 

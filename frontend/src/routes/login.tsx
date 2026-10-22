@@ -1,3 +1,7 @@
+import { useForm } from '@tanstack/react-form';
+import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { z } from 'zod';
+import { Input, Label } from '../components/ui/input';
 import { Card } from '#/components/ui/card';
 import { BodySm } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
@@ -6,10 +10,6 @@ import { useLogin } from '#/features/auth/hooks';
 import { sessionQueryOptions } from '#/features/auth/queries';
 import { loginSchema } from '#/features/auth/schemas';
 import { apiError, isEmailNotVerifiedError } from '#/lib/api/errors';
-import { useForm } from '@tanstack/react-form';
-import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
-import { z } from 'zod';
-import { Input, Label } from '../components/ui/input';
 import { useEmailVerificationEnabled } from '#/features/config/hooks';
 import { Button } from '#/components/ui/button';
 
@@ -24,7 +24,7 @@ export const Route = createFileRoute( '/login' )(
 	beforeLoad: async( { context } ) =>
 	{
 		// Don't show form to logged in user
-		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
+		const session = await context.queryClient.query( sessionQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
 	},
 	component: LoginPage,

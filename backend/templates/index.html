@@ -37,7 +37,6 @@
         <!-- Header -->
         <header>
             <a class="wordmark" href="/">
-                <div class="wordmark-dot"></div>
                 <span class="wordmark-name">NetLogAnalyser / API</span>
             </a>
             <div class="header-right">
@@ -62,7 +61,14 @@
                 Send network logs via the REST API and receive real-time anomaly-scoring, geo-mapping and clear dashboard data.
             </p>
             <div class="hero-actions">
-                <a class="btn btn-primary" href="/docs">
+                <a class="btn btn-primary" href="{{ docs_url }}">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                        <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" />
+                        <path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    Documentation Site
+                </a>
+                <a class="btn btn-secondary" href="/docs">
                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
                         <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" />
                         <path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
@@ -81,24 +87,20 @@
         <!-- Status -->
         <div class="status-bar" id="statusBar">
             <div class="status-item">
-                <div class="status-dot loading" id="apiDot"></div>
                 <span class="status-label">API</span>
-                <span class="status-value" id="apiStatus">checking…</span>
+                <span class="status-value loading" id="apiStatus">checking…</span>
             </div>
             <div class="status-item">
-                <div class="status-dot loading" id="dbDot"></div>
                 <span class="status-label">Database</span>
-                <span class="status-value" id="dbStatus">checking…</span>
+                <span class="status-value loading" id="dbStatus">checking…</span>
             </div>
             <div class="status-item">
-                <div class="status-dot ok"></div>
                 <span class="status-label">Version</span>
-                <span class="status-value" id="versionValue">v{{ version }}</span>
+                <span class="status-value ok" id="versionValue">v{{ version }}</span>
             </div>
             <div class="status-item">
-                <div class="status-dot ok"></div>
                 <span class="status-label">Uptime</span>
-                <span class="status-value" id="uptimeValue">{{ uptime_seconds }}</span>
+                <span class="status-value ok" id="uptimeValue">{{ uptime_seconds }}</span>
             </div>
         </div>
 

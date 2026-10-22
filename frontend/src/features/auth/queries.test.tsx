@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { sessionQueryOptions } from '#/features/auth/queries';
+import { setSessionHint } from '#/lib/auth/session-hint';
 import { tokenStore } from '#/lib/auth/token-store';
 
 import { VALID_EMAIL, setRefreshShouldFail } from '#/../test/mocks/handlers';
@@ -20,6 +21,7 @@ describe( 'route guard (ensureQueryData against sessionQueryOptions)', ( ) =>
 
 	it( 'resolves to the user when a valid refresh cookie is present', async( ) =>
 	{
+		setSessionHint( true );
 		const queryClient = createTestQueryClient( );
 		const session = await queryClient.ensureQueryData( sessionQueryOptions );
 

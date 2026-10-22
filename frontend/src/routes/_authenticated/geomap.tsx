@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 
+import type { Direction } from '#/features/analytics/schemas';
 import { CountrySidebarList } from '#/components/geomap/country-sidebar-list';
 import { WorldChoropleth } from '#/components/geomap/world-choropleth';
 import { PageWrapper } from '#/components/ui/page-wrapper';
@@ -10,7 +11,6 @@ import { Button } from '#/components/ui/button';
 import { useGeo } from '#/features/analytics/hooks';
 import { timeRangeSearchSchema } from '#/lib/time-range/schema';
 import { createUseTimeRange, setCustomRange } from '#/lib/time-range/use-time-range';
-import type { Direction } from '#/features/analytics/schemas';
 import { BodyText, Heading } from '#/components/ui/heading';
 
 const geomapSearchSchema = timeRangeSearchSchema

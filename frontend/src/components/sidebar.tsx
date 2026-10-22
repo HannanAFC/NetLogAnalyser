@@ -1,10 +1,10 @@
+import { Link, useLocation } from '@tanstack/react-router';
+import { Activity, BarChart3, Globe, History, LayoutDashboard, Menu, Settings, ShieldAlert, X } from 'lucide-react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { Button } from '#/components/ui/button';
 import { BodySm } from '#/components/ui/heading';
 import { cn } from '#/lib/utils';
-import { Link, useLocation } from '@tanstack/react-router';
-import { Activity, BarChart3, Globe, History, LayoutDashboard, Settings, ShieldAlert, X } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 interface SidebarContextValue
 {
@@ -75,13 +75,13 @@ const sections: NavSection[ ] =
 	}
 ];
 
-interface SidebarProps
+interface DesktopSidebarProps
 {
 	open:    boolean;
 	onClose: ( ) => void;
 }
 
-export function Sidebar( { open, onClose }: SidebarProps )
+export function DesktopSidebar( { open, onClose }: DesktopSidebarProps )
 {
 	const location = useLocation() ;
 	const sidebarRef = useRef< HTMLElement >( null );
@@ -122,37 +122,39 @@ export function Sidebar( { open, onClose }: SidebarProps )
                     !open ? 'pointer-events-none opacity-0' : ''
                 ) }
                 onClick={ onClose }
-                aria-hidden="true"
+                aria-hidden='true'
             />
 
 			<aside
 				ref={ sidebarRef }
 				tabIndex={ -1 }
 				className={ cn(
-					'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-card shadow-soft transition-transform duration-300 ease-out',
+					'fixed inset-y-0 left-0 z-40 hidden md:flex w-64 flex-col border-r border-border bg-card shadow-soft transition-transform duration-300 ease-out',
 					open ? 'translate-x-0' : '-translate-x-full'
 				) }
+                id='desktop-navigation'
 			>
-				<div className="flex items-center justify-between px-3 py-3">
-					<span className="text-md font-semibold text-text-primary">Navigation</span>
+				<div className='flex items-center justify-between px-3 py-3'>
+					<span className='text-md font-semibold text-text-primary'>Navigation</span>
 					<Button
-						type="button"
+						type='button'
 						onClick={ onClose }
 						variant='ghost'
-						aria-label="Close navigation"
+						aria-label='Close navigation'
+                        aria-controls='desktop-navigation'
 					>
-						<X className="h-4 w-4" />
+						<X className='h-4 w-4' />
 					</Button>
 				</div>
 
-				<nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-2">
+				<nav className='flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-2'>
 					{ sections.map( ( section ) =>
 					(
 						<div key={ section.label }>
-							<BodySm className="mb-1.5 px-2 font-semibold uppercase tracking-[0.10em] text-text-tertiary">
+							<BodySm className='mb-1.5 px-2 font-semibold uppercase tracking-widest text-text-tertiary'>
 								{ section.label }
 							</BodySm>
-							<ul className="flex flex-col gap-0.5">
+							<ul className='flex flex-col gap-0.5'>
 								{ section.items.map( ( item ) =>
 								{
 									const Icon = item.icon;
@@ -170,7 +172,7 @@ export function Sidebar( { open, onClose }: SidebarProps )
 														: 'text-text-secondary hover:bg-inset hover:text-text-primary'
 												) }
 											>
-												<Icon className="h-4 w-4 shrink-0" />
+												<Icon className='h-4 w-4 shrink-0' />
 												{ item.label }
 											</Link>
 										</li>
@@ -181,9 +183,9 @@ export function Sidebar( { open, onClose }: SidebarProps )
 					) ) }
 				</nav>
 
-				<div className="border-t border-border px-3 py-3">
+				<div className='border-t border-border px-3 py-3'>
 					<Link
-						to="/settings"
+						to='/settings'
 						onClick={ handleLinkClick }
 						className={ cn(
 							'flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm font-medium no-underline transition-colors duration-150',
@@ -192,11 +194,154 @@ export function Sidebar( { open, onClose }: SidebarProps )
 								: 'text-text-secondary hover:bg-inset hover:text-text-primary'
 						) }
 					>
-						<Settings className="h-4 w-4 shrink-0" />
+						<Settings className='h-4 w-4 shrink-0' />
 						Settings
 					</Link>
 				</div>
 			</aside>
 		</>
 	);
+}
+
+interface MobileSidebarProps
+{
+	open:     boolean;
+    onClose:  ( ) => void;
+	onToggle: ( ) => void;
+}
+
+export function MobileSidebar( { open, onClose, onToggle }: MobileSidebarProps )
+{
+    const location = useLocation() ;
+	const sidebarRef = useRef< HTMLElement >( null );
+
+	// Close on Escape
+	useEffect( ( ) =>
+	{
+		function handleKeyDown( e: KeyboardEvent )
+		{
+			if ( e.key === 'Escape' && open ) onClose();
+		}
+		document.addEventListener( 'keydown', handleKeyDown );
+		return () => document.removeEventListener( 'keydown', handleKeyDown );
+	}, [ open, onClose ] );
+
+	// Close on route change
+	useEffect( ( ) =>
+	{
+		onClose( );
+	}, [ location.pathname, onClose ] );
+
+	// Trap focus when open on mobile
+	useEffect( ( ) =>
+	{
+		if ( open ) sidebarRef.current?.focus( );
+	}, [ open ] );
+
+	function handleLinkClick( )
+	{
+		onClose( );
+	}
+
+    return (
+        <div className='fixed bottom-5 right-5 z-40 md:hidden'>
+            <div
+                id='mobile-navigation'
+                aria-hidden={ !open }
+                inert={ !open }
+                className={ cn(
+                    'absolute bottom-0 right-0 pt-3',
+                    'w-[min(18rem,calc(100vw-2.5rem))]',
+                    'rounded-3xl border-r border-border bg-card shadow-soft text-text-primary',
+                    'origin-bottom-right',
+                    'transition-[clip-path,opacity,visibility]',
+                    'duration-400',
+                    '',
+                    open
+                        ? '[clip-path:circle(150%_at_100%_100%)] opacity-100 visible'
+                        : '[clip-path:circle(0%_at_100%_100%)] opacity-0 invisible',
+                    open
+                        ? 'delay-[0ms,0ms,0ms]'
+                        : 'delay-[0ms,0ms,400ms]',
+                    'motion-reduce:transition-none'
+                )}
+            >
+                <span className='text-md font-semibold text-text-primary px-5 py-3'>Navigation</span>
+                <nav className='flex flex-1 flex-col gap-3 overflow-y-auto mt-3 px-3 py-2' ref={ sidebarRef }>
+                    { sections.map( ( section ) =>
+                    (
+                        <div key={ section.label }>
+                            <BodySm className='mb-1.5 px-2 font-semibold uppercase tracking-widest text-text-tertiary'>
+                                { section.label }
+                            </BodySm>
+                            <ul className='flex flex-col gap-1'>
+                                { section.items.map( ( item ) =>
+                                {
+                                    const Icon = item.icon;
+                                    const isActive = location.pathname === item.to;
+
+                                    return (
+                                        <li key={ item.to }>
+                                            <Link
+                                                to={ item.to }
+                                                onClick={ handleLinkClick }
+                                                className={ cn(
+                                                    'flex items-center gap-2.5 rounded-md px-4 py-3 text-sm font-medium no-underline transition-colors duration-150',
+                                                    isActive
+                                                        ? 'bg-accent/10 text-accent-strong'
+                                                        : 'text-text-secondary hover:bg-inset hover:text-text-primary'
+                                                ) }
+                                            >
+                                                <Icon className='h-4 w-4 shrink-0' />
+                                                { item.label }
+                                            </Link>
+                                        </li>
+                                    );
+                                } ) }
+                            </ul>
+                        </div>
+                    ) ) }
+                    <Link
+						to='/settings'
+						onClick={ handleLinkClick }
+						className={ cn(
+							'flex items-center gap-2.5 rounded-md px-4 py-3 text-sm font-medium no-underline transition-colors duration-150',
+							location.pathname.startsWith( '/settings' )
+								? 'bg-accent/10 text-accent-strong'
+								: 'text-text-secondary hover:bg-inset hover:text-text-primary'
+						) }
+					>
+						<Settings className='h-4 w-4 shrink-0' />
+						Settings
+					</Link>
+                </nav>
+            </div>
+
+            <Button
+                variant='ghost'
+                aria-label={ open ? 'Close navigation' : 'Open navigation' }
+                aria-expanded={ open }
+                aria-controls='mobile-navigation'
+                onClick={ onToggle }
+                className='relative z-10 grid size-15 rounded-full place-items-center bg-card shadow-soft border-border border-r'
+            >
+                <span
+                    aria-hidden='true'
+                    className={ cn( 'absolute text-2xl transition-opacity duration-200',
+                        open ? 'opacity-0' : 'opacity-100'
+                    ) }
+                >
+                    <Menu />
+                </span>
+                <span
+                    aria-hidden='true'
+                    className={ cn( 'absolute text-3xl transition-opacity duration-200',
+                        open ? 'opacity-100' : 'opacity-0'
+                    ) }
+                >
+                    <X />
+                </span>
+            </Button>
+        </div>
+    );
 }

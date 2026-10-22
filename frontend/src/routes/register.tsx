@@ -1,3 +1,8 @@
+import { useForm } from '@tanstack/react-form';
+import { Link, createFileRoute, redirect } from '@tanstack/react-router';
+import { useState } from 'react';
+import { User2 } from 'lucide-react';
+import type { MouseEvent } from 'react';
 import { Card } from '#/components/ui/card';
 import { BodySm, BodyText, Heading } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
@@ -8,16 +13,11 @@ import { sessionQueryOptions } from '#/features/auth/queries';
 import { registerSchema } from '#/features/auth/schemas';
 import { apiError } from '#/lib/api/errors';
 import { fieldError } from '#/lib/utils';
-import { useForm } from '@tanstack/react-form';
-import { createFileRoute, Link, redirect } from '@tanstack/react-router';
-import { useState } from 'react';
-import type { MouseEvent } from 'react';
 import { Button } from '#/components/ui/button';
 import { useOverlay } from '#/lib/overlay/overlay-context';
 import { PrivacyOverlay } from '#/components/register/privacy-overlay';
 import { TermsOverlay } from '#/components/register/terms-overlay';
 import { useEmailVerificationEnabled } from '#/features/config/hooks';
-import { User2 } from 'lucide-react';
 
 export const Route = createFileRoute( '/register' )(
 {

@@ -1,12 +1,12 @@
 // components/geomap/country-sidebar-list.tsx
-import type { GeoEntry } from '#/lib/analytics/types';
 import { createColumnHelper, metaHelper, tableFeatures, useTable } from '@tanstack/react-table';
+import { useMemo } from 'react';
 import { Card } from '../ui/card';
-import type { SkeletonColumn } from '../ui/skeleton-table';
 import { TableLoadingErrorMessage } from '../ui/table-loading-error-message';
 import { TableNoRecentsErrorMessage } from '../ui/table-no-recents-error-message';
-import { useMemo } from 'react';
 import { TanStackDataTable } from '../ui/tanstack-data-table';
+import type { SkeletonColumn } from '../ui/skeleton-table';
+import type { GeoEntry } from '#/lib/analytics/types';
 
 const GEO_STATUS_LABEL: Record< string, string > = {
 	private:     'Private IP',

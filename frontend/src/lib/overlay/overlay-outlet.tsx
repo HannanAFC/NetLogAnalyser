@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { cn } from '#/lib/utils';
 import type { OverlayItem } from '#/lib/overlay/types';
+import { cn } from '#/lib/utils';
 
 interface OverlayOutletProps
 {
@@ -31,14 +31,17 @@ export function OverlayOutlet( { overlays, onRequestClose }: OverlayOutletProps 
 		return ( ) => window.removeEventListener( 'keydown', handleKeyDown );
 	}, [ top, onRequestClose ] );
 
-	if ( overlays.length === 0 )
+	// DOM side effect, so it lives in an effect rather than the render body
+	// (which also has to run in Node during prerender).
+	const hasOverlays = overlays.length > 0;
+	useEffect( ( ) =>
 	{
-		document.documentElement.classList.remove( 'overflow-y-hidden' );
+		document.documentElement.classList.toggle( 'overflow-y-hidden', hasOverlays );
+	}, [ hasOverlays ] );
+
+	if ( !hasOverlays )
+	{
 		return null;
-	}
-	else
-	{
-		document.documentElement.classList.add( 'overflow-y-hidden' );
 	}
 
 	return createPortal(

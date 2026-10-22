@@ -1,5 +1,5 @@
-import type { LogEntry } from '#/lib/logs/types';
 import { AnomalyIndicator } from '../live-feed/anomaly-indicator';
+import type { LogEntry } from '#/lib/logs/types';
 
 export function TopAnomaliesRow( { row }: { row: LogEntry } )
 {

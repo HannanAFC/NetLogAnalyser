@@ -1,10 +1,10 @@
 import { Link, useRouter } from '@tanstack/react-router';
 import { Button } from '#/components/ui/button';
-import { Heading, BodyText } from '#/components/ui/heading';
+import { BodyText, Heading } from '#/components/ui/heading';
 
 interface ErrorComponentProps
 {
-	error: Error
+	error: unknown
 }
 
 function ErrorComponent( { error }: ErrorComponentProps )

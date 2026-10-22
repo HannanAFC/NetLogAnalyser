@@ -1,10 +1,10 @@
-import type { HTMLAttributes } from 'react';
+import { X } from 'lucide-react';
 import { TermsContent } from '../legal/terms-content';
 import { Card } from '../ui/card';
 import { Heading } from '../ui/heading';
-import { cn } from '#/lib/utils';
 import { Button } from '../ui/button';
-import { X } from 'lucide-react';
+import type { HTMLAttributes } from 'react';
+import { cn } from '#/lib/utils';
 
 type ComponentCallback = ( ...args: any[ ] ) => void;
 

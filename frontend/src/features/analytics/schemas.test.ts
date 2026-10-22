@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	anomaliesFilterParamsSchema,
 	anomaliesParamsSchema,
@@ -9,7 +10,6 @@ import {
 	timeseriesParamsSchema,
 	topTalkersParamsSchema
 } from '#/features/analytics/schemas';
-import { describe, expect, it } from 'vitest';
 
 const START = new Date( '2024-01-01T00:00:00Z' );
 const END   = new Date( '2024-01-02T00:00:00Z' );

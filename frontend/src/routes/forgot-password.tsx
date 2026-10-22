@@ -1,14 +1,14 @@
+import { useForm } from '@tanstack/react-form';
+import { Link, createFileRoute, redirect } from '@tanstack/react-router';
+import { useState } from 'react';
+import { Input, Label } from '../components/ui/input';
 import { Card } from '#/components/ui/card';
-import { BodySm, BodyText, Eyebrow, Heading } from '#/components/ui/heading';
+import { BodySm, BodyText, Heading } from '#/components/ui/heading';
 import { useForgotPassword } from '#/features/auth/hooks';
 import { sessionQueryOptions } from '#/features/auth/queries';
 import { forgotPasswordSchema } from '#/features/auth/schemas';
 import { apiError } from '#/lib/api/errors';
 import { fieldError } from '#/lib/utils';
-import { useForm } from '@tanstack/react-form';
-import { createFileRoute, Link, redirect } from '@tanstack/react-router';
-import { useState } from 'react';
-import { Input, Label } from '../components/ui/input';
 import { configQueryOptions } from '#/features/config/queries';
 import { Button } from '#/components/ui/button';
 
@@ -19,7 +19,7 @@ export const Route = createFileRoute( '/forgot-password' )(
 		const session = await context.queryClient.ensureQueryData( sessionQueryOptions );
 		const config  = await context.queryClient.ensureQueryData( configQueryOptions );
 		if ( session ) throw redirect( { to: '/dashboard' } );
-		if ( config?.email_verification_enabled === false ) throw redirect( { to: '/' } );
+		if ( config.email_verification_enabled === false ) throw redirect( { to: '/' } );
 	},
 	component: ForgotPasswordPage,
 	head: ( ) => (
