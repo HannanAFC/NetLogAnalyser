@@ -1,0 +1,122 @@
+{
+	"anomalies-dark":
+	{
+		"width": 1530,
+		"height": 600,
+		"widths":
+		[
+			640,
+			1024,
+			1530
+		],
+		"hash": "02951e2660"
+	},
+	"anomalies-light":
+	{
+		"width": 1530,
+		"height": 600,
+		"widths":
+		[
+			640,
+			1024,
+			1530
+		],
+		"hash": "846a942293"
+	},
+	"api-keys-dark":
+	{
+		"width": 1170,
+		"height": 532,
+		"widths":
+		[
+			640,
+			1024,
+			1170
+		],
+		"hash": "c1542e43fb"
+	},
+	"api-keys-light":
+	{
+		"width": 1170,
+		"height": 532,
+		"widths":
+		[
+			640,
+			1024,
+			1170
+		],
+		"hash": "70a99fd344"
+	},
+	"dashboard-hero-dark":
+	{
+		"width": 2880,
+		"height": 1620,
+		"widths":
+		[
+			640,
+			1024,
+			1920
+		],
+		"hash": "29fa9bd528"
+	},
+	"dashboard-hero-light":
+	{
+		"width": 2880,
+		"height": 1620,
+		"widths":
+		[
+			640,
+			1024,
+			1920
+		],
+		"hash": "4c6f21265e"
+	},
+	"geomap-dark":
+	{
+		"width": 1530,
+		"height": 837,
+		"widths":
+		[
+			640,
+			1024,
+			1530
+		],
+		"hash": "4f15a2506d"
+	},
+	"geomap-light":
+	{
+		"width": 1530,
+		"height": 837,
+		"widths":
+		[
+			640,
+			1024,
+			1530
+		],
+		"hash": "fc27158663"
+	},
+	"live-feed-dark":
+	{
+		"width": 1530,
+		"height": 570,
+		"widths":
+		[
+			640,
+			1024,
+		1530
+		],
+		"hash": "1ee18e31e7"
+	},
+	"live-feed-light":
+	{
+		"width": 1530,
+		"height": 570,
+		"widths":
+		[
+			640,
+			1024,
+			1530
+		],
+		"hash": "2881d7dafc"
+	}
+}

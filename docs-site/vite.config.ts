@@ -50,8 +50,8 @@ export default defineConfig( ( { mode } ) =>
                         handlers: [ { route: '/**', middleware: true, handler: './src/server/compress.ts' } ],
                         routeRules:
                         {
-                            // Screenshot filenames are not content-hashed, so cache for a week and revalidate in the background
-                            '/screenshots/**': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=86400' } },
+                            // Screenshot filenames include a content hash (scripts/optimize-images.ts)
+                            '/screenshots/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
                             '/favicon*': { headers: { 'cache-control': 'public, max-age=604800' } },
                             '/apple-touch-icon.png': { headers: { 'cache-control': 'public, max-age=604800' } },
                             '/web-app-manifest-*': { headers: { 'cache-control': 'public, max-age=604800' } }

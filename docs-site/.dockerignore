@@ -10,3 +10,4 @@ dist
 !.env.example
 .git
 *.log
+public/screenshots

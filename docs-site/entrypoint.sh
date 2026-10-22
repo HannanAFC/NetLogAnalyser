@@ -15,6 +15,10 @@ until pnpm run generate:api; do
 done
 
 if [ "$ENVIRONMENT" = "production" ]; then
+  # The screenshots are generated from assets/screenshots and are not committed; the build imports their manifest
+  echo "Optimising screenshots..."
+  pnpm run optimize:images
+
   echo "Starting documentation site (production)..."
   pnpm run build
   pnpm run start
