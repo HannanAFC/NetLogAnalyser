@@ -6,13 +6,14 @@ import { onResponse } from 'nitro/h3';
 const brotli = promisify( brotliCompress );
 const gzipAsync = promisify( gzip );
 
-const compressible = /^(text\/|application\/(json|xml|javascript))/;
+// Event streams must stay unbuffered, so they are excluded even though they are text/*
+const compressible = /^(text\/(?!event-stream)|application\/(json|xml|javascript))/;
 const minBytes = 1024;
 
 export default onResponse( async( response, event ) =>
 {
     const type = response.headers.get( 'content-type' ) ?? '';
-    if ( !response.body || response.status !== 200 || response.headers.has( 'content-encoding' ) || !compressible.test( type ) )
+    if ( !response.body || response.status !== 200 || response.headers.has( 'content-encoding' ) || /no-transform/.test( response.headers.get( 'cache-control' ) ?? '' ) || !compressible.test( type ) )
     {
         return;
     }
@@ -37,6 +38,10 @@ export default onResponse( async( response, event ) =>
     const compressed = encoding === 'br'
         ? await brotli( body, { params: { [ constants.BROTLI_PARAM_QUALITY ]: 5 } } )
         : await gzipAsync( body );
+
+    // A strong ETag would claim the compressed bytes are identical to the uncompressed ones
+    const etag = headers.get( 'etag' );
+    if ( etag && !etag.startsWith( 'W/' ) ) headers.set( 'etag', `W/${ etag }` );
 
     headers.set( 'content-encoding', encoding );
     headers.set( 'content-length', String( compressed.length ) );

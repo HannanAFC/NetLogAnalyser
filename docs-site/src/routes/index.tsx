@@ -4,7 +4,7 @@ import { ArrowRight, BookOpenText, Code, Rocket, Server, ShieldCheck } from 'luc
 import type { ReactNode } from 'react';
 import { baseOptions } from '@/lib/layout.shared';
 import { env } from '@/lib/env';
-import { ScreenshotPicture, type ScreenshotName } from '@/components/screenshot-picture';
+import { ScreenshotPicture, screenshotUrl, type ScreenshotName } from '@/components/screenshot-picture';
 
 const title       = 'NetLogAnalyser Docs';
 const description = 'Real-time network log analysis. Send packet data to a REST API, watch it stream live, and spot anomalies as they happen. Open source and self-hostable.';
@@ -22,12 +22,12 @@ export const Route = createFileRoute( '/' )(
                 { property: 'og:description', content: description },
                 { property: 'og:type', content: 'website' },
                 { property: 'og:url', content: env.docsUrl },
-                { property: 'og:image', content: `${ env.docsUrl }/screenshots/dashboard-hero-dark.jpg` },
+                { property: 'og:image', content: `${ env.docsUrl }${ screenshotUrl( 'dashboard-hero-dark', '.jpg' ) }` },
                 { name: 'twitter:url', content: env.docsUrl },
                 { name: 'twitter:card', content: 'summary_large_image' },
                 { name: 'twitter:title', content: title },
                 { name: 'twitter:description', content: description },
-                { name: 'twitter:image', content: `${ env.docsUrl }/screenshots/dashboard-hero-dark.jpg` }
+                { name: 'twitter:image', content: `${ env.docsUrl }${ screenshotUrl( 'dashboard-hero-dark', '.jpg' ) }` }
             ]
         } )
     } );

@@ -16,8 +16,12 @@ interface ScreenshotPictureProps
 
 const themeClass: Record<Theme, string> = { light: 'dark:hidden', dark: 'hidden dark:block' };
 
+// Filenames include a content hash (see scripts/optimize-images.ts), so they can be cached immutably
+export const screenshotUrl = ( key: keyof typeof manifest, suffix: string ): string =>
+    `/screenshots/${ key }.${ manifest[ key ].hash }${ suffix }`;
+
 const variants = ( key: keyof typeof manifest, format: 'avif' | 'webp' ): string =>
-    manifest[ key ].widths.map( ( w ) => `/screenshots/${ key }-${ w }.${ format } ${ w }w` ).join( ', ' );
+    manifest[ key ].widths.map( ( w ) => `${ screenshotUrl( key, `-${ w }.${ format }` ) } ${ w }w` ).join( ', ' );
 
 // Both themes are rendered and the inactive one is hidden with CSS, so the site's theme toggle switches instantly.
 // Lazy images that are display:none are never fetched, so below the fold only the visible theme downloads. The priority
@@ -36,7 +40,7 @@ export function ScreenshotPicture( { name, alt, sizes, className = '', priority 
                         <source type="image/avif" srcSet={ variants( key, 'avif' ) } sizes={ sizes } />
                         <source type="image/webp" srcSet={ variants( key, 'webp' ) } sizes={ sizes } />
                         <img
-                            src={ `/screenshots/${ key }.jpg` }
+                            src={ screenshotUrl( key, '.jpg' ) }
                             alt={ alt }
                             width={ width }
                             height={ height }
