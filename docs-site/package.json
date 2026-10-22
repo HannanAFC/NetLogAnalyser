@@ -12,9 +12,13 @@
     "generate:api": "node --experimental-strip-types scripts/generate-docs.ts",
     "types:check": "tsc --noEmit",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix"
+    "lint:fix": "oxlint --fix",
+    "optimize:images": "node --experimental-strip-types scripts/optimize-images.ts",
+    "generate:screenshots": "node --experimental-strip-types scripts/generate-screenshots.ts"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@tanstack/react-router": "1.170.44",
     "@tanstack/react-router-devtools": "1.167.2",
     "@tanstack/react-start": "1.169.2",
@@ -41,6 +45,8 @@
     "@vitejs/plugin-react": "^6.1.1",
     "nitro": "3.0.260903-beta",
     "oxlint": "^1.86.0",
+    "playwright": "^1.64.1",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.3.2"
