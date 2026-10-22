@@ -136,7 +136,8 @@ describe( 'logEntryBatchMessageSchema', ( ) =>
 
 	it( 'rejects an entry missing a required field', ( ) =>
 	{
-		const { ...missingSrcIp } = VALID_BATCH.data[ 0 ];
+
+		const { src_ip, ...missingSrcIp } = VALID_BATCH.data[ 0 ]; // eslint-disable-line no-unused-vars
 
 		const result = logEntryBatchMessageSchema.safeParse(
 		{

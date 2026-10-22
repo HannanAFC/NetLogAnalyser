@@ -3,6 +3,7 @@ import { getMe } from '../users/api';
 import type { User } from '#/lib/users/types';
 import { refreshRequest } from '#/features/auth/api';
 import { sessionQueryKey } from '#/lib/auth/session-key';
+import { hasSessionHint } from '#/lib/auth/session-hint';
 import { tokenStore } from '#/lib/auth/token-store';
 
 export { sessionQueryKey };
@@ -17,6 +18,10 @@ export { sessionQueryKey };
  */
 async function fetchSession( ): Promise< User | null >
 {
+	// No hint means no refresh cookie was ever issued to this browser - skip
+	// the network round trip that would only return a 401.
+	if ( !tokenStore.get( ) && !hasSessionHint( ) ) return null;
+
 	try
 	{
 		if ( !tokenStore.get( ) )

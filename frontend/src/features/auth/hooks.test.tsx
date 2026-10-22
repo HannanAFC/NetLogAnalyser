@@ -5,6 +5,7 @@ import { createTestQueryClient } from '#/../test/test-utils';
 import { useForgotPassword, useLogin, useResendVerification, useResetPassword, useVerifyEmail } from '#/features/auth/hooks';
 import { sessionQueryKey, sessionQueryOptions } from '#/features/auth/queries';
 import { wrapperFor } from '#/lib/api/test-utils';
+import { setSessionHint } from '#/lib/auth/session-hint';
 import { tokenStore } from '#/lib/auth/token-store';
 
 describe( 'useLogin', ( ) =>
@@ -65,6 +66,7 @@ describe( 'route guard (ensureQueryData against sessionQueryOptions)', ( ) =>
 
 	it( 'resolves to the user when a valid refresh cookie is present', async( ) =>
 	{
+		setSessionHint( true );
 		// tokenStore starts empty (page reload); fetchSession should fall
 		// back to /auth/refresh, succeed, then call /users/me.
 		const queryClient = createTestQueryClient( );

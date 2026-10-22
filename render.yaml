@@ -15,7 +15,7 @@ services:
     routes:
       - type: rewrite
         source: /*
-        destination: /index.html
+        destination: /shell.html
     autoDeployTrigger: "off"
     rootDir: frontend
     headers:
@@ -36,8 +36,26 @@ services:
         value: geolocation=(), camera=(), microphone=()
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api.netloganalyser.com ws://api.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://api.netloganalyser.com ws://api.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"
       - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /shell.html
+        name: Cache-Control
+        value: no-cache
+      - path: /login
+        name: Cache-Control
+        value: no-cache
+      - path: /register
+        name: Cache-Control
+        value: no-cache
+      - path: /forgot-password
+        name: Cache-Control
+        value: no-cache
+      - path: /legal
+        name: Cache-Control
+        value: no-cache
+      - path: /legal/*
         name: Cache-Control
         value: no-cache
       - path: /assets/*
@@ -56,7 +74,7 @@ services:
     routes:
       - type: rewrite
         source: /*
-        destination: /index.html
+        destination: /shell.html
     autoDeployTrigger: "off"
     rootDir: frontend
     headers:
@@ -77,8 +95,26 @@ services:
         value: geolocation=(), camera=(), microphone=()
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api-staging.netloganalyser.com ws://api-staging.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://api-staging.netloganalyser.com ws://api-staging.netloganalyser.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none';"
       - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /shell.html
+        name: Cache-Control
+        value: no-cache
+      - path: /login
+        name: Cache-Control
+        value: no-cache
+      - path: /register
+        name: Cache-Control
+        value: no-cache
+      - path: /forgot-password
+        name: Cache-Control
+        value: no-cache
+      - path: /legal
+        name: Cache-Control
+        value: no-cache
+      - path: /legal/*
         name: Cache-Control
         value: no-cache
       - path: /assets/*

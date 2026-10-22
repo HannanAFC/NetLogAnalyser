@@ -4,6 +4,10 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
     location = /config.js {
         add_header Cache-Control "no-store";
         try_files /config.js =404;
@@ -14,7 +18,10 @@ server {
         try_files $uri =404;
     }
 
+    # Prerendered pages live at <route>/index.html; every other route gets
+    # the empty SPA shell.
     location / {
-        try_files $uri /index.html;
+        add_header Cache-Control "no-cache";
+        try_files $uri $uri/index.html /shell.html;
     }
 }

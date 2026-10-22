@@ -3,15 +3,20 @@ import { Card } from '#/components/ui/card';
 import { BodySm, BodyText, Heading, SectionTitle } from '#/components/ui/heading';
 import { PageWrapper } from '#/components/ui/page-wrapper';
 import { useSession } from '#/features/auth/hooks';
-import { sessionQueryOptions } from '#/features/auth/queries';
 
 export const Route = createFileRoute( '/' )(
 {
-	beforeLoad: async( { context } ) =>
+	component: IndexPage,
+	head: ( ) => (
 	{
-		await context.queryClient.ensureQueryData( sessionQueryOptions );
-	},
-	component: IndexPage
+		links:
+		[
+			{
+				rel: 'canonical',
+				href: 'https://www.netloganalyser.com/'
+			}
+		]
+	} )
 } );
 
 function IndexPage( )

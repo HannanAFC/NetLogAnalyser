@@ -54,14 +54,6 @@ export const Route = createRootRouteWithContext< RouterContext >( )(
 			{
 				rel: 'manifest',
 				href: 'manifest.json'
-			},
-			{
-				rel: 'stylesheet',
-				href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap'
-			},
-			{
-				rel: 'canonical',
-				href: 'https://www.netloganalyser.com/'
 			}
 		],
 		meta:
