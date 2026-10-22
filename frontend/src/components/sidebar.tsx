@@ -267,14 +267,14 @@ export function MobileSidebar( { open, onClose, onToggle }: MobileSidebarProps )
                 )}
             >
                 <span className='text-md font-semibold text-text-primary px-5 py-3'>Navigation</span>
-                <nav className='flex flex-1 flex-col gap-3 overflow-y-auto mt-3 px-3 py-2'>
+                <nav className='flex flex-1 flex-col gap-3 overflow-y-auto mt-3 px-3 py-2' ref={ sidebarRef }>
                     { sections.map( ( section ) =>
                     (
                         <div key={ section.label }>
                             <BodySm className='mb-1.5 px-2 font-semibold uppercase tracking-widest text-text-tertiary'>
                                 { section.label }
                             </BodySm>
-                            <ul className='flex flex-col gap-0.5'>
+                            <ul className='flex flex-col gap-1'>
                                 { section.items.map( ( item ) =>
                                 {
                                     const Icon = item.icon;
@@ -286,7 +286,7 @@ export function MobileSidebar( { open, onClose, onToggle }: MobileSidebarProps )
                                                 to={ item.to }
                                                 onClick={ handleLinkClick }
                                                 className={ cn(
-                                                    'flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm font-medium no-underline transition-colors duration-150',
+                                                    'flex items-center gap-2.5 rounded-md px-4 py-3 text-sm font-medium no-underline transition-colors duration-150',
                                                     isActive
                                                         ? 'bg-accent/10 text-accent-strong'
                                                         : 'text-text-secondary hover:bg-inset hover:text-text-primary'
@@ -301,6 +301,19 @@ export function MobileSidebar( { open, onClose, onToggle }: MobileSidebarProps )
                             </ul>
                         </div>
                     ) ) }
+                    <Link
+						to='/settings'
+						onClick={ handleLinkClick }
+						className={ cn(
+							'flex items-center gap-2.5 rounded-md px-4 py-3 text-sm font-medium no-underline transition-colors duration-150',
+							location.pathname.startsWith( '/settings' )
+								? 'bg-accent/10 text-accent-strong'
+								: 'text-text-secondary hover:bg-inset hover:text-text-primary'
+						) }
+					>
+						<Settings className='h-4 w-4 shrink-0' />
+						Settings
+					</Link>
                 </nav>
             </div>
 
@@ -310,7 +323,7 @@ export function MobileSidebar( { open, onClose, onToggle }: MobileSidebarProps )
                 aria-expanded={ open }
                 aria-controls='mobile-navigation'
                 onClick={ onToggle }
-                className='relative z-10 grid size-15 rounded-full place-items-center bg-card'
+                className='relative z-10 grid size-15 rounded-full place-items-center bg-card shadow-soft border-border border-r'
             >
                 <span
                     aria-hidden='true'

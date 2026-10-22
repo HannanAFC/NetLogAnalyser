@@ -367,13 +367,28 @@ header {
     box-shadow: 0 0 6px var(--color-accent);
 }
 
+.status-value.ok
+{
+    color: var( --color-accent );
+}
+
 .status-dot.loading {
     background: var(--color-warning);
     animation: blink 1s step-end infinite;
 }
 
+.status-value.loading
+{
+    color: var( --color-warning );
+}
+
 .status-dot.err {
     background: var(--color-danger);
+}
+
+.status-value.err
+{
+    color: var( --color-danger );
 }
 
 @keyframes blink {
