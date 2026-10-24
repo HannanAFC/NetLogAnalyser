@@ -1,4 +1,4 @@
-FROM node:26-slim
+FROM node:26.12.1-slim
 WORKDIR /app
 
 RUN npm install -g corepack
