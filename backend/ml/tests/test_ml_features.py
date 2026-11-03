@@ -277,7 +277,7 @@ def test_sklearn_version_check( monkeypatch ):
     from nla_ml import compat
 
     monkeypatch.setattr( compat, "installed_sklearn_version", lambda: "0.0.1" )
-    with pytest.raises( IncompatibleModelError, match=f"scikit-learn=={ SKLEARN_VERSION }" ):
+    with pytest.raises( IncompatibleModelError, match=f"scikit-learn { SKLEARN_VERSION } is required, found 0.0.1." ):
         compat.assert_sklearn_version( )
 
     monkeypatch.setattr( compat, "installed_sklearn_version", lambda: SKLEARN_VERSION )
