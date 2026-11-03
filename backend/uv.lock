@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -221,6 +221,7 @@ dependencies = [
     { name = "fastapi-redis-sdk" },
     { name = "geoip2" },
     { name = "greenlet" },
+    { name = "nla-ml", extra = ["sklearn"] },
     { name = "numpy" },
     { name = "pandas" },
     { name = "psycopg", extra = ["binary"] },
@@ -230,7 +231,6 @@ dependencies = [
     { name = "pyjwt" },
     { name = "redis", extra = ["hiredis"] },
     { name = "resend", extra = ["async"] },
-    { name = "scikit-learn" },
     { name = "sqlalchemy" },
 ]
 
@@ -251,6 +251,7 @@ requires-dist = [
     { name = "fastapi-redis-sdk", specifier = ">=0.9.0" },
     { name = "geoip2", specifier = ">=5.3.0" },
     { name = "greenlet", specifier = ">=3.5.6" },
+    { name = "nla-ml", extras = ["sklearn"], editable = "ml" },
     { name = "numpy", specifier = ">=2.5.4" },
     { name = "pandas", specifier = ">=3.0.6" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.6" },
@@ -260,7 +261,6 @@ requires-dist = [
     { name = "pyjwt", specifier = ">=2.15.1" },
     { name = "redis", specifier = ">=8.1.0" },
     { name = "resend", extras = ["async"], specifier = ">=2.49.1" },
-    { name = "scikit-learn", specifier = ">=1.9.1" },
     { name = "sqlalchemy", specifier = ">=2.1.4" },
 ]
 
@@ -973,6 +973,31 @@ sdist = { url = "https://files.pythonhosted.org/packages/62/3c/c4ef2164a71c1a63d
 wheels = [
     { url = "https://files.pythonhosted.org/packages/48/ca/36339329c4604adbcc99c899b7eb1ce1a555c499b6a6860757dc9bfed36d/narwhals-2.22.1-py3-none-any.whl", hash = "sha256:60567d774edf77db53906f89d9fbd164e66e56d66d388e1e6990f17ac33cfb53", size = 454815, upload-time = "2026-06-05T12:34:32.289Z" },
 ]
+
+[[package]]
+name = "nla-ml"
+version = "0.1.0"
+source = { editable = "ml" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pandas" },
+]
+
+[package.optional-dependencies]
+sklearn = [
+    { name = "scikit-learn" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "numpy", specifier = ">=1.26" },
+    { name = "pandas", specifier = ">=2.0" },
+    { name = "scikit-learn", marker = "extra == 'sklearn'", specifier = "==1.9.1" },
+]
+provides-extras = ["sklearn"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=8.0" }]
 
 [[package]]
 name = "numpy"

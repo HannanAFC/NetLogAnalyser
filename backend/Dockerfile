@@ -14,6 +14,8 @@ ARG APP_VERSION=0.0.0
 ENV APP_VERSION=${APP_VERSION}
 
 COPY pyproject.toml uv.lock ./
+# nla-ml is a path dependency, so it must be present before uv sync
+COPY ml/ ./ml/
 RUN uv sync --frozen
 
 COPY . .

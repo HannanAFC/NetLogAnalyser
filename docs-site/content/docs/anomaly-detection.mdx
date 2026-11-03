@@ -21,7 +21,7 @@ Each heuristic produces its own score from 0 to 1.
 
 | Heuristic | Fires when | Example reason |
 |---|---|---|
-| `packet_size` | Packet is larger than the MTU (1500 B), reaching 1.0 at the jumbo limit (9000 B); or tiny, at or under 40 B | "Packet size 9000B is unusually large" |
+| `packet_size` | Packet is larger than the MTU (1500 B), reaching 1.0 at the jumbo limit (9000 B); or tiny, under 40 B (the size of a bare TCP/IPv4 packet). Sizes are IP total length | "Packet size 9000B is unusually large" |
 | `tcp_flags` | TCP packet has no flags, all of FIN+PSH+URG (an "XMAS" scan), or an invalid pair (SYN+FIN, SYN+RST) | "Packet contains XMAS flags" |
 | `port_protocol_mismatch` | A well-known port is used with the wrong protocol, or ICMP has non-zero ports | "Port 22 is expected to use TCP, not UDP" |
 

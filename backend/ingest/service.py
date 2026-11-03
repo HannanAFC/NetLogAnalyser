@@ -15,6 +15,7 @@ from pydantic import ValidationError
 from sqlalchemy import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from nla_ml.features import featurize
 
 
 async def insert_log_entries(
