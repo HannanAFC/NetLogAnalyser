@@ -104,6 +104,14 @@ class Settings( BaseSettings ):
     anomaly_weight_port_scan_shape:      float = Field( ge=0.0, le=1.0, default=0.7 )
     anomaly_weight_host_sweep_shape:     float = Field( ge=0.0, le=1.0, default=0.6 )
 
+    # ML scoring
+    ml_enabled:                          bool = False
+    ml_model_dir:                        str = "shared/models"
+    ml_models:                           list[ Literal[ "rf", "iforest" ] ] = [ "rf", "iforest" ]
+    ml_inference_threads:                int = Field( ge=1, default=2 )
+    ml_weight_rf:                        float = Field( ge=0.0, le=1.0, default=0.5 )
+    ml_weight_iforest:                   float = Field( ge=0.0, le=1.0, default=0.5 )
+
     # Analytics endpoint
     analytics_max_range_days:            int = 30
     analytics_summary_expire_seconds:    int = 30
@@ -138,6 +146,14 @@ class Settings( BaseSettings ):
                 "users would be locked out permanently. Set RESEND_API_KEY, or "
                 "set EMAIL_VERIFICATION_ENABLED=false to skip verification."
             )
+        return self
+
+    @model_validator( mode="after" )
+    def _check_ml_config( self ) -> "Settings":
+        if self.ml_enabled and not self.ml_models:
+            raise ValueError( "ML_ENABLED=true requires at least one model in ML_MODELS, e.g. [\"rf\",\"iforest\"]" )
+        if len( set( self.ml_models ) ) != len( self.ml_models ):
+            raise ValueError( "ML_MODELS must not list a model twice" )
         return self
 
     @model_validator( mode="after" )

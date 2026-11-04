@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from geoip import close_geoip, init_geoip
 from ingest import router as ingest_router
+from ingest.ml import close_ml, init_ml
 from logging_config import configure_logging
 from logs import router as logs_router
 from redis_fastapi import FastAPIRedis
@@ -34,11 +35,12 @@ verify_export_storage( )
 @asynccontextmanager
 async def lifespan( _app: FastAPI ):
     # startup
+    configure_logging( )
+    init_ml( )
     init_redis( )
     init_geoip( )
     start_pubsub_listener( new_redis_client )
     await init_arq_pool( )
-    configure_logging( )
 
     yield
 
@@ -47,6 +49,7 @@ async def lifespan( _app: FastAPI ):
     await close_redis( )
     await close_arq_pool( )
     close_geoip( )
+    close_ml( )
     await engine.dispose( )
 
 

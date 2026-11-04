@@ -137,7 +137,9 @@ _WEIGHTS = {
     "tcp_flags":              settings.anomaly_weight_tcp_flags,
     "port_protocol_mismatch": settings.anomaly_weight_mismatch_ports,
     "port_scan_shape":        settings.anomaly_weight_port_scan_shape,
-    "host_sweep_shape":       settings.anomaly_weight_host_sweep_shape
+    "host_sweep_shape":       settings.anomaly_weight_host_sweep_shape,
+    "ml_rf":                  settings.ml_weight_rf,
+    "ml_iforest":             settings.ml_weight_iforest
 }
 
 def _score_batch_heuristics( rows: list[ dict[ str, Any ] ] ) -> list[ list[ HeuristicResult ] ]:

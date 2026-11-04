@@ -1,24 +1,23 @@
-# nla-ml
+# nla-ml - NetLogAnalyser ML Dependency
 
-Feature extraction shared by the NetLogAnalyser backend and the Kaggle notebooks that train its
+This is a feature extraction dependency shared by the NetLogAnalyser backend and the Kaggle notebooks that train its
 anomaly models (Random Forest and Isolation Forest).
 
-The backend (at ingest) and the notebooks (at training) both call `featurize()`, so a model only
-ever sees features that production can compute from a real ingest request.
+The backend (at ingest) and the notebooks (at training) both call `featurize()`, so a model is only trained on and sees features that the backend can produce from an ingest request.
 
 ```python
 from nla_ml.compat import assert_compatible, assert_sklearn_version, feature_spec
 from nla_ml.features import featurize, featurize_frame
 
-X = featurize( scoring_inputs )        # list of entry dicts -> DataFrame[FEATURE_COLUMNS]
-X = featurize_frame( adapted_df )      # DataFrame of entries -> same, index preserved for labels
+X = featurize( scoring_inputs )        # list of entry dicts to DataFrame[FEATURE_COLUMNS]
+X = featurize_frame( adapted_df )      # DataFrame of entries remains as DataFrame, index preserved for labels
 
 metadata = { **feature_spec( ), ... }  # notebook: write into the model's metadata.json
 assert_compatible( metadata )          # backend: refuse a model trained on other features
 assert_sklearn_version( )              # both: installed scikit-learn must be the pinned one
 ```
 
-## What goes in, what comes out
+## What goes in and what comes out
 
 **Inputs** (`INPUT_FIELDS`) are the fields of the ingest API's `LogEntryCreate`: `src_ip`, `dst_ip`,
 `src_port`, `dst_port`, `protocol`, `packet_size_bytes`, `flags`. Any other key on an entry or
@@ -40,9 +39,7 @@ test checks that every input field still exists on `LogEntryCreate`.
 | `flags_present` | 1 if a flags string was sent at all. `","` and `""` give `flags_present=1, flag_count=0`, which is the "malformed/empty flags" signal the heuristic uses |
 | `src_is_private` / `dst_is_private` | Python's `ipaddress` `is_private`. The IP itself is discarded |
 
-Invalid entries (unknown protocol, out-of-range port, bad IP, missing field) raise `KeyError` / `TypeError` /
-`ValueError`; `featurize()` re-raises them as `ValueError` naming the entry index. They never get a default value. In production `LogEntryCreate`
-has already validated them. In notebooks, the dataset adapter should drop them first.
+Invalid entries via datasets are rejected and fail, so adaptors for datasets which are made to train models need to drop invalid entries before hand. For the ingest endpoint, validation is performed already.
 
 `is_private` follows the IANA special-purpose registries. It counts documentation, benchmarking
 and reserved ranges (192.0.2.0/24, 198.18.0.0/15, 240.0.0.0/4, 2001:db8::/32, ...) as private,
@@ -87,7 +84,7 @@ The Dockerfile copies `ml/` before `uv sync`.
 **Kaggle:** install from a pinned commit, never a branch:
 
 ```
-!pip install "nla-ml[sklearn] @ git+https://github.com/HannanAFC/NetLogAnalyser@<sha>#subdirectory=backend/ml"
+!pip install "nla-ml[sklearn] @ git+https://github.com/HannanAFC/NetLogAnalyser.git@<sha>#subdirectory=backend/ml"
 ```
 
 The `[sklearn]` extra installs exactly the pinned scikit-learn, replacing Kaggle's preinstalled one.
@@ -96,13 +93,52 @@ Restart the kernel after installing, then call `assert_sklearn_version()` before
 **Tests:** `uv run pytest ml/tests` from `backend/` (also included in the backend's normal `pytest`
 run). They need no database or `.env`.
 
-## Decisions (Phase 0)
+## Models
 
-| Decision | Status |
-|---|---|
-| Python floor | `>=3.13`. Kaggle runs 3.13.15, the backend 3.14. Tests pass on both. |
-| `packet_size_bytes` definition | **IP total length** (IPv4 Total Length; IPv6 40 + Payload Length). Matches the heuristic thresholds (MTU 1500, jumbo 9000, tiny < 40 = smaller than a bare TCP/IPv4 packet). The CIC-IDS2017 adapter must produce this. Documented in the API schema and `sending-logs.mdx`. |
-| Private-address check | Python's `is_private`, with the probe in the fingerprint (see above). |
-| scikit-learn pin | `==1.9.1`: the latest release (2026-09-10), already in the backend lockfile, with wheels for cp313 (Kaggle) and cp314 (backend, Linux and macOS arm64). Needs numpy ≥ 1.24.1 and scipy ≥ 1.10. |
-| Model artifact format | `joblib` for v1. ONNX later. |
-| Kaggle internet access | **TODO:** enable it (needs a phone-verified account) so notebooks can `pip install` from GitHub. |
+`nla_ml.inference` saves, loads and scores model artifacts. An artifact is a directory with
+`model.joblib` and `metadata.json` (`feature_spec()` + `model_type`, `model_version`,
+`model_sha256`, `created_at`, plus `calibration` for Isolation Forests and any `extra` you pass).
+
+```python
+from nla_ml.inference import calibrate_iforest, export_model, load_model
+
+# notebook: fit on featurize() output so the model records FEATURE_COLUMNS
+export_model( rf, "rf", "out/rf", model_version="2026-11-rf-1", extra={ "dataset_version": 3 } )
+export_model( iforest, "iforest", "out/iforest", model_version="2026-11-if-1",
+              calibration=calibrate_iforest( iforest, X_benign_val ) )
+
+model  = load_model( "out/rf", "rf" )   # raises ModelLoadError on any problem
+scores = model.score( featurize( entries ) )   # float64 in [0, 1], higher = more anomalous
+```
+
+`load_model` refuses an artifact if: a file is missing; the scikit-learn version, feature version,
+fingerprint or columns don't match; `model.joblib` doesn't match `model_sha256` (checked **before**
+unpickling); the estimator isn't a `RandomForestClassifier` / `IsolationForest` fitted on
+`FEATURE_COLUMNS`; the RF wasn't trained on labels 0/1; the IF calibration is missing or invalid; or a
+smoke-test prediction isn't a finite score in [0, 1]. It also sets `n_jobs=1`, because the backend
+already runs predictions on its own thread pool. Only load artifacts you made: unpickling runs code.
+
+**Scores:** RF = `predict_proba` for class 1. IF = `-decision_function`, mapped linearly so that
+`calibration.low` → 0 and `calibration.high` → 1, then clipped. `calibrate_iforest` sets low/high to
+the 50th / 99.9th percentile of the raw scores on the data you give it (use benign validation data).
+
+**In the backend** (`ingest/ml.py`):
+- Models load at startup from `ML_MODEL_DIR/<name>/` for each name in `ML_MODELS`. With
+  `ML_ENABLED=true`, any load failure **stops startup**. It runs before Redis and the other services
+  connect.
+- Each ingest batch is featurized once and scored by every model on a dedicated thread pool
+  (`ML_INFERENCE_THREADS`, default 2), off the event loop. A full 500-row batch takes about 10 ms
+  with the dummy models (featurize 3 ms, RF 2 ms, IF 5 ms on 4 cores).
+- Each row gets `ml_rf` / `ml_iforest` results in the noisy-OR, weighted by `ML_WEIGHT_RF` /
+  `ML_WEIGHT_IFOREST`, shown in `anomaly_reasons` as e.g. `rf model 2026-11-rf-1: 0.93`.
+- If scoring fails at runtime, the error is logged and the batch is stored with heuristic scores
+  only, so ingest never drops logs because of ML.
+- The repo's `models/` folder is mounted read-only at `/app/shared/models` (dev and self-host compose).
+
+**Dummy models**, for testing the plumbing (their accuracy is meaningless: the generator labels
+packets with the heuristics' own rules):
+
+```
+cd backend && uv run python ml/scripts/train_dummy.py --out ../models
+# then set ML_ENABLED=true and restart the backend
+```

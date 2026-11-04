@@ -17,7 +17,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from collections.abc import Iterable, Mapping
+from collections.abc import Mapping
 from typing import Any
 
 import numpy as np

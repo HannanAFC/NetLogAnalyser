@@ -66,7 +66,7 @@ else
 fi
 
 echo "Installing NetLogAnalyser (${REF}) into ./${INSTALL_DIR}"
-mkdir -p "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR/models"
 cd "$INSTALL_DIR"
 
 # Fetch a file from selfhost/ at the resolved ref. Only overwrites the local

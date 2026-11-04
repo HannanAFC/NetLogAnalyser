@@ -3,6 +3,7 @@ from dataclasses import asdict
 from api_keys.schemas import APIKeyCacheEntry
 from geoip import lookup_country
 from ingest.anomaly import _score_batch_heuristics, compute_anomaly_score
+from ingest.ml import score_batch_ml
 from ingest.schemas import (
     IngestBatchRequest,
     IngestBatchResponse,
@@ -15,7 +16,6 @@ from pydantic import ValidationError
 from sqlalchemy import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from nla_ml.features import featurize
 
 
 async def insert_log_entries(
@@ -75,8 +75,10 @@ async def ingest_batch( db: AsyncSession, api_key: APIKeyCacheEntry, payload: In
             "dst_geo_status":   dst_geo_status
         } )
 
-    # Do batch level heuristics first
+    # Do batch level heuristics first, then ML scores (on a worker thread, empty if ML is off)
     batch_extras = _score_batch_heuristics( scoring_inputs )
+    ml_extras    = await score_batch_ml( scoring_inputs )
+    batch_extras = [ batch + ml for batch, ml in zip( batch_extras, ml_extras ) ]
 
     # Phase 3: now that score + reasons are knowable, construct the final,
     # immutable row in one shot. Forgetting a required field here is a

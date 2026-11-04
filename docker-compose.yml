@@ -46,6 +46,7 @@ services:
     volumes:
       - export_data:/app/data/exports
       - geoip-data:/app/shared/geoip
+      - ./models:/app/shared/models:ro
     networks:
       - NetLogAnalyser-Network
     restart: unless-stopped
