@@ -93,6 +93,30 @@ Restart the kernel after installing, then call `assert_sklearn_version()` before
 **Tests:** `uv run pytest ml/tests` from `backend/` (also included in the backend's normal `pytest`
 run). They need no database or `.env`.
 
+## Heuristics
+
+`nla_ml.heuristics` holds the production anomaly heuristics as pure functions. The backend's
+`ingest/anomaly.py` is a thin wrapper that builds a `HeuristicConfig` from its `ANOMALY_*` settings,
+so notebooks score with the same code as production, with no `.env` or database:
+
+```python
+from nla_ml.heuristics import HeuristicConfig, score_entries
+
+config = HeuristicConfig( )                     # defaults == the backend's ANOMALY_* defaults (tested)
+scores, reasons = score_entries( entries, config, batch_size=50 )
+baseline = { "heuristics": config.as_dict( ), "batch_size": 50 }   # record next to results
+```
+
+- **Per entry:** `score_packet_size`, `score_tcp_flags`, `score_port_protocol_mismatch`.
+- **Per batch:** `score_batch_heuristics` (port-scan / host-sweep shape per `src_ip` *within one
+  ingest batch*). Results depend on how entries are batched, so `score_entries` replays them in order
+  in batches of `batch_size` (log_sender's default is 50; the API allows 500). Keep it fixed across
+  comparisons, and note that real clients batch differently.
+- **Combined:** `combine_scores` / `compute_anomaly_score` apply the weighted noisy-OR. A result with no
+  weight counts at 1.0.
+- To compare with a deployment that has custom settings, pass a `HeuristicConfig` with its values
+  (the backend's `ingest.anomaly.heuristic_config()` returns the live one).
+
 ## Models
 
 `nla_ml.inference` saves, loads and scores model artifacts. An artifact is a directory with
