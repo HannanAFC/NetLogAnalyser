@@ -93,6 +93,48 @@ Restart the kernel after installing, then call `assert_sklearn_version()` before
 **Tests:** `uv run pytest ml/tests` from `backend/` (also included in the backend's normal `pytest`
 run). They need no database or `.env`.
 
+## Dataset adapters
+
+`nla_ml.adapters.cicids2017_packets` turns rows of the CIC-IDS2017 **Packet-Fields** subset
+(`rdpahalavan/CIC-IDS2017` on Hugging Face, via `nids-datasets`) into API entries plus a separate
+labels frame:
+
+```python
+from huggingface_hub import HfFileSystem
+from nla_ml.adapters.cicids2017_packets import adapt_packet_fields, read_packet_fields
+
+with HfFileSystem( ).open( "datasets/rdpahalavan/CIC-IDS2017/Packet-Fields/Packet_Fields_File_3.parquet", "rb" ) as f:
+    raw = read_packet_fields( f )          # only the ~11 columns the adapter needs
+adapted = adapt_packet_fields( raw )       # .entries (API fields, index=packet_id), .labels, .dropped
+X = featurize_frame( adapted.entries )     # same index, so adapted.labels lines up
+```
+
+| Source column | Entry field | Notes |
+|---|---|---|
+| `source_ip` / `destination_ip` | `src_ip` / `dst_ip` | |
+| `source_port` / `destination_port` | `src_port` / `dst_port` | 0 for non-TCP/UDP |
+| `protocol` (+ `IP proto`) | `protocol` | `tcp`/`udp` → TCP/UDP; `icmp` in either column → ICMP; else OTHER |
+| `IP len` | `packet_size_bytes` | IPv4 Total Length = our definition, unchanged. (`IP length` is an IP *option* field: not used) |
+| `TCP flags` | `flags` | scapy letters → names in header-bit order: `PA` → `PSH,ACK`, `SEC` → `SYN,ECE,CWR`, `N` = NS |
+| `attack_label` | labels `attack`, `is_attack` | never put in the entry |
+| `packet_id` / `flow_id` | index / labels `flow_id` | `packet_id` is capture order |
+
+**Dropped rows** (counted in `.dropped`): `no_ip_layer` (ARP), `unknown_tcp_flag`,
+`flags_too_long` (over the API's 20-character limit, i.e. 6+ flags), `bad_port`, `bad_size`, `bad_ip`.
+
+**No timestamps** in this subset: `to_log_entries()` (full `LogEntryCreate` dicts for validation or
+replay) sets a synthetic `captured_at` = 3 July 2017 + `packet_id` µs, which keeps the order and
+nothing else. v1 features don't use time; window features (Phase 7) will need real timestamps.
+
+**Memory:** each file is one huge Parquet row group (file 3: 3.56 M rows, 16.7 GB uncompressed), and
+Parquet reads a whole row group at once. Always read a column subset (`read_packet_fields` does);
+reading every column, e.g. `nids_datasets`' `to_pandas()`, runs out of memory. File 3 takes about
+30 s and ~4 GB to adapt and featurize.
+
+Tests: `tests/test_ml_adapter_cicids2017.py` (hand-written expectations for real rows from file 3 plus
+marked synthetic edge cases) and the backend's `tests/test_ml_adapter.py` (every output passes the
+real `LogEntryCreate`; flags limit and protocols match the schema).
+
 ## Heuristics
 
 `nla_ml.heuristics` holds the production anomaly heuristics as pure functions. The backend's

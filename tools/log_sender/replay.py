@@ -78,7 +78,7 @@ def _coerce_row( raw: dict[ str, Any ], field_map: dict[ str, str ] | None ) -> 
 
     flags = raw.get( "flags" )
     if flags not in ( None, "" ):
-        entry[ "flags" ] = str( flags )[ :20 ]
+        entry[ "flags" ] = str( flags )[ :64 ]
 
     raw_payload = raw.get( "raw_payload" )
     if isinstance( raw_payload, str ):

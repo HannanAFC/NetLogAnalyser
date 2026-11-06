@@ -123,7 +123,7 @@ class LogEntry( Base ):
     dst_port:          Mapped[ int ]          = mapped_column( Integer )
     protocol:          Mapped[ str ]          = mapped_column( ENUM( "TCP", "UDP", "ICMP", "OTHER", name="protocol_enum" ), index=True )
     packet_size_bytes: Mapped[ int ]          = mapped_column( )
-    flags:             Mapped[ str | None ]   = mapped_column( String( 20 ), nullable=True )
+    flags:             Mapped[ str | None ]   = mapped_column( String( 64 ), nullable=True )
     src_country_code:  Mapped[ str | None ]   = mapped_column( String( 2 ), nullable=True )
     dst_country_code:  Mapped[ str | None ]   = mapped_column( String( 2 ), nullable=True )
     src_geo_status:    Mapped[ GeoStatus ]    = mapped_column( ENUM( GeoStatus, name="geo_status" ), nullable=False, index=True )

@@ -31,7 +31,7 @@ Requests with a missing, unknown or revoked key are rejected.
 | `dst_port` | integer | yes | 0–65535 |
 | `protocol` | string | yes | One of `TCP`, `UDP`, `ICMP`, `OTHER` |
 | `packet_size_bytes` | integer | yes | 0 or greater. The **IP total length**: the IPv4 Total Length field, or 40 + Payload Length for IPv6. Don't include link-layer headers (e.g. Ethernet's 14 bytes) |
-| `flags` | string | no | Comma-separated TCP flags, e.g. `"SYN,ACK"`. Max 20 characters |
+| `flags` | string | no | Comma-separated TCP flags, e.g. `"SYN,ACK"`. Max 64 characters |
 | `raw_payload` | object | yes | Any JSON object you want to keep alongside the entry. Use `{}` if you have nothing |
 | `captured_at` | string | yes | ISO 8601 timestamp of when the packet was **captured** |
 

@@ -68,7 +68,7 @@ def generate_entry( cfg: SyntheticConfig, *, now: datetime | None = None ) -> di
     if protocol == "TCP":
         flags = _tcp_flags( anomalous )
         if flags:
-            entry[ "flags" ] = flags[ :20 ]
+            entry[ "flags" ] = flags[ :64 ]
 
     return entry
 

@@ -28,7 +28,7 @@ class LogEntryCreate( BaseModel ):
     dst_port:          int = Field( ge=0, le=65535 )
     protocol:          ProtocolEnum
     packet_size_bytes: int = Field( ge=0, description="IP total length: the IPv4 Total Length field, or 40 + Payload Length for IPv6. Excludes link-layer headers." )
-    flags:             str | None = Field( default=None, max_length=20 )
+    flags:             str | None = Field( default=None, max_length=64 )
     raw_payload:       dict
     captured_at:       datetime
 
