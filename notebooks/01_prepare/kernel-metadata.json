@@ -1,0 +1,15 @@
+{
+  "id": "hannana06/nla-01-prepare-cicids2017",
+  "title": "NLA 01 Prepare CIC-IDS2017",
+  "code_file": "01_prepare.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

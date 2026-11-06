@@ -17,6 +17,7 @@ from nla_ml.adapters.cicids2017_packets import (
     SOURCE_COLUMNS,
     adapt_packet_fields,
     convert_tcp_flags,
+    read_prepared,
     to_log_entries,
 )
 from nla_ml.features import FEATURE_COLUMNS, INPUT_FIELDS, featurize_frame
@@ -147,3 +148,15 @@ def test_to_log_entries( adapted ):
     times = [ e[ "captured_at" ] for e in entries ]
     assert times == sorted( times )  # capture order preserved
     assert not any( "attack" in json.dumps( e ) or "BENIGN" in json.dumps( e ) for e in entries )
+
+
+def test_read_prepared_restores_none_flags( adapted, tmp_path ):
+    pytest.importorskip( "pyarrow" )
+    path = tmp_path / "prepared.parquet"
+    adapted.entries.join( adapted.labels ).reset_index( ).to_parquet( path, index=False )
+    frame = read_prepared( path )
+    assert frame.loc[ frame[ "packet_id" ] == 9000002, "flags" ].item( ) is None   # UDP row
+    assert frame.loc[ frame[ "packet_id" ] == 9000008, "flags" ].item( ) == ""     # TCP with no flags stays ""
+    entries = frame[ list( ENTRY_COLUMNS ) ].to_dict( orient="records" )
+    scores, _ = score_entries( entries )   # heuristics must accept what comes back
+    assert len( scores ) == adapted.kept

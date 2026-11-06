@@ -119,6 +119,9 @@ X = featurize_frame( adapted.entries )     # same index, so adapted.labels lines
 | `attack_label` | labels `attack`, `is_attack` | never put in the entry |
 | `packet_id` / `flow_id` | index / labels `flow_id` | `packet_id` is capture order |
 
+**Prepared files** (written by `notebooks/01_prepare`) should be loaded with `read_prepared( path )`.
+It restores missing `flags` to `None`: pandas 3 reads them back as NaN, which the API rejects on replay.
+
 **Dropped rows** (counted in `.dropped`): `no_ip_layer` (ARP), `unknown_tcp_flag`,
 `flags_too_long` (over the API's 20-character limit, i.e. 6+ flags), `bad_port`, `bad_size`, `bad_ip`.
 

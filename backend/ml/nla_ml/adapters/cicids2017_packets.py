@@ -239,3 +239,16 @@ def read_packet_fields( source: Any, columns: tuple[ str, ... ] = SOURCE_COLUMNS
     if missing:
         raise KeyError( f"file is missing column(s): { ', '.join( missing ) }" )
     return parquet.read( columns=[ c for c in columns if c in present ] ).to_pandas( )
+
+
+def read_prepared( source: Any, columns: list[ str ] | None = None ) -> pd.DataFrame:
+    """
+    Read a file written by the 01_prepare notebook (entries + labels), restoring `flags` to
+    Python str/None. Use before `to_log_entries`.
+    """
+    frame = pd.read_parquet( source, columns=columns )
+    if "flags" in frame.columns:
+        flags = frame[ "flags" ].to_numpy( dtype=object )
+        flags[ pd.isna( flags ) ] = None
+        frame[ "flags" ] = pd.Series( flags, index=frame.index, dtype=object )
+    return frame
