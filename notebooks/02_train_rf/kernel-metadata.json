@@ -1,0 +1,15 @@
+{
+  "id": "hannana06/nla-02-train-rf",
+  "title": "NLA 02 Train RF",
+  "code_file": "02_train_rf.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [ "hannana06/nla-cicids2017-prepared" ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
